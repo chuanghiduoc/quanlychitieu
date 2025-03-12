@@ -55,17 +55,26 @@ public class MainActivity extends AppCompatActivity {
         // Thêm listener để không làm nổi bật BottomNavigationView khi điều hướng
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.loginFragment ||
-                    destination.getId() == R.id.registerFragment ||
-                    destination.getId() == R.id.profileFragment) {
-                // Nếu đang ở màn hình đăng nhập, đăng ký hoặc profile, giữ nguyên hiển thị
-                binding.navView.setVisibility(View.VISIBLE);
-                // Đặt ID không hợp lệ để không làm nổi bật
-                binding.navView.setSelectedItemId(-1); // Hoặc có thể chọn một item không phải là một trong các item hiện có
+                    destination.getId() == R.id.registerFragment) {
+                // Ẩn bottom navigation ở màn hình đăng nhập và đăng ký
+                binding.navView.setVisibility(View.GONE);
+
+                // Ẩn FAB (nếu cần)
+                binding.fabAddTransaction.setVisibility(View.GONE);
             } else {
+                // Hiển thị bottom navigation ở các màn hình khác
                 binding.navView.setVisibility(View.VISIBLE);
-                binding.navView.setSelectedItemId(destination.getId());
+
+                // Chỉ hiển thị FAB ở một số màn hình cụ thể (nếu cần)
+                if (destination.getId() == R.id.navigation_dashboard ||
+                        destination.getId() == R.id.navigation_transactions) {
+                    binding.fabAddTransaction.setVisibility(View.VISIBLE);
+                } else {
+                    binding.fabAddTransaction.setVisibility(View.GONE);
+                }
             }
         });
+
 
         // Setup FAB click listener
         binding.fabAddTransaction.setOnClickListener(v -> {
