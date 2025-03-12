@@ -1,29 +1,27 @@
 package com.example.quanlychitieu.ui.dashboard;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavOptions;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.adapter.TransactionAdapter;
+import com.example.quanlychitieu.auth.ProfileActivity;
 import com.example.quanlychitieu.databinding.FragmentDashboardBinding;
-import com.example.quanlychitieu.data.model.Transaction;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class DashboardFragment extends Fragment {
@@ -32,6 +30,8 @@ public class DashboardFragment extends Fragment {
     private DashboardViewModel dashboardViewModel;
     private TransactionAdapter recentTransactionsAdapter;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+    private static final String TAG = "DashboardFragment";
+    private NavController navController;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,30 +43,36 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ViewModel
+        // Khởi tạo NavController
+        navController = Navigation.findNavController(view);
+        // Khởi tạo ViewModel một lần
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
-        // Setup recent transactions RecyclerView
+        // Thiết lập RecyclerView cho các giao dịch gần đây
         setupRecentTransactionsRecyclerView();
 
-        // Setup click listener for "View All" transactions
+        // Thiết lập click listener cho "View All" giao dịch
         binding.viewAllTransactions.setOnClickListener(v -> {
-            NavOptions navOptions = new NavOptions.Builder()
-                    .setPopUpTo(R.id.navigation_dashboard, false)
-                    .build();
-
-            Navigation.findNavController(view).navigate(R.id.navigation_transactions, null, navOptions);
+            // Chuyển đến Transactions không xoá back stack
+            navController.navigate(R.id.action_dashboard_to_transactions, null);
         });
 
-        // Setup click listener for profile image
+        // Thiết lập click listener cho hình ảnh profile
         binding.profileImage.setOnClickListener(v -> {
-            Navigation.findNavController(view).navigate(R.id.profileFragment);
+            try {
+                // Start ProfileActivity instead of navigating to a fragment
+                Intent intent = new Intent(requireActivity(), ProfileActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "Navigation to profile failed: " + e.getMessage(), e);
+            }
         });
 
-        // Observe financial data
+
+        // Quan sát dữ liệu tài chính
         observeFinancialData();
 
-        // Observe recent transactions
+        // Quan sát các giao dịch gần đây
         observeRecentTransactions();
     }
 
@@ -74,25 +80,22 @@ public class DashboardFragment extends Fragment {
         RecyclerView recyclerView = binding.recentTransactionsRecycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Initialize adapter
+        // Khởi tạo adapter
         recentTransactionsAdapter = new TransactionAdapter();
         recyclerView.setAdapter(recentTransactionsAdapter);
     }
 
     private void observeFinancialData() {
-        // Observe income
         dashboardViewModel.getIncome().observe(getViewLifecycleOwner(), income -> {
             String formattedIncome = formatCurrency(income);
             binding.incomeAmount.setText(formattedIncome);
         });
 
-        // Observe expenses
         dashboardViewModel.getExpenses().observe(getViewLifecycleOwner(), expenses -> {
             String formattedExpenses = formatCurrency(expenses);
             binding.expenseAmount.setText(formattedExpenses);
         });
 
-        // Observe balance
         dashboardViewModel.getBalance().observe(getViewLifecycleOwner(), balance -> {
             String formattedBalance = formatCurrency(balance);
             binding.balanceAmount.setText(formattedBalance);

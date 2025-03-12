@@ -4,21 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.quanlychitieu.MainActivity;
 import com.example.quanlychitieu.R;
-import com.example.quanlychitieu.databinding.LoginFragmentBinding;
+import com.example.quanlychitieu.databinding.ActivityLoginBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -34,48 +28,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginFragment extends Fragment {
+public class LoginActivity extends AppCompatActivity {
 
-    private LoginFragmentBinding binding;
+    private ActivityLoginBinding binding;
     private FirebaseAuth auth;
     private GoogleSignInClient googleSignInClient;
-    private static final String TAG = "LoginFragment";
-    private NavController navController;
+    private static final String TAG = "LoginActivity";
     private FirebaseFirestore db;
-
-    private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == -1) { // RESULT_OK
-                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                    try {
-                        GoogleSignInAccount account = task.getResult(ApiException.class);
-                        if (account != null) {
-                            firebaseAuthWithGoogle(account.getIdToken());
-                        }
-                    } catch (ApiException e) {
-                        Log.w(TAG, "Google sign in failed", e);
-                        Toast.makeText(requireContext(), "Đăng nhập Google thất bại: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                        showLoading(false);
-                    }
-                } else {
-                    showLoading(false);
-                }
-            });
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = LoginFragmentBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        navController = Navigation.findNavController(view);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
@@ -87,14 +53,23 @@ public class LoginFragment extends Fragment {
                 .requestEmail()
                 .build();
 
-        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         // Set up click listeners
         binding.btnLogin.setOnClickListener(v -> loginWithEmailPassword());
         binding.btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
-        binding.tvRegister.setOnClickListener(v ->
-                navController.navigate(R.id.action_loginFragment_to_registerFragment));
+        binding.tvRegister.setOnClickListener(v -> navigateToRegister());
         binding.tvForgotPassword.setOnClickListener(v -> handleForgotPassword());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is already signed in
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            navigateToMainScreen();
+        }
     }
 
     private void loginWithEmailPassword() {
@@ -129,7 +104,7 @@ public class LoginFragment extends Fragment {
                     } else {
                         // If sign in fails, display a message to the user
                         Log.w(TAG, "signInWithEmail:failure", task.getException());
-                        Toast.makeText(requireContext(), "Đăng nhập thất bại: " +
+                        Toast.makeText(this, "Đăng nhập thất bại: " +
                                         (task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định"),
                                 Toast.LENGTH_SHORT).show();
                         showLoading(false);
@@ -145,8 +120,28 @@ public class LoginFragment extends Fragment {
 
             // Start Google sign in flow
             Intent signInIntent = googleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if (account != null) {
+                    firebaseAuthWithGoogle(account.getIdToken());
+                }
+            } catch (ApiException e) {
+                Log.w(TAG, "Google sign in failed", e);
+                Toast.makeText(this, "Đăng nhập Google thất bại: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                showLoading(false);
+            }
+        }
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
@@ -173,7 +168,7 @@ public class LoginFragment extends Fragment {
                     } else {
                         // If sign in fails, display a message to the user
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(requireContext(), "Đăng nhập Google thất bại: " +
+                        Toast.makeText(this, "Đăng nhập Google thất bại: " +
                                         (task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định"),
                                 Toast.LENGTH_SHORT).show();
                         showLoading(false);
@@ -220,11 +215,11 @@ public class LoginFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     showLoading(false);
                     if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(),
+                        Toast.makeText(this,
                                 "Email đặt lại mật khẩu đã được gửi đến " + email,
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(requireContext(),
+                        Toast.makeText(this,
                                 "Không thể gửi email đặt lại mật khẩu: " +
                                         (task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định"),
                                 Toast.LENGTH_LONG).show();
@@ -233,8 +228,14 @@ public class LoginFragment extends Fragment {
     }
 
     private void navigateToMainScreen() {
-        // Navigate to the main dashboard
-        navController.navigate(R.id.action_loginFragment_to_navigation_dashboard);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish(); // Close LoginActivity
+    }
+
+    private void navigateToRegister() {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 
     private void showLoading(boolean isLoading) {
@@ -245,22 +246,5 @@ public class LoginFragment extends Fragment {
         binding.tvForgotPassword.setEnabled(!isLoading);
         binding.etEmail.setEnabled(!isLoading);
         binding.etPassword.setEnabled(!isLoading);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in and update UI accordingly
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser != null) {
-            // User is already signed in, navigate to main screen
-            navigateToMainScreen();
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
     }
 }
