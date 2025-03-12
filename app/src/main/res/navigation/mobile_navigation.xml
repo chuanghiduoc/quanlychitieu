@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/loginFragment">
+
+    <!-- Màn hình đăng nhập -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.quanlychitieu.auth.LoginFragment"
+        android:label="Đăng nhập"
+        tools:layout="@layout/login_fragment">
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_loginFragment_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Màn hình đăng ký -->
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.quanlychitieu.auth.RegisterFragment"
+        android:label="Đăng ký"
+        tools:layout="@layout/register_fragment">
+        <action
+            android:id="@+id/action_registerFragment_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Màn hình Profile -->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.quanlychitieu.auth.ProfileFragment"
+        android:label="Tài khoản"
+        tools:layout="@layout/profile_fragment">
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@+id/navigation_dashboard"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+
+    <!-- Dashboard (Tổng quan) -->
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.example.quanlychitieu.ui.dashboard.DashboardFragment"
+        android:label="Tổng quan"
+        tools:layout="@layout/fragment_dashboard">
+
+        <action
+            android:id="@+id/action_dashboard_to_add_transaction"
+            app:destination="@id/navigation_add_edit_transaction" />
+
+        <action
+            android:id="@+id/action_dashboard_to_transactions"
+            app:destination="@id/navigation_transactions" />
+    </fragment>
+
+    <!-- Transactions (Giao dịch) -->
+    <fragment
+        android:id="@+id/navigation_transactions"
+        android:name="com.example.quanlychitieu.ui.transactions.TransactionsFragment"
+        android:label="Giao dịch"
+        tools:layout="@layout/fragment_transactions">
+        <argument
+            android:name="fromDashboard"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <action
+            android:id="@+id/action_transactions_to_add_transaction"
+            app:destination="@id/navigation_add_edit_transaction" />
+
+        <action
+            android:id="@+id/action_transactions_to_transaction_detail"
+            app:destination="@id/navigation_transaction_detail" />
+    </fragment>
+
+    <!-- Transaction Detail (Chi tiết giao dịch) -->
+    <fragment
+        android:id="@+id/navigation_transaction_detail"
+        android:name="com.example.quanlychitieu.ui.transactions.TransactionDetailFragment"
+        android:label="Chi tiết giao dịch"
+        tools:layout="@layout/fragment_transaction_detail">
+
+        <argument
+            android:name="transactionId"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_transaction_detail_to_edit_transaction"
+            app:destination="@id/navigation_add_edit_transaction" />
+    </fragment>
+
+    <!-- Add/Edit Transaction (Thêm/Sửa giao dịch) -->
+    <fragment
+        android:id="@+id/navigation_add_edit_transaction"
+        android:name="com.example.quanlychitieu.ui.transactions.AddEditTransactionFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_add_edit_transaction">
+
+        <argument
+            android:name="transactionId"
+            app:argType="string"
+            app:nullable="true" />
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue="Thêm giao dịch" />
+    </fragment>
+
+    <!-- Budget (Ngân sách) -->
+    <fragment
+        android:id="@+id/navigation_budget"
+        android:name="com.example.quanlychitieu.ui.budget.BudgetFragment"
+        android:label="Ngân sách"
+        tools:layout="@layout/fragment_budget">
+
+        <action
+            android:id="@+id/action_budget_to_add_budget"
+            app:destination="@id/navigation_add_edit_budget" />
+    </fragment>
+
+    <!-- Add/Edit Budget (Thêm/Sửa ngân sách) -->
+    <fragment
+        android:id="@+id/navigation_add_edit_budget"
+        android:name="com.example.quanlychitieu.ui.budget.AddEditBudgetFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_add_edit_budget">
+
+        <argument
+            android:name="budgetId"
+            app:argType="string"
+            app:nullable="true" />
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue="Thêm ngân sách" />
+    </fragment>
+
+    <!-- Statistics (Thống kê) -->
+    <fragment
+        android:id="@+id/navigation_statistics"
+        android:name="com.example.quanlychitieu.ui.statistics.StatisticsFragment"
+        android:label="Thống kê"
+        tools:layout="@layout/fragment_statistics" />
+
+    <!-- Reminders (Nhắc nhở) -->
+    <fragment
+        android:id="@+id/navigation_reminders"
+        android:name="com.example.quanlychitieu.ui.reminders.RemindersFragment"
+        android:label="Nhắc nhở"
+        tools:layout="@layout/fragment_reminders">
+
+        <action
+            android:id="@+id/action_reminders_to_add_reminder"
+            app:destination="@id/navigation_add_edit_reminder" />
+    </fragment>
+
+    <!-- Add/Edit Reminder (Thêm/Sửa nhắc nhở) -->
+    <fragment
+        android:id="@+id/navigation_add_edit_reminder"
+        android:name="com.example.quanlychitieu.ui.reminders.AddEditReminderFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_add_edit_reminder">
+
+        <argument
+            android:name="reminderId"
+            app:argType="string"
+            app:nullable="true" />
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue="Thêm nhắc nhở" />
+    </fragment>
+
+    <!-- Settings (Cài đặt) -->
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.example.quanlychitieu.ui.settings.SettingsFragment"
+        android:label="Cài đặt"
+        tools:layout="@layout/fragment_settings" />
+</navigation>
