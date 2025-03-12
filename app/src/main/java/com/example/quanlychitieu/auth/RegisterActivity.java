@@ -10,21 +10,15 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.quanlychitieu.MainActivity;
 import com.example.quanlychitieu.R;
-import com.example.quanlychitieu.databinding.RegisterFragmentBinding;
+import com.example.quanlychitieu.databinding.ActivityRegisterBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -44,57 +38,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterFragment extends Fragment {
+public class RegisterActivity extends AppCompatActivity {
 
-    private RegisterFragmentBinding binding;
+    private ActivityRegisterBinding binding;
     private FirebaseAuth auth;
     private GoogleSignInClient googleSignInClient;
-    private static final String TAG = "RegisterFragment";
-    private NavController navController;
+    private static final String TAG = "RegisterActivity";
     private FirebaseFirestore db;
     private Handler timeoutHandler;
     private Runnable timeoutRunnable;
-
-    private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == -1) { // RESULT_OK
-                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                    try {
-                        GoogleSignInAccount account = task.getResult(ApiException.class);
-                        if (account != null) {
-                            firebaseAuthWithGoogle(account.getIdToken());
-                        }
-                    } catch (ApiException e) {
-                        Log.w(TAG, "Google sign in failed", e);
-                        Toast.makeText(requireContext(), "Đăng nhập Google thất bại: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                        showLoading(false);
-                    }
-                } else {
-                    showLoading(false);
-                }
-            });
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = RegisterFragmentBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        navController = Navigation.findNavController(view);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        // Đảm bảo reCAPTCHA verification đã bị tắt
-        auth.getFirebaseAuthSettings().setAppVerificationDisabledForTesting(true);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -102,15 +65,15 @@ public class RegisterFragment extends Fragment {
                 .requestEmail()
                 .build();
 
-        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         // Set up click listeners
         binding.btnRegister.setOnClickListener(v -> registerWithEmailPassword());
         binding.btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
-        binding.tvLogin.setOnClickListener(v -> navController.navigateUp());
-        binding.ivBack.setOnClickListener(v -> navController.navigateUp());
+        binding.tvLogin.setOnClickListener(v -> navigateToLogin());
+        binding.ivBack.setOnClickListener(v -> navigateToLogin());
 
-        // Khởi tạo timeout handler
+        // Initialize timeout handler
         timeoutHandler = new Handler(Looper.getMainLooper());
     }
 
@@ -156,9 +119,9 @@ public class RegisterFragment extends Fragment {
             return;
         }
 
-        // Kiểm tra kết nối mạng
+        // Check network connectivity
         if (!isNetworkAvailable()) {
-            Toast.makeText(requireContext(),
+            Toast.makeText(this,
                     "Không có kết nối mạng. Vui lòng kiểm tra kết nối và thử lại.",
                     Toast.LENGTH_LONG).show();
             return;
@@ -173,14 +136,13 @@ public class RegisterFragment extends Fragment {
         // Show loading
         showLoading(true);
 
-        // Thiết lập timeout
+        // Set up timeout
         setupTimeout();
-
 
         // Create user with email and password
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
-                    // Hủy timeout
+                    // Cancel timeout
                     cancelTimeout();
 
                     if (task.isSuccessful()) {
@@ -203,7 +165,7 @@ public class RegisterFragment extends Fragment {
                                     });
                         }
                     } else {
-                        // Xử lý lỗi chi tiết
+                        // Handle detailed errors
                         String errorMessage = "Lỗi không xác định";
                         Exception exception = task.getException();
 
@@ -224,38 +186,35 @@ public class RegisterFragment extends Fragment {
                             }
                         }
 
-                        final String finalErrorMessage = errorMessage;
-                        Toast.makeText(requireContext(), "Đăng ký thất bại: " + finalErrorMessage,
+                        Toast.makeText(this, "Đăng ký thất bại: " + errorMessage,
                                 Toast.LENGTH_LONG).show();
                         showLoading(false);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Hủy timeout
+                    // Cancel timeout
                     cancelTimeout();
 
                     Log.e(TAG, "Registration failed with exception", e);
-                    Toast.makeText(requireContext(), "Đăng ký thất bại: " + e.getMessage(),
+                    Toast.makeText(this, "Đăng ký thất bại: " + e.getMessage(),
                             Toast.LENGTH_LONG).show();
                     showLoading(false);
                 });
     }
 
     private void setupTimeout() {
-        // Hủy timeout cũ nếu có
+        // Cancel old timeout if exists
         cancelTimeout();
 
-        // Tạo timeout mới
+        // Create new timeout
         timeoutRunnable = () -> {
-            if (binding != null) {
-                Toast.makeText(requireContext(),
-                        "Kết nối đến máy chủ quá lâu, vui lòng thử lại sau",
-                        Toast.LENGTH_LONG).show();
-                showLoading(false);
-            }
+            Toast.makeText(this,
+                    "Kết nối đến máy chủ quá lâu, vui lòng thử lại sau",
+                    Toast.LENGTH_LONG).show();
+            showLoading(false);
         };
 
-        // Đặt timeout 20 giây
+        // Set timeout to 20 seconds
         timeoutHandler.postDelayed(timeoutRunnable, 20000);
     }
 
@@ -265,40 +224,49 @@ public class RegisterFragment extends Fragment {
         }
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) requireContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            NetworkCapabilities capabilities = connectivityManager
-                    .getNetworkCapabilities(connectivityManager.getActiveNetwork());
-            return capabilities != null && (
-                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
-        }
-        return false;
-    }
-
     private void signInWithGoogle() {
         // Clear previous sign in
         googleSignInClient.signOut().addOnCompleteListener(task -> {
             // Show loading
             showLoading(true);
 
-            // Thiết lập timeout
+            // Set up timeout
             setupTimeout();
 
             // Start Google sign in flow
             Intent signInIntent = googleSignInClient.getSignInIntent();
-            googleSignInLauncher.launch(signInIntent);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if (account != null) {
+                    firebaseAuthWithGoogle(account.getIdToken());
+                }
+            } catch (ApiException e) {
+                // Cancel timeout
+                cancelTimeout();
+
+                Log.w(TAG, "Google sign in failed", e);
+                Toast.makeText(this, "Đăng nhập Google thất bại: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                showLoading(false);
+            }
+        }
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         auth.signInWithCredential(credential)
                 .addOnCompleteListener(task -> {
-                    // Hủy timeout
+                    // Cancel timeout
                     cancelTimeout();
 
                     if (task.isSuccessful()) {
@@ -321,24 +289,22 @@ public class RegisterFragment extends Fragment {
                     } else {
                         // If sign in fails, display a message to the user
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(requireContext(), "Đăng nhập Google thất bại: " +
+                        Toast.makeText(this, "Đăng nhập Google thất bại: " +
                                         (task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định"),
                                 Toast.LENGTH_SHORT).show();
                         showLoading(false);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    // Hủy timeout
+                    // Cancel timeout
                     cancelTimeout();
 
                     Log.e(TAG, "Google sign in failed with exception", e);
-                    Toast.makeText(requireContext(), "Đăng nhập Google thất bại: " + e.getMessage(),
+                    Toast.makeText(this, "Đăng nhập Google thất bại: " + e.getMessage(),
                             Toast.LENGTH_SHORT).show();
                     showLoading(false);
                 });
-    }
-
-    private void saveUserDataToFirestore(FirebaseUser user, String name) {
+    }    private void saveUserDataToFirestore(FirebaseUser user, String name) {
         Map<String, Object> userData = new HashMap<>();
         userData.put("displayName", name);
         userData.put("email", user.getEmail());
@@ -351,13 +317,13 @@ public class RegisterFragment extends Fragment {
                 .set(userData)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "User data saved to Firestore");
-                    Toast.makeText(requireContext(), "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                     navigateToMainScreen();
                 })
                 .addOnFailureListener(e -> {
                     Log.w(TAG, "Error saving user data", e);
                     // Still navigate to main screen even if saving data fails
-                    Toast.makeText(requireContext(),
+                    Toast.makeText(this,
                             "Đăng ký thành công nhưng không thể lưu thông tin người dùng",
                             Toast.LENGTH_SHORT).show();
                     navigateToMainScreen();
@@ -365,8 +331,27 @@ public class RegisterFragment extends Fragment {
     }
 
     private void navigateToMainScreen() {
-        // Navigate to the main dashboard
-        navController.navigate(R.id.action_registerFragment_to_navigation_dashboard);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish(); // Close RegisterActivity
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish(); // Close RegisterActivity
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+            return capabilities != null && (
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
+        }
+        return false;
     }
 
     private void showLoading(boolean isLoading) {
@@ -382,10 +367,9 @@ public class RegisterFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Đảm bảo hủy timeout khi fragment bị hủy
+    protected void onDestroy() {
+        super.onDestroy();
+        // Ensure timeout is canceled when activity is destroyed
         cancelTimeout();
-        binding = null;
     }
 }

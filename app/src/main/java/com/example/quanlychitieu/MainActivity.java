@@ -1,27 +1,46 @@
 package com.example.quanlychitieu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.quanlychitieu.auth.LoginActivity;
 import com.example.quanlychitieu.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
     private static final String TAG = "MainActivity";
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance();
+
+        // Check if user is logged in
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            // User is not logged in, redirect to LoginActivity
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -30,10 +49,14 @@ public class MainActivity extends AppCompatActivity {
                 .findFragmentById(R.id.nav_host_fragment_activity_main);
 
         if (navHostFragment == null) {
+            Log.e(TAG, "NavHostFragment not found");
             return;
         }
 
         navController = navHostFragment.getNavController();
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            Log.d("NavController", "Navigating to: " + destination.getId());
+        });
 
         // Define top-level destinations
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -41,10 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_transactions,
                 R.id.navigation_budget,
                 R.id.navigation_statistics,
-                R.id.navigation_reminders,
-                R.id.loginFragment, // Thêm màn hình đăng nhập vào top-level destinations
-                R.id.registerFragment, // Thêm màn hình đăng ký
-                R.id.profileFragment // Thêm màn hình profile
+                R.id.navigation_reminders
         ).build();
 
         BottomNavigationView navView = binding.navView;
@@ -52,18 +72,9 @@ public class MainActivity extends AppCompatActivity {
         // Setup bottom navigation handling
         setupBottomNavigation(navView);
 
-        // Thêm listener để không làm nổi bật BottomNavigationView khi điều hướng
+        // Handle navigation destination changes
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.loginFragment ||
-                    destination.getId() == R.id.registerFragment ) {
-                // Nếu đang ở màn hình đăng nhập, đăng ký hoặc profile, giữ nguyên hiển thị
-                binding.navView.setVisibility(View.GONE);
-                binding.fabAddTransaction.setVisibility(View.GONE);
-                // Đặt ID không hợp lệ để không làm nổi bật
-                binding.navView.setSelectedItemId(-1); // Hoặc có thể chọn một item không phải là một trong các item hiện có
-            } else {
-                binding.navView.setVisibility(View.VISIBLE);
-            }
+            handleDestinationChange(destination);
         });
 
         // Setup FAB click listener
@@ -87,6 +98,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void handleDestinationChange(NavDestination destination) {
+        Log.d(TAG, "Navigating to: " + destination.getId());
+        int destinationId = destination.getId();
+
+        // Only show FAB on dashboard and transactions screens
+        binding.fabAddTransaction.setVisibility(destinationId == R.id.navigation_dashboard ||
+                destinationId == R.id.navigation_transactions ? View.VISIBLE : View.GONE);
+    }
+
     private void setupBottomNavigation(BottomNavigationView bottomNavigationView) {
         // Set up bottom navigation with NavController
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
@@ -94,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
         // Handle reselection properly
         bottomNavigationView.setOnItemReselectedListener(item -> {
             int itemId = item.getItemId();
-
-            // When re-selecting the current tab, pop the back stack to the start destination
             if (navController.getCurrentDestination() != null &&
                     navController.getCurrentDestination().getId() == itemId) {
                 // Pop back stack to the start destination of this tab
@@ -105,27 +123,25 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle item selection with proper back stack handling
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            // Handle navigation with proper back stack management
             int itemId = item.getItemId();
-
-            // Check if we're navigating to a top-level destination
-            if (itemId == R.id.navigation_dashboard ||
-                    itemId == R.id.navigation_transactions ||
-                    itemId == R.id.navigation_budget ||
-                    itemId == R.id.navigation_statistics ||
-                    itemId == R.id.navigation_reminders) {
-
+            if (isTopLevelDestination(itemId)) {
                 // Pop back stack to the start destination if needed
                 if (navController.getCurrentDestination() != null &&
                         navController.getCurrentDestination().getId() != itemId) {
                     navController.popBackStack(itemId, false);
                 }
-
                 // Navigate to the selected destination
                 return NavigationUI.onNavDestinationSelected(item, navController);
             }
-
             return false;
         });
+    }
+
+    private boolean isTopLevelDestination(int itemId) {
+        return itemId == R.id.navigation_dashboard ||
+                itemId == R.id.navigation_transactions ||
+                itemId == R.id.navigation_budget ||
+                itemId == R.id.navigation_statistics ||
+                itemId == R.id.navigation_reminders;
     }
 }

@@ -3,74 +3,73 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/loginFragment">
+    app:startDestination="@+id/navigation_dashboard">
 
-    <!-- Màn hình đăng nhập -->
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.quanlychitieu.auth.LoginFragment"
-        android:label="Đăng nhập"
-        tools:layout="@layout/login_fragment">
-        <action
-            android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_loginFragment_to_navigation_dashboard"
-            app:destination="@id/navigation_dashboard"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+<!--    &lt;!&ndash; Màn hình đăng nhập &ndash;&gt;-->
+<!--    <fragment-->
+<!--        android:id="@+id/loginFragment"-->
+<!--        android:name="com.example.quanlychitieu.auth.LoginFragment"-->
+<!--        android:label="Đăng nhập"-->
+<!--        tools:layout="@layout/login_fragment">-->
+<!--        <action-->
+<!--            android:id="@+id/action_loginFragment_to_registerFragment"-->
+<!--            app:destination="@id/registerFragment"-->
+<!--            app:enterAnim="@anim/nav_default_enter_anim"-->
+<!--            app:exitAnim="@anim/nav_default_exit_anim"-->
+<!--            app:popEnterAnim="@anim/nav_default_pop_enter_anim"-->
+<!--            app:popExitAnim="@anim/nav_default_pop_exit_anim" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_loginFragment_to_navigation_dashboard"-->
+<!--            app:destination="@id/navigation_dashboard"-->
+<!--            app:enterAnim="@anim/nav_default_enter_anim"-->
+<!--            app:exitAnim="@anim/nav_default_exit_anim"-->
+<!--            app:popUpTo="@id/mobile_navigation"-->
+<!--            app:popUpToInclusive="true" />-->
+<!--    </fragment>-->
 
-    <!-- Màn hình đăng ký -->
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.quanlychitieu.auth.RegisterFragment"
-        android:label="Đăng ký"
-        tools:layout="@layout/register_fragment">
-        <action
-            android:id="@+id/action_registerFragment_to_navigation_dashboard"
-            app:destination="@id/navigation_dashboard"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+<!--    &lt;!&ndash; Màn hình đăng ký &ndash;&gt;-->
+<!--    <fragment-->
+<!--        android:id="@+id/registerFragment"-->
+<!--        android:name="com.example.quanlychitieu.auth.RegisterFragment"-->
+<!--        android:label="Đăng ký"-->
+<!--        tools:layout="@layout/register_fragment">-->
+<!--        <action-->
+<!--            android:id="@+id/action_registerFragment_to_navigation_dashboard"-->
+<!--            app:destination="@id/navigation_dashboard"-->
+<!--            app:enterAnim="@anim/nav_default_enter_anim"-->
+<!--            app:exitAnim="@anim/nav_default_exit_anim"-->
+<!--            app:popUpTo="@id/loginFragment"-->
+<!--            app:popUpToInclusive="true" />-->
+<!--    </fragment>-->
 
-    <!-- Màn hình Profile -->
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.quanlychitieu.auth.ProfileFragment"
-        android:label="Tài khoản"
-        tools:layout="@layout/profile_fragment">
-        <action
-            android:id="@+id/action_profileFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@+id/navigation_dashboard"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-
+<!--    &lt;!&ndash; Màn hình Profile &ndash;&gt;-->
+<!--    <fragment-->
+<!--        android:id="@+id/profileFragment"-->
+<!--        android:name="com.example.quanlychitieu.auth.ProfileFragment"-->
+<!--        android:label="Tài khoản"-->
+<!--        tools:layout="@layout/profile_fragment">-->
+<!--        <action-->
+<!--            android:id="@+id/action_profileFragment_to_loginFragment"-->
+<!--            app:destination="@id/loginFragment"-->
+<!--            app:popUpTo="@id/mobile_navigation"-->
+<!--            app:popUpToInclusive="true" />-->
+<!--    </fragment>-->
     <!-- Dashboard (Tổng quan) -->
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.quanlychitieu.ui.dashboard.DashboardFragment"
         android:label="Tổng quan"
         tools:layout="@layout/fragment_dashboard">
-
         <action
             android:id="@+id/action_dashboard_to_add_transaction"
             app:destination="@id/navigation_add_edit_transaction" />
-
         <action
             android:id="@+id/action_dashboard_to_transactions"
             app:destination="@id/navigation_transactions" />
     </fragment>
+
+
+
 
     <!-- Transactions (Giao dịch) -->
     <fragment
