@@ -113,15 +113,24 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
             if (transactions != null) {
                 recentTransactionsAdapter.submitList(transactions);
 
-                // Show or hide static transactions if list is empty
-                if (transactions.isEmpty() && binding.staticTransactions != null) {
-                    binding.staticTransactions.setVisibility(View.VISIBLE);
+                if (transactions.isEmpty()) {
+                    // Hiển thị thông báo "Không có giao dịch nào"
+                    binding.noTransactionsText.setVisibility(View.VISIBLE);
                     binding.recentTransactionsRecycler.setVisibility(View.GONE);
-                } else {
+
+                    // Ẩn layout tĩnh nếu có
                     if (binding.staticTransactions != null) {
                         binding.staticTransactions.setVisibility(View.GONE);
                     }
+                } else {
+                    // Hiển thị danh sách giao dịch
+                    binding.noTransactionsText.setVisibility(View.GONE);
                     binding.recentTransactionsRecycler.setVisibility(View.VISIBLE);
+
+                    // Ẩn layout tĩnh nếu có
+                    if (binding.staticTransactions != null) {
+                        binding.staticTransactions.setVisibility(View.GONE);
+                    }
                 }
             }
         });

@@ -377,7 +377,16 @@
                         android:layout_marginTop="16dp"
                         tools:itemCount="3"
                         tools:listitem="@layout/item_transaction" />
-
+                    <TextView
+                        android:id="@+id/no_transactions_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center"
+                        android:text="Không có giao dịch nào"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
                     <!-- Fallback static layout if you need it -->
                     <LinearLayout
                         android:id="@+id/static_transactions"
