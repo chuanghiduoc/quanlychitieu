@@ -1,10 +1,8 @@
 package com.example.quanlychitieu.ui.transactions;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.example.quanlychitieu.data.model.Transaction;
@@ -16,16 +14,16 @@ import java.util.List;
 
 public class TransactionsViewModel extends ViewModel {
     private final TransactionRepository repository;
-    private LiveData<List<Transaction>> transactions;
+    private final MediatorLiveData<List<Transaction>> transactions = new MediatorLiveData<>();
     private final MutableLiveData<Date> fromDate = new MutableLiveData<>();
     private final MutableLiveData<Date> toDate = new MutableLiveData<>();
     private final MutableLiveData<String> selectedCategory = new MutableLiveData<>("Tất cả danh mục");
     private final MutableLiveData<String> selectedType = new MutableLiveData<>("Tất cả giao dịch");
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
+
     public interface FilterCallback {
         void onFilterComplete(List<Transaction> transactions);
     }
-    // Add loading state
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true); // Start with loading=true
 
     public TransactionsViewModel() {
         repository = TransactionRepository.getInstance();
@@ -38,32 +36,15 @@ public class TransactionsViewModel extends ViewModel {
         calendar = Calendar.getInstance();
         toDate.setValue(calendar.getTime());
 
-        // Initialize with loading state
-        loadInitialData();
-    }
-
-    private void loadInitialData() {
-        isLoading.setValue(true);
-
-        // Get all transactions initially
-        transactions = repository.getAllTransactions();
-
-        // Observe transactions to update loading state
-        transactions.observeForever(new Observer<List<Transaction>>() {
-            @Override
-            public void onChanged(List<Transaction> transactionList) {
-                isLoading.setValue(false);
-                // Remove observer to avoid memory leaks
-                transactions.removeObserver(this);
-            }
-        });
+        // Load initial transactions with default date range
+        applyFilter(fromDate.getValue(), toDate.getValue(),
+                "Tất cả danh mục", "Tất cả giao dịch", null);
     }
 
     public LiveData<List<Transaction>> getTransactions() {
         return transactions;
     }
 
-    // Add getter for loading state
     public LiveData<Boolean> getIsLoading() {
         return isLoading;
     }
@@ -72,62 +53,104 @@ public class TransactionsViewModel extends ViewModel {
         return repository.getTransactionById(id);
     }
 
-    public void addTransaction(Transaction transaction) {
-        repository.addTransaction(transaction);
-    }
-
-    public void updateTransaction(Transaction transaction) {
-        repository.updateTransaction(transaction);
-    }
-
     public void deleteTransaction(String id) {
         isLoading.setValue(true);
-        repository.deleteTransaction(id);
-        // The loading state will be updated when the transactions are reloaded
+
+        repository.deleteTransaction(id).addOnCompleteListener(task -> {
+            // After deletion is complete, refresh the transactions with current filters
+            refreshTransactions();
+        });
     }
 
+
     public void applyFilter(Date fromDate, Date toDate, String category, String type, FilterCallback callback) {
+        // Update stored filter values
         this.fromDate.setValue(fromDate);
         this.toDate.setValue(toDate);
         this.selectedCategory.setValue(category);
         this.selectedType.setValue(type);
 
+        // Prepare date range with proper time components
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(fromDate);
+        startCal.set(Calendar.HOUR_OF_DAY, 0);
+        startCal.set(Calendar.MINUTE, 0);
+        startCal.set(Calendar.SECOND, 0);
+        startCal.set(Calendar.MILLISECOND, 0);
+        Date startDate = startCal.getTime();
 
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(toDate);
+        endCal.set(Calendar.HOUR_OF_DAY, 23);
+        endCal.set(Calendar.MINUTE, 59);
+        endCal.set(Calendar.SECOND, 59);
+        endCal.set(Calendar.MILLISECOND, 999);
+        Date endDate = endCal.getTime();
 
-        // Set loading state to true
         isLoading.setValue(true);
+        LiveData<List<Transaction>> source = repository.getFilteredTransactions(
+                startDate, endDate, category, type);
 
-        // Lấy dữ liệu đã lọc từ repository
-        LiveData<List<Transaction>> filteredTransactions = repository.getFilteredTransactions(fromDate, toDate, category, type);
+        transactions.addSource(source, transactionList -> {
+            transactions.setValue(transactionList);
+            isLoading.setValue(false);
 
-        // Đảm bảo cập nhật LiveData transactions
-        filteredTransactions.observeForever(new Observer<List<Transaction>>() {
-            @Override
-            public void onChanged(List<Transaction> transactionList) {
-
-                // Always update the LiveData, even with empty list
-                if (transactions instanceof MutableLiveData) {
-                    ((MutableLiveData<List<Transaction>>) transactions).setValue(transactionList);
-                } else {
-                    // If not MutableLiveData, create a new one
-                    MutableLiveData<List<Transaction>> newTransactions = new MutableLiveData<>();
-                    newTransactions.setValue(transactionList);
-                    transactions = newTransactions;
-                }
-
-                // Set loading state to false
-                isLoading.setValue(false);
-
-                // Call the callback with the results
-                if (callback != null) {
-                    callback.onFilterComplete(transactionList);
-                }
-
-                // Hủy quan sát sau khi cập nhật
-                filteredTransactions.removeObserver(this);
+            if (callback != null) {
+                callback.onFilterComplete(transactionList);
             }
+
+            transactions.removeSource(source);
         });
     }
 
+    public void refreshTransactions() {
+        isLoading.setValue(true);
 
+        // Use current filter values
+        Date startDate = fromDate.getValue();
+        Date endDate = toDate.getValue();
+        String category = selectedCategory.getValue();
+        String type = selectedType.getValue();
+
+        // Apply proper time components
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(startDate);
+        startCal.set(Calendar.HOUR_OF_DAY, 0);
+        startCal.set(Calendar.MINUTE, 0);
+        startCal.set(Calendar.SECOND, 0);
+        Date adjustedStartDate = startCal.getTime();
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(endDate);
+        endCal.set(Calendar.HOUR_OF_DAY, 23);
+        endCal.set(Calendar.MINUTE, 59);
+        endCal.set(Calendar.SECOND, 59);
+        Date adjustedEndDate = endCal.getTime();
+
+        LiveData<List<Transaction>> source = repository.getFilteredTransactions(
+                adjustedStartDate, adjustedEndDate, category, type);
+
+        transactions.addSource(source, transactionList -> {
+            transactions.setValue(transactionList);
+            isLoading.setValue(false);
+            transactions.removeSource(source);
+        });
+    }
+
+    // Getters for filter values to use in UI
+    public Date getFromDate() {
+        return fromDate.getValue();
+    }
+
+    public Date getToDate() {
+        return toDate.getValue();
+    }
+
+    public String getSelectedCategory() {
+        return selectedCategory.getValue();
+    }
+
+    public String getSelectedType() {
+        return selectedType.getValue();
+    }
 }

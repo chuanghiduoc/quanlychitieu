@@ -19,13 +19,28 @@ public class Transaction {
     private String note;        // Ghi chú cho giao dịch
     private boolean repeat;     // true nếu giao dịch lặp lại, false nếu không
     private String userId;      // ID của người dùng sở hữu giao dịch
+    private String repeatType;    // "daily", "weekly", "monthly", "yearly"
+    private Date endDate;         // Ngày kết thúc (tùy chọn)
 
     // No-args constructor for Firebase
     public Transaction() {
     }
 
     public Transaction(long id, String description, double amount, String category,
-                       Date date, boolean isIncome, String note, boolean repeat) {
+                       Date date, boolean isIncome, String note, boolean repeat, String repeatType, Date endDate) {
+        this.id = id;
+        this.description = description;
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+        this.isIncome = isIncome;
+        this.note = note;
+        this.repeat = repeat;
+        this.repeatType = repeatType;
+        this.endDate = endDate;
+    }
+
+    public Transaction(long id, String description, double amount, String category, Date date, boolean isIncome, String note, boolean repeat) {
         this.id = id;
         this.description = description;
         this.amount = amount;
@@ -36,10 +51,26 @@ public class Transaction {
         this.repeat = repeat;
     }
 
+    // Constructor sao chép (dùng để tạo giao dịch lặp lại)
+    public Transaction(Transaction transaction) {
+        this.firebaseId = transaction.firebaseId;
+        this.id = transaction.id;
+        this.description = transaction.description;
+        this.amount = transaction.amount;
+        this.category = transaction.category;
+        this.date = transaction.date;
+        this.isIncome = transaction.isIncome;
+        this.note = transaction.note;
+        this.repeat = transaction.repeat;
+        this.userId = transaction.userId;
+        this.repeatType = transaction.repeatType;
+        this.endDate = transaction.endDate;
+    }
+
     // Constructor with Firebase ID and user ID
     public Transaction(String firebaseId, long id, String description, double amount,
                        String category, Date date, boolean isIncome, String note,
-                       boolean repeat, String userId) {
+                       boolean repeat, String userId, String repeatType, Date endDate) {
         this.firebaseId = firebaseId;
         this.id = id;
         this.description = description;
@@ -50,6 +81,8 @@ public class Transaction {
         this.note = note;
         this.repeat = repeat;
         this.userId = userId;
+        this.repeatType = repeatType;
+        this.endDate = endDate;
     }
 
     @Exclude
@@ -132,4 +165,20 @@ public class Transaction {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+    public String getRepeatType() {
+        return repeatType;
+    }
+
+    public void setRepeatType(String repeatType) {
+        this.repeatType = repeatType;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
 }

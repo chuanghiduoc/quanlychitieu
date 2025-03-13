@@ -30,7 +30,6 @@ public class TransactionDetailFragment extends Fragment {
     private Transaction currentTransaction;
 
     private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.getDefault());
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Nullable
     @Override
@@ -114,11 +113,32 @@ public class TransactionDetailFragment extends Fragment {
         // Set recurring info if applicable
         if (transaction.isRepeat()) {
             binding.recurringContainer.setVisibility(View.VISIBLE);
-            binding.recurringValue.setText("Có (Hàng tháng)"); // You may need to adjust based on your data model
+
+            // Get the repeat type
+            String repeatType = transaction.getRepeatType();
+            if (repeatType == null || repeatType.isEmpty()) {
+                repeatType = "Hàng tháng"; // Default value
+            }
+
+            // Format the recurring info
+            StringBuilder recurringInfo = new StringBuilder("Có (");
+            recurringInfo.append(repeatType);
+            recurringInfo.append(")");
+
+            // Add end date if available
+            if (transaction.getEndDate() != null) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                recurringInfo.append(" đến ngày ");
+                recurringInfo.append(dateFormat.format(transaction.getEndDate()));
+            }
+
+            binding.recurringValue.setText(recurringInfo.toString());
         } else {
             binding.recurringContainer.setVisibility(View.GONE);
         }
     }
+
+
 
     private void setCategoryIcon(String category, boolean isIncome) {
         // Set the appropriate icon based on the category

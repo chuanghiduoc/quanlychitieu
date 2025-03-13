@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.Transaction;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -16,6 +18,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,9 +77,10 @@ public class TransactionRepository {
                     transactionsLiveData.setValue(new ArrayList<>());
                     allTransactionsLiveData.setValue(new ArrayList<>());
                 });
-
+        loadTransactions();
         return allTransactionsLiveData;
     }
+
 
     public LiveData<List<Transaction>> getFilteredTransactions(Date fromDate, Date toDate, String category, String type) {
         MutableLiveData<List<Transaction>> filteredData = new MutableLiveData<>();
@@ -87,7 +91,24 @@ public class TransactionRepository {
             return filteredData;
         }
 
+        // Ensure the date range includes the full days
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(fromDate);
+        startCal.set(Calendar.HOUR_OF_DAY, 0);
+        startCal.set(Calendar.MINUTE, 0);
+        startCal.set(Calendar.SECOND, 0);
+        startCal.set(Calendar.MILLISECOND, 0);
+        fromDate = startCal.getTime();
 
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(toDate);
+        endCal.set(Calendar.HOUR_OF_DAY, 23);
+        endCal.set(Calendar.MINUTE, 59);
+        endCal.set(Calendar.SECOND, 59);
+        endCal.set(Calendar.MILLISECOND, 999);
+        toDate = endCal.getTime();
+
+        // Query with date range filter
         Query query = db.collection(COLLECTION_USERS)
                 .document(currentUser.getUid())
                 .collection(COLLECTION_TRANSACTIONS)
@@ -127,7 +148,6 @@ public class TransactionRepository {
                 boolean categoryMatch = category.equals("Tất cả danh mục") ||
                         transaction.getCategory().equals(category);
 
-
                 // Chỉ thêm giao dịch nếu thỏa mãn cả hai điều kiện
                 if (typeMatch && categoryMatch) {
                     transactions.add(transaction);
@@ -141,6 +161,8 @@ public class TransactionRepository {
 
         return filteredData;
     }
+
+
 
 
     private void loadTransactions() {
@@ -173,10 +195,19 @@ public class TransactionRepository {
     public LiveData<Transaction> getTransactionById(String transactionId) {
         MutableLiveData<Transaction> transactionLiveData = new MutableLiveData<>();
 
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            return transactionLiveData;
+        List<Transaction> currentTransactions = transactionsLiveData.getValue();
+        if (currentTransactions != null) {
+            for (Transaction transaction : currentTransactions) {
+                if (transaction.getFirebaseId().equals(transactionId)) {
+                    transactionLiveData.setValue(transaction);
+                    return transactionLiveData;
+                }
+            }
         }
+
+        // Nếu không tìm thấy, mới truy vấn Firestore
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) return transactionLiveData;
 
         db.collection(COLLECTION_USERS)
                 .document(currentUser.getUid())
@@ -185,14 +216,13 @@ public class TransactionRepository {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Use the generic documentSnapshotToTransaction method instead
-                        Transaction transaction = documentSnapshotToTransaction(documentSnapshot);
-                        transactionLiveData.setValue(transaction);
+                        transactionLiveData.setValue(documentSnapshotToTransaction(documentSnapshot));
                     }
                 });
 
         return transactionLiveData;
     }
+
 
     public void addTransaction(Transaction transaction) {
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -217,63 +247,55 @@ public class TransactionRepository {
                 .collection(COLLECTION_TRANSACTIONS)
                 .add(transactionMap)
                 .addOnSuccessListener(documentReference -> {
-                    // Reload transactions
-                    loadTransactions();
+                    transaction.setFirebaseId(documentReference.getId());
+                    loadTransactions(); // 🛠 Cập nhật danh sách sau khi thêm
                 });
+
+
     }
 
     public void updateTransaction(Transaction transaction) {
         FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            return;
-        }
+        if (currentUser == null) return;
 
-        // Đảm bảo tính nhất quán của dữ liệu
         double amount = transaction.getAmount();
-        if (!transaction.isIncome() && amount > 0) {
-            // Nếu là chi tiêu nhưng số tiền là dương, chuyển thành số âm
-            transaction.setAmount(-amount);
-        } else if (transaction.isIncome() && amount < 0) {
-            // Nếu là thu nhập nhưng số tiền là âm, chuyển thành số dương
-            transaction.setAmount(Math.abs(amount));
-        }
+        transaction.setAmount(transaction.isIncome() ? Math.abs(amount) : -Math.abs(amount));
 
-        // Convert transaction to Map
         Map<String, Object> transactionMap = transactionToMap(transaction);
-
-        // Update in Firestore
-        String documentId = transaction.getFirebaseId() != null ?
-                transaction.getFirebaseId() :
-                String.valueOf(transaction.getId());
 
         db.collection(COLLECTION_USERS)
                 .document(currentUser.getUid())
                 .collection(COLLECTION_TRANSACTIONS)
-                .document(documentId)
+                .document(transaction.getFirebaseId())
                 .set(transactionMap)
                 .addOnSuccessListener(aVoid -> {
-                    // Reload transactions
                     loadTransactions();
                 });
     }
 
 
-    public void deleteTransaction(String transactionId) {
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            return;
-        }
 
-        db.collection(COLLECTION_USERS)
+    public Task<Void> deleteTransaction(String transactionId) {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) return Tasks.forException(new Exception("User not logged in"));
+
+        return db.collection(COLLECTION_USERS)
                 .document(currentUser.getUid())
                 .collection(COLLECTION_TRANSACTIONS)
                 .document(transactionId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    // Reload transactions
-                    loadTransactions();
+                    // Update the local cache
+                    List<Transaction> currentList = transactionsLiveData.getValue();
+                    if (currentList != null) {
+                        List<Transaction> updatedList = new ArrayList<>(currentList);
+                        updatedList.removeIf(t -> t.getFirebaseId().equals(transactionId));
+                        transactionsLiveData.setValue(updatedList);
+                    }
                 });
     }
+
+
 
     // Method for QueryDocumentSnapshot (from query results)
     private Transaction documentToTransaction(QueryDocumentSnapshot document) {
@@ -300,12 +322,32 @@ public class TransactionRepository {
         boolean repeat = document.getBoolean("repeat") != null ? document.getBoolean("repeat") : false;
         String userId = document.getString("userId") != null ? document.getString("userId") : "";
 
-        Transaction transaction = new Transaction(id, description, amount, category, date, isIncome, note, repeat);
-        transaction.setFirebaseId(firebaseId);
+        // Extract repeat type and end date
+        String repeatType = document.getString("repeatType");
+        Date endDate = document.getDate("endDate");
+
+        Transaction transaction = new Transaction();
+        transaction.setId(id);
+        transaction.setDescription(description);
+        transaction.setAmount(amount);
+        transaction.setCategory(category);
+        transaction.setDate(date);
+        transaction.setIncome(isIncome);
+        transaction.setNote(note);
+        transaction.setRepeat(repeat);
         transaction.setUserId(userId);
+        transaction.setFirebaseId(firebaseId);
+
+        // Set repeat information if available
+        if (repeat) {
+            transaction.setRepeatType(repeatType);
+            transaction.setEndDate(endDate);
+        }
 
         return transaction;
     }
+
+
 
     private Map<String, Object> transactionToMap(Transaction transaction) {
         Map<String, Object> map = new HashMap<>();
@@ -318,6 +360,17 @@ public class TransactionRepository {
         map.put("note", transaction.getNote());
         map.put("repeat", transaction.isRepeat());
 
+        // Add repeat type and end date if transaction is recurring
+        if (transaction.isRepeat()) {
+            if (transaction.getRepeatType() != null) {
+                map.put("repeatType", transaction.getRepeatType());
+            }
+
+            if (transaction.getEndDate() != null) {
+                map.put("endDate", transaction.getEndDate());
+            }
+        }
+
         // Add user ID if available
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
@@ -328,5 +381,7 @@ public class TransactionRepository {
 
         return map;
     }
+
+
 
 }
