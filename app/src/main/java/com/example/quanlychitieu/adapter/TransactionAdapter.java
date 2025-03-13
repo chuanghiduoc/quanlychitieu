@@ -13,6 +13,13 @@ import com.example.quanlychitieu.adapter.viewholder.TransactionViewHolder;
 import com.example.quanlychitieu.data.model.Transaction;
 
 public class TransactionAdapter extends ListAdapter<Transaction, TransactionViewHolder> {
+    private OnTransactionClickListener listener;
+
+    public interface OnTransactionClickListener {
+        void onTransactionClick(Transaction transaction);
+        void onEditClick(Transaction transaction);
+        void onDeleteClick(Transaction transaction);
+    }
 
     public TransactionAdapter() {
         super(new DiffUtil.ItemCallback<Transaction>() {

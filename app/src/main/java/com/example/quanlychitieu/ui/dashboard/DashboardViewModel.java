@@ -39,9 +39,9 @@ public class DashboardViewModel extends ViewModel {
         List<Transaction> transactions = new ArrayList<>();
 
         // Thêm một số giao dịch mẫu
-        transactions.add(new Transaction(1, "Ăn trưa", -75000, "Ăn uống", new Date(), false, "Chi phí ăn uống"));
-        transactions.add(new Transaction(2, "Xăng xe", -150000, "Di chuyển", new Date(), false, "Chi phí đi lại"));
-        transactions.add(new Transaction(3, "Lương tháng 3", 5000000, "Thu nhập", new Date(), true, "Lương tháng"));
+        transactions.add(new Transaction(1, "Ăn trưa", -75000, "Ăn uống", new Date(), false, "Chi phí ăn uống", false));
+        transactions.add(new Transaction(2, "Xăng xe", -150000, "Di chuyển", new Date(), false, "Chi phí đi lại", false));
+        transactions.add(new Transaction(3, "Lương tháng 3", 5000000, "Thu nhập", new Date(), true, "Lương tháng", false));
 
         recentTransactions.setValue(transactions);
     }
