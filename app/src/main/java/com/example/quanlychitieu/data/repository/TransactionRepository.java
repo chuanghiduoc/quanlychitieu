@@ -337,15 +337,12 @@ public class TransactionRepository {
         transaction.setRepeat(repeat);
         transaction.setUserId(userId);
         transaction.setFirebaseId(firebaseId);
-
-        // Set repeat information if available
-        if (repeat) {
-            transaction.setRepeatType(repeatType);
-            transaction.setEndDate(endDate);
-        }
+        transaction.setRepeatType(repeatType);
+        transaction.setEndDate(endDate);
 
         return transaction;
     }
+
 
 
 
@@ -359,17 +356,8 @@ public class TransactionRepository {
         map.put("isIncome", transaction.isIncome());
         map.put("note", transaction.getNote());
         map.put("repeat", transaction.isRepeat());
-
-        // Add repeat type and end date if transaction is recurring
-        if (transaction.isRepeat()) {
-            if (transaction.getRepeatType() != null) {
-                map.put("repeatType", transaction.getRepeatType());
-            }
-
-            if (transaction.getEndDate() != null) {
-                map.put("endDate", transaction.getEndDate());
-            }
-        }
+        map.put("repeatType", transaction.getRepeatType());
+        map.put("endDate", transaction.getEndDate());
 
         // Add user ID if available
         FirebaseUser currentUser = auth.getCurrentUser();

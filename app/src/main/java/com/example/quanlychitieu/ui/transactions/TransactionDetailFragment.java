@@ -61,6 +61,12 @@ public class TransactionDetailFragment extends Fragment {
         setupActionButtons();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (transactionId != null && !transactionId.isEmpty()) {
+            loadTransactionDetails(transactionId);
+        }    }
     private void loadTransactionDetails(String id) {
         // Show loading state
         showLoading(true);

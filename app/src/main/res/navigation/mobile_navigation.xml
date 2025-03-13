@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_dashboard_to_transactions"
             app:destination="@id/navigation_transactions" />
+        <action
+            android:id="@+id/action_dashboard_to_transaction_detail"
+            app:destination="@id/navigation_transaction_detail" />
     </fragment>
 
     <!-- Transactions (Giao dịch) -->
