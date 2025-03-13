@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quanlychitieu.R;
+import com.example.quanlychitieu.adapter.TransactionAdapter;
 import com.example.quanlychitieu.data.model.Transaction;
 
 import java.text.NumberFormat;
@@ -23,16 +24,29 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
     private final TextView titleTextView;
     private final TextView amountTextView;
     private final TextView dateTextView;
+    private Transaction transaction;
 
-    public TransactionViewHolder(@NonNull View itemView) {
+    public TransactionViewHolder(@NonNull View itemView, TransactionAdapter.OnTransactionClickListener listener) {
         super(itemView);
         categoryIcon = itemView.findViewById(R.id.category_icon);
         titleTextView = itemView.findViewById(R.id.transaction_title);
         amountTextView = itemView.findViewById(R.id.transaction_amount);
         dateTextView = itemView.findViewById(R.id.transaction_date);
+
+        // Set click listener for the entire item
+        if (listener != null) {
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && transaction != null) {
+                    listener.onTransactionClick(transaction);
+                }
+            });
+        }
     }
 
     public void bind(Transaction transaction) {
+        this.transaction = transaction;
+
         // Set transaction title (description)
         titleTextView.setText(transaction.getDescription());
 

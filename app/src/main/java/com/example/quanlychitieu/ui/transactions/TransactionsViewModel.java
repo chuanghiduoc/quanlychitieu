@@ -21,10 +21,14 @@ public class TransactionsViewModel extends ViewModel {
     private final MutableLiveData<Date> toDate = new MutableLiveData<>();
     private final MutableLiveData<String> selectedCategory = new MutableLiveData<>("Tất cả danh mục");
     private final MutableLiveData<String> selectedType = new MutableLiveData<>("Tất cả giao dịch");
+    public interface FilterCallback {
+        void onFilterComplete(List<Transaction> transactions);
+    }
+    // Add loading state
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true); // Start with loading=true
 
     public TransactionsViewModel() {
         repository = TransactionRepository.getInstance();
-        transactions = repository.getAllTransactions();
 
         // Set default date range (current month)
         Calendar calendar = Calendar.getInstance();
@@ -33,10 +37,35 @@ public class TransactionsViewModel extends ViewModel {
 
         calendar = Calendar.getInstance();
         toDate.setValue(calendar.getTime());
+
+        // Initialize with loading state
+        loadInitialData();
+    }
+
+    private void loadInitialData() {
+        isLoading.setValue(true);
+
+        // Get all transactions initially
+        transactions = repository.getAllTransactions();
+
+        // Observe transactions to update loading state
+        transactions.observeForever(new Observer<List<Transaction>>() {
+            @Override
+            public void onChanged(List<Transaction> transactionList) {
+                isLoading.setValue(false);
+                // Remove observer to avoid memory leaks
+                transactions.removeObserver(this);
+            }
+        });
     }
 
     public LiveData<List<Transaction>> getTransactions() {
         return transactions;
+    }
+
+    // Add getter for loading state
+    public LiveData<Boolean> getIsLoading() {
+        return isLoading;
     }
 
     public LiveData<Transaction> getTransactionById(String id) {
@@ -52,35 +81,52 @@ public class TransactionsViewModel extends ViewModel {
     }
 
     public void deleteTransaction(String id) {
+        isLoading.setValue(true);
         repository.deleteTransaction(id);
+        // The loading state will be updated when the transactions are reloaded
     }
 
-    public void applyFilter(Date fromDate, Date toDate, String category, String type) {
+    public void applyFilter(Date fromDate, Date toDate, String category, String type, FilterCallback callback) {
         this.fromDate.setValue(fromDate);
         this.toDate.setValue(toDate);
         this.selectedCategory.setValue(category);
         this.selectedType.setValue(type);
 
-        Log.d("TransactionsViewModel", "Applying filter - Type: " + type + ", Category: " + category);
+
+
+        // Set loading state to true
+        isLoading.setValue(true);
 
         // Lấy dữ liệu đã lọc từ repository
         LiveData<List<Transaction>> filteredTransactions = repository.getFilteredTransactions(fromDate, toDate, category, type);
 
         // Đảm bảo cập nhật LiveData transactions
-        if (transactions instanceof MutableLiveData) {
-            // Nếu đang sử dụng MutableLiveData, cần cập nhật giá trị
-            filteredTransactions.observeForever(new Observer<List<Transaction>>() {
-                @Override
-                public void onChanged(List<Transaction> transactionList) {
+        filteredTransactions.observeForever(new Observer<List<Transaction>>() {
+            @Override
+            public void onChanged(List<Transaction> transactionList) {
+
+                // Always update the LiveData, even with empty list
+                if (transactions instanceof MutableLiveData) {
                     ((MutableLiveData<List<Transaction>>) transactions).setValue(transactionList);
-                    // Hủy quan sát sau khi cập nhật
-                    filteredTransactions.removeObserver(this);
+                } else {
+                    // If not MutableLiveData, create a new one
+                    MutableLiveData<List<Transaction>> newTransactions = new MutableLiveData<>();
+                    newTransactions.setValue(transactionList);
+                    transactions = newTransactions;
                 }
-            });
-        } else {
-            // Nếu không, gán trực tiếp LiveData mới
-            transactions = filteredTransactions;
-        }
+
+                // Set loading state to false
+                isLoading.setValue(false);
+
+                // Call the callback with the results
+                if (callback != null) {
+                    callback.onFilterComplete(transactionList);
+                }
+
+                // Hủy quan sát sau khi cập nhật
+                filteredTransactions.removeObserver(this);
+            }
+        });
     }
 
 
