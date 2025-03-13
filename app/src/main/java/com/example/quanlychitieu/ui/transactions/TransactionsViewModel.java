@@ -1,98 +1,87 @@
 package com.example.quanlychitieu.ui.transactions;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.example.quanlychitieu.data.model.Transaction;
+import com.example.quanlychitieu.data.repository.TransactionRepository;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TransactionsViewModel extends ViewModel {
-
-    private final List<Transaction> allTransactions = new ArrayList<>();
-    private final MutableLiveData<List<Transaction>> transactions = new MutableLiveData<>();
-
-    private Date fromDate;
-    private Date toDate;
-    private String category;
-    private String transactionType = "Tất cả giao dịch";
+    private final TransactionRepository repository;
+    private LiveData<List<Transaction>> transactions;
+    private final MutableLiveData<Date> fromDate = new MutableLiveData<>();
+    private final MutableLiveData<Date> toDate = new MutableLiveData<>();
+    private final MutableLiveData<String> selectedCategory = new MutableLiveData<>("Tất cả danh mục");
+    private final MutableLiveData<String> selectedType = new MutableLiveData<>("Tất cả giao dịch");
 
     public TransactionsViewModel() {
-        // Khởi tạo với dữ liệu mẫu
-        loadTransactions();
-        clearFilter(); // Áp dụng bộ lọc mặc định
-    }
+        repository = TransactionRepository.getInstance();
+        transactions = repository.getAllTransactions();
 
-    private void loadTransactions() {
-        allTransactions.clear();
-        // Thêm một số giao dịch mẫu
-        allTransactions.add(new Transaction(1, "Tiền ăn trưa", -50000, "Ăn uống", new Date(), false, "Chi phí ăn trưa"));
-        allTransactions.add(new Transaction(2, "Xăng xe", -100000, "Di chuyển", new Date(), false, "Chi phí đi lại"));
-        allTransactions.add(new Transaction(3, "Mua quần áo", -500000, "Mua sắm", new Date(), false, "Chi phí mua sắm"));
-        allTransactions.add(new Transaction(4, "Lương tháng 3", 5000000, "Lương", new Date(), false, "Thu nhập từ lương"));
+        // Set default date range (current month)
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        fromDate.setValue(calendar.getTime());
 
-        // Áp dụng bộ lọc
-        applyFilterInternal();
+        calendar = Calendar.getInstance();
+        toDate.setValue(calendar.getTime());
     }
 
     public LiveData<List<Transaction>> getTransactions() {
         return transactions;
     }
 
-    public void applyFilter(Date fromDate, Date toDate, String category, String transactionType) {
-        this.fromDate = fromDate;
-        this.toDate = toDate;
-        this.category = category;
-        this.transactionType = transactionType;
-
-        applyFilterInternal();
-    }
-
-    private void applyFilterInternal() {
-        List<Transaction> filteredList = allTransactions;
-
-        // Áp dụng bộ lọc ngày
-        if (fromDate != null && toDate != null) {
-            filteredList = filteredList.stream()
-                    .filter(transaction -> !transaction.getDate().before(fromDate)
-                            && !transaction.getDate().after(toDate))
-                    .collect(Collectors.toList());
-        }
-
-        // Áp dụng bộ lọc loại giao dịch
-        if (!"Tất cả giao dịch".equals(transactionType)) {
-            boolean isExpense = "Chi tiêu".equals(transactionType);
-            filteredList = filteredList.stream()
-                    .filter(transaction -> isExpense ? transaction.getAmount() < 0 : transaction.getAmount() > 0)
-                    .collect(Collectors.toList());
-        }
-
-        // Áp dụng bộ lọc danh mục
-        if (category != null && !category.equals("Tất cả danh mục")) {
-            filteredList = filteredList.stream()
-                    .filter(transaction -> transaction.getCategory().equals(category))
-                    .collect(Collectors.toList());
-        }
-
-        transactions.setValue(filteredList);
-    }
-
-    public void clearFilter() {
-        Date now = new Date();
-        // Reset bộ lọc về mặc định
-        this.fromDate = new Date(now.getYear(), now.getMonth(), 1); // Ngày đầu tháng hiện tại
-        this.toDate = now;
-        this.category = "Tất cả danh mục";
-        this.transactionType = "Tất cả giao dịch"; // Đặt lại loại giao dịch
-        applyFilterInternal();
+    public LiveData<Transaction> getTransactionById(String id) {
+        return repository.getTransactionById(id);
     }
 
     public void addTransaction(Transaction transaction) {
-        allTransactions.add(transaction);
-        applyFilterInternal();
+        repository.addTransaction(transaction);
     }
+
+    public void updateTransaction(Transaction transaction) {
+        repository.updateTransaction(transaction);
+    }
+
+    public void deleteTransaction(String id) {
+        repository.deleteTransaction(id);
+    }
+
+    public void applyFilter(Date fromDate, Date toDate, String category, String type) {
+        this.fromDate.setValue(fromDate);
+        this.toDate.setValue(toDate);
+        this.selectedCategory.setValue(category);
+        this.selectedType.setValue(type);
+
+        Log.d("TransactionsViewModel", "Applying filter - Type: " + type + ", Category: " + category);
+
+        // Lấy dữ liệu đã lọc từ repository
+        LiveData<List<Transaction>> filteredTransactions = repository.getFilteredTransactions(fromDate, toDate, category, type);
+
+        // Đảm bảo cập nhật LiveData transactions
+        if (transactions instanceof MutableLiveData) {
+            // Nếu đang sử dụng MutableLiveData, cần cập nhật giá trị
+            filteredTransactions.observeForever(new Observer<List<Transaction>>() {
+                @Override
+                public void onChanged(List<Transaction> transactionList) {
+                    ((MutableLiveData<List<Transaction>>) transactions).setValue(transactionList);
+                    // Hủy quan sát sau khi cập nhật
+                    filteredTransactions.removeObserver(this);
+                }
+            });
+        } else {
+            // Nếu không, gán trực tiếp LiveData mới
+            transactions = filteredTransactions;
+        }
+    }
+
+
 }

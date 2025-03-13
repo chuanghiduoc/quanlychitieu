@@ -40,24 +40,26 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
         dateTextView.setText(DATE_FORMAT.format(transaction.getDate()));
 
         // Format currency amount
-        String formattedAmount = CURRENCY_FORMAT.format(transaction.getAmount())
-                .replace("₫", "đ")  // Replace currency symbol if needed
-                .replace(",", "."); // Adjust formatting if needed
+        double displayAmount = Math.abs(transaction.getAmount());
+        String formattedAmount = CURRENCY_FORMAT.format(displayAmount)
+                .replace("₫", "đ")
+                .replace(",", ".");
 
-        // Determine if it's an expense or income and set the appropriate sign and color
-        if (transaction.getAmount() < 0) {
-            // Expense (negative amount)
-            amountTextView.setText(formattedAmount); // Already has the negative sign
-            amountTextView.setTextColor(Color.parseColor("#F44336")); // Red color
-        } else {
-            // Income (positive amount)
+        // Hiển thị dấu và màu sắc dựa trên isIncome thay vì giá trị amount
+        if (transaction.isIncome()) {
+            // Thu nhập: hiển thị dấu + và màu xanh
             amountTextView.setText("+" + formattedAmount);
             amountTextView.setTextColor(Color.parseColor("#4CAF50")); // Green color
+        } else {
+            // Chi tiêu: hiển thị dấu - và màu đỏ
+            amountTextView.setText("-" + formattedAmount);
+            amountTextView.setTextColor(Color.parseColor("#F44336")); // Red color
         }
 
         // Set category icon based on category name
         setCategoryIcon(transaction.getCategory());
     }
+
 
     private void setCategoryIcon(String category) {
         // Set the appropriate icon based on the category
