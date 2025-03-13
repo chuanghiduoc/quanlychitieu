@@ -54,7 +54,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     @Override
     public void onResume() {
         super.onResume();
-
+        viewModel.refreshTransactions();
         // Restore dropdown selections
         restoreDropdownSelections();
     }
@@ -62,11 +62,6 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     private void restoreDropdownSelections() {
         // Get the current selections
         String currentTransactionType = binding.transactionTypeInput.getText().toString();
-        String currentCategory = binding.categoryFilterInput.getText().toString();
-
-        // Log the current selections for debugging
-        Log.d("TransactionsFragment", "Restoring dropdowns - Type: " + currentTransactionType +
-                ", Category: " + currentCategory);
 
         // Reinitialize the adapters
         setupTransactionTypeFilter();
@@ -75,8 +70,9 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         updateCategoryFilterBasedOnTransactionType(currentTransactionType);
 
         // Restore the selections
-        binding.transactionTypeInput.setText(currentTransactionType, false);
-        binding.categoryFilterInput.setText(currentCategory, false);
+        binding.transactionTypeInput.setText("Tất cả giao dịch", false);
+        binding.categoryFilterInput.setText("Tất cả danh mục", false);
+        binding.dateToInput.setText(dateFormatter.format(toDateCalendar.getTime()));
     }
 
     @Nullable
@@ -95,6 +91,8 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         viewModel = new ViewModelProvider(this).get(TransactionsViewModel.class);
 
         setupToolbar();
+
+        // Add this line to set up the date pickers
         setupDatePickers();
 
         // Initialize category adapters only once
@@ -109,7 +107,20 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         setupAddTransactionButton();
         observeLoadingState();
         observeTransactions();
+
+        // Apply default filters automatically
+        applyDefaultFilters();
     }
+
+    private void applyDefaultFilters() {
+        // Set default dropdown values
+        binding.transactionTypeInput.setText("Tất cả giao dịch", false);
+        binding.categoryFilterInput.setText("Tất cả danh mục", false);
+
+        // Apply filters with default values
+        applyFilters();
+    }
+
 
     private void observeLoadingState() {
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
@@ -173,8 +184,13 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     }
 
     private void setupDatePickers() {
-        // Giữ nguyên code
+        // Set from date to first day of current month
         fromDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set to date to current day
+        toDateCalendar.setTime(new Date()); // Today
+
+        // Update the UI
         binding.dateFromInput.setText(dateFormatter.format(fromDateCalendar.getTime()));
         binding.dateToInput.setText(dateFormatter.format(toDateCalendar.getTime()));
 
@@ -182,8 +198,12 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     requireContext(),
                     (view, year, month, dayOfMonth) -> {
-                        fromDateCalendar.set(year, month, dayOfMonth);
+                        fromDateCalendar.set(Calendar.YEAR, year);
+                        fromDateCalendar.set(Calendar.MONTH, month);
+                        fromDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         binding.dateFromInput.setText(dateFormatter.format(fromDateCalendar.getTime()));
+
+                        // Apply filters with the new date
                         applyFilters();
                     },
                     fromDateCalendar.get(Calendar.YEAR),
@@ -197,8 +217,12 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     requireContext(),
                     (view, year, month, dayOfMonth) -> {
-                        toDateCalendar.set(year, month, dayOfMonth);
+                        toDateCalendar.set(Calendar.YEAR, year);
+                        toDateCalendar.set(Calendar.MONTH, month);
+                        toDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         binding.dateToInput.setText(dateFormatter.format(toDateCalendar.getTime()));
+
+                        // Apply filters with the new date
                         applyFilters();
                     },
                     toDateCalendar.get(Calendar.YEAR),
@@ -328,70 +352,24 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
 
         Date fromDate = fromDateCalendar.getTime();
         Date toDate = toDateCalendar.getTime();
-        String category = binding.categoryFilterInput.getText().toString();
-        String transactionType = binding.transactionTypeInput.getText().toString();
 
+        // Validate dates
         if (fromDate.after(toDate)) {
             Toast.makeText(requireContext(), "Ngày bắt đầu phải trước ngày kết thúc", Toast.LENGTH_SHORT).show();
-            hideLoading(); // Hide loading if there's an error
+            hideLoading();
             return;
         }
 
-        // Ensure we set the end time to the end of the day for proper date range filtering
-        Calendar endCalendar = Calendar.getInstance();
-        endCalendar.setTime(toDate);
-        endCalendar.set(Calendar.HOUR_OF_DAY, 23);
-        endCalendar.set(Calendar.MINUTE, 59);
-        endCalendar.set(Calendar.SECOND, 59);
-        toDate = endCalendar.getTime();
+        String category = binding.categoryFilterInput.getText().toString();
+        String transactionType = binding.transactionTypeInput.getText().toString();
 
-        // Validate category and transaction type
-        if (!transactionType.equals("Tất cả giao dịch")) {
-            if (transactionType.equals("Chi tiêu") &&
-                    !CategoryManager.getInstance().getExpenseCategories().contains(category) &&
-                    !category.equals("Tất cả danh mục")) {
-                Toast.makeText(requireContext(), "Danh mục không phù hợp với loại giao dịch", Toast.LENGTH_SHORT).show();
-                binding.categoryFilterInput.setText("Tất cả danh mục", false);
-                category = "Tất cả danh mục";
-            } else if (transactionType.equals("Thu nhập") &&
-                    !CategoryManager.getInstance().getIncomeCategories().contains(category) &&
-                    !category.equals("Tất cả danh mục")) {
-                Toast.makeText(requireContext(), "Danh mục không phù hợp với loại giao dịch", Toast.LENGTH_SHORT).show();
-                binding.categoryFilterInput.setText("Tất cả danh mục", false);
-                category = "Tất cả danh mục";
-            }
-        }
-
-        // Store final values for use in callback
-        final String finalCategory = category;
-        final String finalType = transactionType;
-
-        // Apply filters with callback for immediate UI updates
-        viewModel.applyFilter(fromDate, toDate, category, transactionType, new TransactionsViewModel.FilterCallback() {
-            @Override
-            public void onFilterComplete(List<Transaction> transactions) {
-
-                // Force update UI immediately
-                updateUIBasedOnTransactions(transactions);
-
-                // Force empty state if needed
-                if (transactions == null || transactions.isEmpty()) {
-                    binding.emptyState.setVisibility(View.VISIBLE);
-                    binding.transactionsRecyclerView.setVisibility(View.GONE);
-                }
-            }
+        // Apply filters
+        viewModel.applyFilter(fromDate, toDate, category, transactionType, transactions -> {
+            // Update UI based on filtered results
+            updateUIBasedOnTransactions(transactions);
         });
-
-        // Fallback check after a delay
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (adapter.getItemCount() == 0) {
-                binding.emptyState.setVisibility(View.VISIBLE);
-                binding.transactionsRecyclerView.setVisibility(View.GONE);
-            }
-        }, 500);
     }
 
-    // Các phương thức còn lại giữ nguyên
     private void setupRecyclerView() {
         adapter = new TransactionAdapter(this);
         binding.transactionsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

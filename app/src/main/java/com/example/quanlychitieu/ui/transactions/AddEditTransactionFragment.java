@@ -183,8 +183,20 @@ public class AddEditTransactionFragment extends Fragment {
         binding.repeatSwitch.setChecked(transaction.isRepeat());
         if (transaction.isRepeat()) {
             binding.repeatOptions.setVisibility(View.VISIBLE);
+
+            // Set repeat type if available
+            if (transaction.getRepeatType() != null && !transaction.getRepeatType().isEmpty()) {
+                binding.repeatTypeInput.setText(transaction.getRepeatType(), false);
+            }
+
+            // Set end date if available
+            if (transaction.getEndDate() != null) {
+                endDateCalendar.setTime(transaction.getEndDate());
+                binding.endDateInput.setText(dateFormatter.format(transaction.getEndDate()));
+            }
         }
     }
+
 
     private void setupTransactionTypeRadioGroup() {
         binding.transactionTypeGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -376,47 +388,140 @@ public class AddEditTransactionFragment extends Fragment {
         String note = binding.noteInput.getText().toString().trim();
         boolean isRecurring = binding.repeatSwitch.isChecked();
 
-        // Create transaction object
+        // Lấy kiểu lặp lại và ngày kết thúc (nếu có)
+        String repeatType = "None";
+        Date endDate = null;
+
+        if (isRecurring) {
+            repeatType = binding.repeatTypeInput.getText() != null
+                    ? binding.repeatTypeInput.getText().toString()
+                    : "None";
+            endDate = endDateCalendar.getTime();
+        }
+
         Transaction transaction;
         if (isEditMode) {
-            // Update existing transaction
             transaction = new Transaction();
             transaction.setFirebaseId(transactionId);
             transaction.setId(System.currentTimeMillis());
-            transaction.setDescription(category); // Using category as description for simplicity
-            transaction.setAmount(amount);
+            transaction.setDescription(category);
+            transaction.setAmount(isIncome ? Math.abs(amount) : -Math.abs(amount)); // Đảm bảo số tiền âm cho chi tiêu
             transaction.setCategory(category);
             transaction.setDate(date);
             transaction.setIncome(isIncome);
             transaction.setNote(note);
             transaction.setRepeat(isRecurring);
+            transaction.setRepeatType(repeatType);
+            transaction.setEndDate(endDate);
             transaction.setUserId(currentUser.getUid());
 
-            // Update in Firebase
             repository.updateTransaction(transaction);
             Toast.makeText(requireContext(), "Giao dịch đã được cập nhật", Toast.LENGTH_SHORT).show();
         } else {
-            // Create new transaction
             transaction = new Transaction();
             transaction.setFirebaseId(UUID.randomUUID().toString());
             transaction.setId(System.currentTimeMillis());
-            transaction.setDescription(category); // Using category as description for simplicity
-            transaction.setAmount(amount);
+            transaction.setDescription(category);
+            transaction.setAmount(isIncome ? Math.abs(amount) : -Math.abs(amount)); // Đảm bảo số tiền âm cho chi tiêu
             transaction.setCategory(category);
             transaction.setDate(date);
             transaction.setIncome(isIncome);
             transaction.setNote(note);
             transaction.setRepeat(isRecurring);
+            transaction.setRepeatType(repeatType);
+            transaction.setEndDate(endDate);
             transaction.setUserId(currentUser.getUid());
 
-            // Add to Firebase
             repository.addTransaction(transaction);
+
+            // Kiểm tra nếu có lặp lại
+            if (isRecurring && !"None".equals(repeatType)) {
+                generateRecurringTransactions(transaction);
+            }
+
             Toast.makeText(requireContext(), "Giao dịch đã được thêm", Toast.LENGTH_SHORT).show();
         }
 
-        // Navigate back
         Navigation.findNavController(requireView()).popBackStack();
     }
+
+    private void generateRecurringTransactions(Transaction baseTransaction) {
+        if (!baseTransaction.isRepeat() || baseTransaction.getRepeatType() == null) {
+            return; // Không có lặp lại, thoát
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(baseTransaction.getDate());
+
+        Date endDate = baseTransaction.getEndDate(); // Ngày kết thúc
+        if (endDate == null) {
+            // Nếu không có ngày kết thúc, mặc định tạo lặp lại trong 1 năm
+            Calendar defaultEndCal = Calendar.getInstance();
+            defaultEndCal.setTime(baseTransaction.getDate());
+            defaultEndCal.add(Calendar.YEAR, 1);
+            endDate = defaultEndCal.getTime();
+        }
+
+        // Xác định khoảng cách thời gian dựa trên loại lặp lại
+        int calendarField;
+        int amount = 1;
+
+        switch (baseTransaction.getRepeatType().toLowerCase()) {
+            case "hàng ngày":
+                calendarField = Calendar.DAY_OF_MONTH;
+                break;
+            case "hàng tuần":
+                calendarField = Calendar.WEEK_OF_YEAR;
+                break;
+            case "hàng tháng":
+                calendarField = Calendar.MONTH;
+                break;
+            case "hàng năm":
+                calendarField = Calendar.YEAR;
+                break;
+            default:
+                return; // Loại lặp lại không hợp lệ
+        }
+
+        // Tạo các giao dịch lặp lại
+        int maxRecurringTransactions = 100; // Giới hạn số lượng giao dịch lặp lại để tránh lặp vô hạn
+        int count = 0;
+
+        while (count < maxRecurringTransactions) {
+            // Tăng ngày theo loại lặp lại
+            calendar.add(calendarField, amount);
+            Date nextDate = calendar.getTime();
+
+            // Kiểm tra nếu đã vượt quá ngày kết thúc
+            if (nextDate.after(endDate)) {
+                break;
+            }
+
+            // Tạo giao dịch mới dựa trên giao dịch gốc
+            Transaction newTransaction = new Transaction();
+            newTransaction.setFirebaseId(UUID.randomUUID().toString());
+            newTransaction.setId(System.currentTimeMillis() + count); // ID duy nhất
+            newTransaction.setDescription(baseTransaction.getDescription());
+            newTransaction.setAmount(baseTransaction.getAmount());
+            newTransaction.setCategory(baseTransaction.getCategory());
+            newTransaction.setDate(nextDate); // Ngày mới
+            newTransaction.setIncome(baseTransaction.isIncome());
+            newTransaction.setNote(baseTransaction.getNote());
+
+            // Giữ lại thông tin lặp lại giống như giao dịch gốc
+            newTransaction.setRepeat(baseTransaction.isRepeat());
+            newTransaction.setRepeatType(baseTransaction.getRepeatType());
+            newTransaction.setEndDate(baseTransaction.getEndDate());
+
+            newTransaction.setUserId(baseTransaction.getUserId());
+
+            // Lưu giao dịch vào cơ sở dữ liệu
+            repository.addTransaction(newTransaction);
+
+            count++;
+        }
+    }
+
 
     private void setupToolbar() {
         binding.toolbar.setNavigationOnClickListener(v -> {
