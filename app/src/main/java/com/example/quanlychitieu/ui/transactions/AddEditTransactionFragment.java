@@ -3,7 +3,10 @@ package com.example.quanlychitieu.ui.transactions;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,8 @@ import com.example.quanlychitieu.databinding.FragmentAddEditTransactionBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -75,8 +80,65 @@ public class AddEditTransactionFragment extends Fragment {
         setupTimePicker();
         setupCategoryDropdown();
         setupRecurringOptions();
+        setupAmountInputFormatting();
         setupSaveButton();
         setupToolbar();
+    }
+
+    private void setupAmountInputFormatting() {
+        int maxLength = 15;
+        InputFilter[] filters = new InputFilter[1];
+        filters[0] = new InputFilter.LengthFilter(maxLength);
+        binding.amountInput.setFilters(filters);
+
+        binding.amountInput.addTextChangedListener(new TextWatcher() {
+            private String current = "";
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not needed
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals(current)) {
+                    binding.amountInput.removeTextChangedListener(this);
+
+                    // Remove all non-digit characters
+                    String cleanString = s.toString().replaceAll("[^\\d]", "");
+
+                    if (!cleanString.isEmpty()) {
+                        try {
+                            // Parse to a long (no decimals for VND)
+                            long parsed = Long.parseLong(cleanString);
+
+                            // Format with Vietnamese locale
+                            DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(new Locale("vi", "VN"));
+                            formatter.applyPattern("#,###");
+                            formatter.setDecimalSeparatorAlwaysShown(false);
+                            formatter.setGroupingUsed(true);
+                            formatter.setGroupingSize(3);
+
+                            String formatted = formatter.format(parsed);
+                            // Replace comma with dot for Vietnamese display
+                            formatted = formatted.replace(",", ".");
+
+                            current = formatted;
+                            s.replace(0, s.length(), formatted);
+                        } catch (NumberFormatException e) {
+                            s.clear();
+                        }
+                    }
+
+                    binding.amountInput.addTextChangedListener(this);
+                }
+            }
+        });
     }
 
     private void loadExistingTransaction(String id) {
@@ -92,8 +154,19 @@ public class AddEditTransactionFragment extends Fragment {
         binding.expenseRadio.setChecked(!transaction.isIncome());
         binding.incomeRadio.setChecked(transaction.isIncome());
 
-        // Set amount
-        binding.amountInput.setText(String.valueOf(transaction.getAmount()));
+        // Format the amount properly with thousand separators
+        double amount = Math.abs(transaction.getAmount());
+
+        // Use DecimalFormat for better control
+        DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(new Locale("vi", "VN"));
+        formatter.applyPattern("#,###");
+        formatter.setDecimalSeparatorAlwaysShown(false);
+
+        String formattedAmount = formatter.format(amount);
+        // Replace comma with dot for Vietnamese display
+        formattedAmount = formattedAmount.replace(",", ".");
+
+        binding.amountInput.setText(formattedAmount);
 
         // Set category
         binding.categoryInput.setText(transaction.getCategory(), false);
@@ -110,7 +183,6 @@ public class AddEditTransactionFragment extends Fragment {
         binding.repeatSwitch.setChecked(transaction.isRepeat());
         if (transaction.isRepeat()) {
             binding.repeatOptions.setVisibility(View.VISIBLE);
-            // Would need to set repeat type and end date if those were in the model
         }
     }
 
@@ -243,7 +315,9 @@ public class AddEditTransactionFragment extends Fragment {
             isValid = false;
         } else {
             try {
-                double amount = Double.parseDouble(amountText);
+                // Remove formatting before parsing
+                String cleanAmount = amountText.replace(".", "");
+                double amount = Double.parseDouble(cleanAmount);
                 if (amount <= 0) {
                     binding.amountLayout.setError("Số tiền phải lớn hơn 0");
                     isValid = false;
@@ -284,7 +358,19 @@ public class AddEditTransactionFragment extends Fragment {
 
         // Get all form values
         boolean isIncome = binding.incomeRadio.isChecked();
-        double amount = Double.parseDouble(binding.amountInput.getText().toString().trim());
+
+        // Parse the formatted amount
+        String amountStr = binding.amountInput.getText().toString().trim();
+        double amount;
+        try {
+            // Remove all dots (thousand separators) before parsing
+            amountStr = amountStr.replace(".", "");
+            amount = Double.parseDouble(amountStr);
+        } catch (NumberFormatException e) {
+            binding.amountLayout.setError("Số tiền không hợp lệ");
+            return;
+        }
+
         String category = binding.categoryInput.getText().toString().trim();
         Date date = transactionCalendar.getTime();
         String note = binding.noteInput.getText().toString().trim();

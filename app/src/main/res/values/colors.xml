@@ -60,5 +60,8 @@
     <color name="text_hint">#9E9E9E</color>
     <color name="ripple">#33000000</color>
 
-
+    <!-- Transaction Detail Colors -->
+    <color name="income_green">#4CAF50</color>
+    <color name="expense_red">#F44336</color>
+    <color name="background_light">#F5F5F5</color>
 </resources>

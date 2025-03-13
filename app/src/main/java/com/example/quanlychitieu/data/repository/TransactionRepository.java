@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.Transaction;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,8 +45,37 @@ public class TransactionRepository {
     }
 
     public LiveData<List<Transaction>> getAllTransactions() {
-        loadTransactions();
-        return transactionsLiveData;
+        MutableLiveData<List<Transaction>> allTransactionsLiveData = new MutableLiveData<>();
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            allTransactionsLiveData.setValue(new ArrayList<>());
+            return allTransactionsLiveData;
+        }
+
+        db.collection(COLLECTION_USERS)
+                .document(currentUser.getUid())
+                .collection(COLLECTION_TRANSACTIONS)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Transaction> transactions = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Transaction transaction = documentToTransaction(document);
+                        transactions.add(transaction);
+                    }
+
+                    // Update both LiveData objects
+                    transactionsLiveData.setValue(transactions);
+                    allTransactionsLiveData.setValue(transactions);
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failure
+                    transactionsLiveData.setValue(new ArrayList<>());
+                    allTransactionsLiveData.setValue(new ArrayList<>());
+                });
+
+        return allTransactionsLiveData;
     }
 
     public LiveData<List<Transaction>> getFilteredTransactions(Date fromDate, Date toDate, String category, String type) {
@@ -57,11 +87,13 @@ public class TransactionRepository {
             return filteredData;
         }
 
+
         Query query = db.collection(COLLECTION_USERS)
                 .document(currentUser.getUid())
                 .collection(COLLECTION_TRANSACTIONS)
                 .whereGreaterThanOrEqualTo("date", fromDate)
-                .whereLessThanOrEqualTo("date", toDate);
+                .whereLessThanOrEqualTo("date", toDate)
+                .orderBy("date", Query.Direction.DESCENDING);
 
         query.get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<Transaction> transactions = new ArrayList<>();
@@ -72,7 +104,19 @@ public class TransactionRepository {
                 // Áp dụng bộ lọc loại giao dịch
                 boolean typeMatch = false;
                 if (type.equals("Tất cả giao dịch")) {
-                    typeMatch = true;
+                    if (!category.equals("Tất cả danh mục")) {
+                        // Check if it's a valid category for this transaction's type
+                        if (transaction.isIncome() &&
+                                CategoryManager.getInstance().getIncomeCategories().contains(category)) {
+                            typeMatch = true;
+                        } else if (!transaction.isIncome() &&
+                                CategoryManager.getInstance().getExpenseCategories().contains(category)) {
+                            typeMatch = true;
+                        }
+                    } else {
+                        // No category filter, show all
+                        typeMatch = true;
+                    }
                 } else if (type.equals("Chi tiêu") && !transaction.isIncome()) {
                     typeMatch = true;
                 } else if (type.equals("Thu nhập") && transaction.isIncome()) {
@@ -82,6 +126,7 @@ public class TransactionRepository {
                 // Áp dụng bộ lọc danh mục
                 boolean categoryMatch = category.equals("Tất cả danh mục") ||
                         transaction.getCategory().equals(category);
+
 
                 // Chỉ thêm giao dịch nếu thỏa mãn cả hai điều kiện
                 if (typeMatch && categoryMatch) {
@@ -95,6 +140,33 @@ public class TransactionRepository {
         });
 
         return filteredData;
+    }
+
+
+    private void loadTransactions() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            transactionsLiveData.setValue(new ArrayList<>());
+            return;
+        }
+
+        db.collection(COLLECTION_USERS)
+                .document(currentUser.getUid())
+                .collection(COLLECTION_TRANSACTIONS)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Transaction> transactions = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Transaction transaction = documentToTransaction(document);
+                        transactions.add(transaction);
+                    }
+                    transactionsLiveData.setValue(transactions);
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failure
+                    transactionsLiveData.setValue(new ArrayList<>());
+                });
     }
 
 
@@ -200,32 +272,6 @@ public class TransactionRepository {
                 .addOnSuccessListener(aVoid -> {
                     // Reload transactions
                     loadTransactions();
-                });
-    }
-
-    private void loadTransactions() {
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null) {
-            transactionsLiveData.setValue(new ArrayList<>());
-            return;
-        }
-
-        db.collection(COLLECTION_USERS)
-                .document(currentUser.getUid())
-                .collection(COLLECTION_TRANSACTIONS)
-                .orderBy("date", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Transaction> transactions = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        Transaction transaction = documentToTransaction(document);
-                        transactions.add(transaction);
-                    }
-                    transactionsLiveData.setValue(transactions);
-                })
-                .addOnFailureListener(e -> {
-                    // Handle failure
-                    transactionsLiveData.setValue(new ArrayList<>());
                 });
     }
 

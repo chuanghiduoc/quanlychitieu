@@ -2,6 +2,8 @@ package com.example.quanlychitieu.ui.transactions;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +18,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.adapter.TransactionAdapter;
+import com.example.quanlychitieu.adapter.helper.SwipeToDeleteCallback;
 import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.Transaction;
 import com.example.quanlychitieu.databinding.FragmentTransactionsBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class TransactionsFragment extends Fragment {
+public class TransactionsFragment extends Fragment implements TransactionAdapter.OnTransactionClickListener,
+        SwipeToDeleteCallback.SwipeActionListener {
 
     private FragmentTransactionsBinding binding;
     private TransactionsViewModel viewModel;
@@ -44,6 +50,34 @@ public class TransactionsFragment extends Fragment {
     private ArrayAdapter<String> allCategoriesAdapter;
     private ArrayAdapter<String> expenseCategoriesAdapter;
     private ArrayAdapter<String> incomeCategoriesAdapter;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Restore dropdown selections
+        restoreDropdownSelections();
+    }
+
+    private void restoreDropdownSelections() {
+        // Get the current selections
+        String currentTransactionType = binding.transactionTypeInput.getText().toString();
+        String currentCategory = binding.categoryFilterInput.getText().toString();
+
+        // Log the current selections for debugging
+        Log.d("TransactionsFragment", "Restoring dropdowns - Type: " + currentTransactionType +
+                ", Category: " + currentCategory);
+
+        // Reinitialize the adapters
+        setupTransactionTypeFilter();
+
+        // Update category filter based on current transaction type
+        updateCategoryFilterBasedOnTransactionType(currentTransactionType);
+
+        // Restore the selections
+        binding.transactionTypeInput.setText(currentTransactionType, false);
+        binding.categoryFilterInput.setText(currentCategory, false);
+    }
 
     @Nullable
     @Override
@@ -63,20 +97,46 @@ public class TransactionsFragment extends Fragment {
         setupToolbar();
         setupDatePickers();
 
-        // Khởi tạo các adapter danh mục
-        initCategoryAdapters();
+        // Initialize category adapters only once
+        if (allCategoriesAdapter == null) {
+            initCategoryAdapters();
+        }
 
-        // Thiết lập bộ lọc loại giao dịch trước, vì danh mục phụ thuộc vào loại
+        // Set up UI components
         setupTransactionTypeFilter();
-
-        // Thiết lập bộ lọc danh mục (ban đầu hiển thị tất cả danh mục)
         setupCategoryFilter();
-
         setupRecyclerView();
         setupAddTransactionButton();
-
-        // Observe transactions data
+        observeLoadingState();
         observeTransactions();
+    }
+
+    private void observeLoadingState() {
+        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading) {
+                showLoading();
+            } else {
+                hideLoading();
+
+                // Force UI update when loading completes
+                List<Transaction> currentTransactions = adapter.getCurrentList();
+                updateUIBasedOnTransactions(currentTransactions);
+            }
+        });
+    }
+
+    private void showLoading() {
+        binding.loadingContainer.setVisibility(View.VISIBLE);
+        binding.emptyState.setVisibility(View.GONE);
+        binding.transactionsRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void hideLoading() {
+        binding.loadingContainer.setVisibility(View.GONE);
+
+        // Get current transactions to determine what to show
+        List<Transaction> currentTransactions = adapter.getCurrentList();
+        updateUIBasedOnTransactions(currentTransactions);
     }
 
     private void initCategoryAdapters() {
@@ -153,11 +213,21 @@ public class TransactionsFragment extends Fragment {
         // Ban đầu, thiết lập adapter mặc định (tất cả danh mục)
         AutoCompleteTextView categoryInput = binding.categoryFilterInput;
         categoryInput.setAdapter(allCategoriesAdapter);
-        categoryInput.setText("Tất cả danh mục", false);
+
 
         // Lắng nghe sự kiện khi người dùng chọn danh mục
         categoryInput.setOnItemClickListener((parent, view, position, id) -> {
-            // Áp dụng bộ lọc ngay lập tức sau khi chọn danh mục
+            String selectedCategory = (String) parent.getItemAtPosition(position);
+            if (!selectedCategory.equals("Tất cả danh mục")) {
+                boolean inExpense = CategoryManager.getInstance().getExpenseCategories().contains(selectedCategory);
+                boolean inIncome = CategoryManager.getInstance().getIncomeCategories().contains(selectedCategory);
+
+                if (inExpense && !inIncome) {
+                    binding.transactionTypeInput.setText("Chi tiêu", false);
+                } else if (inIncome && !inExpense) {
+                    binding.transactionTypeInput.setText("Thu nhập", false);
+                }
+            }
             applyFilters();
         });
     }
@@ -174,7 +244,8 @@ public class TransactionsFragment extends Fragment {
         );
 
         binding.transactionTypeInput.setAdapter(typeAdapter);
-        binding.transactionTypeInput.setText(transactionTypes[0], false);
+
+        // Don't set default text here, as it will be restored in restoreDropdownSelections
 
         binding.transactionTypeInput.setOnItemClickListener((parent, view, position, id) -> {
             String selectedType = (String) parent.getItemAtPosition(position);
@@ -193,6 +264,7 @@ public class TransactionsFragment extends Fragment {
     private void updateCategoryFilterBasedOnTransactionType(String transactionType) {
         AutoCompleteTextView categoryInput = binding.categoryFilterInput;
         String currentCategory = categoryInput.getText().toString();
+
 
         // Tạm thời tắt sự kiện lắng nghe để tránh gọi applyFilters() nhiều lần
         AdapterView.OnItemClickListener originalListener = categoryInput.getOnItemClickListener();
@@ -251,51 +323,84 @@ public class TransactionsFragment extends Fragment {
 
 
     private void applyFilters() {
+        // Show loading before applying filters
+        showLoading();
+
         Date fromDate = fromDateCalendar.getTime();
         Date toDate = toDateCalendar.getTime();
         String category = binding.categoryFilterInput.getText().toString();
         String transactionType = binding.transactionTypeInput.getText().toString();
 
-        Log.d("TransactionsFragment", "Applying filters - Type: " + transactionType +
-                ", Category: " + category +
-                ", From: " + dateFormatter.format(fromDate) +
-                ", To: " + dateFormatter.format(toDate));
-
         if (fromDate.after(toDate)) {
             Toast.makeText(requireContext(), "Ngày bắt đầu phải trước ngày kết thúc", Toast.LENGTH_SHORT).show();
+            hideLoading(); // Hide loading if there's an error
             return;
         }
 
-        // Kiểm tra tính hợp lệ của bộ lọc danh mục và loại giao dịch
+        // Ensure we set the end time to the end of the day for proper date range filtering
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTime(toDate);
+        endCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endCalendar.set(Calendar.MINUTE, 59);
+        endCalendar.set(Calendar.SECOND, 59);
+        toDate = endCalendar.getTime();
+
+        // Validate category and transaction type
         if (!transactionType.equals("Tất cả giao dịch")) {
             if (transactionType.equals("Chi tiêu") &&
                     !CategoryManager.getInstance().getExpenseCategories().contains(category) &&
                     !category.equals("Tất cả danh mục")) {
-                // Nếu đang lọc chi tiêu nhưng chọn danh mục thu nhập
                 Toast.makeText(requireContext(), "Danh mục không phù hợp với loại giao dịch", Toast.LENGTH_SHORT).show();
                 binding.categoryFilterInput.setText("Tất cả danh mục", false);
                 category = "Tất cả danh mục";
             } else if (transactionType.equals("Thu nhập") &&
                     !CategoryManager.getInstance().getIncomeCategories().contains(category) &&
                     !category.equals("Tất cả danh mục")) {
-                // Nếu đang lọc thu nhập nhưng chọn danh mục chi tiêu
                 Toast.makeText(requireContext(), "Danh mục không phù hợp với loại giao dịch", Toast.LENGTH_SHORT).show();
                 binding.categoryFilterInput.setText("Tất cả danh mục", false);
                 category = "Tất cả danh mục";
             }
         }
 
-        // Áp dụng bộ lọc trong ViewModel
-        viewModel.applyFilter(fromDate, toDate, category, transactionType);
+        // Store final values for use in callback
+        final String finalCategory = category;
+        final String finalType = transactionType;
+
+        // Apply filters with callback for immediate UI updates
+        viewModel.applyFilter(fromDate, toDate, category, transactionType, new TransactionsViewModel.FilterCallback() {
+            @Override
+            public void onFilterComplete(List<Transaction> transactions) {
+
+                // Force update UI immediately
+                updateUIBasedOnTransactions(transactions);
+
+                // Force empty state if needed
+                if (transactions == null || transactions.isEmpty()) {
+                    binding.emptyState.setVisibility(View.VISIBLE);
+                    binding.transactionsRecyclerView.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        // Fallback check after a delay
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (adapter.getItemCount() == 0) {
+                binding.emptyState.setVisibility(View.VISIBLE);
+                binding.transactionsRecyclerView.setVisibility(View.GONE);
+            }
+        }, 500);
     }
-
-
 
     // Các phương thức còn lại giữ nguyên
     private void setupRecyclerView() {
-        adapter = new TransactionAdapter();
+        adapter = new TransactionAdapter(this);
         binding.transactionsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.transactionsRecyclerView.setAdapter(adapter);
+
+        // Add swipe functionality
+        SwipeToDeleteCallback swipeHandler = new SwipeToDeleteCallback(requireContext(), this);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeHandler);
+        itemTouchHelper.attachToRecyclerView(binding.transactionsRecyclerView);
     }
 
     private void setupAddTransactionButton() {
@@ -308,23 +413,26 @@ public class TransactionsFragment extends Fragment {
     }
 
 
-    // Trong TransactionsFragment
     private void observeTransactions() {
         viewModel.getTransactions().observe(getViewLifecycleOwner(), transactions -> {
 
+            // Always update the adapter with the new transactions, even if empty
             adapter.submitList(transactions);
 
-            // Show/hide empty state
-            if (transactions.isEmpty()) {
-                binding.emptyState.setVisibility(View.VISIBLE);
-                binding.transactionsRecyclerView.setVisibility(View.GONE);
-            } else {
-                binding.emptyState.setVisibility(View.GONE);
-                binding.transactionsRecyclerView.setVisibility(View.VISIBLE);
-            }
+            // Force UI update whenever we get new transaction data
+            updateUIBasedOnTransactions(transactions);
         });
     }
 
+    private void updateUIBasedOnTransactions(List<Transaction> transactions) {
+        if (transactions == null || transactions.isEmpty()) {
+            binding.emptyState.setVisibility(View.VISIBLE);
+            binding.transactionsRecyclerView.setVisibility(View.GONE);
+        } else {
+            binding.emptyState.setVisibility(View.GONE);
+            binding.transactionsRecyclerView.setVisibility(View.VISIBLE);
+        }
+    }
 
     private void setupToolbar() {
         // Toolbar setup logic here
@@ -334,5 +442,60 @@ public class TransactionsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onTransactionClick(Transaction transaction) {
+        Bundle args = new Bundle();
+        args.putString("transaction_id", transaction.getFirebaseId());
+        Navigation.findNavController(requireView()).navigate(
+                R.id.action_transactions_to_transaction_detail, args);
+    }
+    @Override
+    public void onEditClick(Transaction transaction) {
+        navigateToEditTransaction(transaction);
+    }
+
+    @Override
+    public void onDeleteClick(Transaction transaction) {
+        showDeleteConfirmationDialog(transaction);
+    }
+
+    // Implement SwipeActionListener methods
+    @Override
+    public void onDelete(int position) {
+        Transaction transaction = adapter.getCurrentList().get(position);
+        showDeleteConfirmationDialog(transaction);
+    }
+
+    @Override
+    public void onEdit(int position) {
+        Transaction transaction = adapter.getCurrentList().get(position);
+        navigateToEditTransaction(transaction);
+    }
+
+
+    private void navigateToEditTransaction(Transaction transaction) {
+        Bundle args = new Bundle();
+        args.putString("transaction_id", transaction.getFirebaseId());
+        Navigation.findNavController(requireView()).navigate(
+                R.id.action_transactions_to_add_transaction, args);
+    }
+
+    private void showDeleteConfirmationDialog(Transaction transaction) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Xóa giao dịch")
+                .setMessage("Bạn có chắc chắn muốn xóa giao dịch này?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    // Show loading while deleting
+                    showLoading();
+                    viewModel.deleteTransaction(transaction.getFirebaseId());
+                    Toast.makeText(requireContext(), "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", (dialog, which) -> {
+                    // Refresh the adapter to reset the swiped item
+                    adapter.notifyDataSetChanged();
+                })
+                .show();
     }
 }

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,12 +20,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.adapter.TransactionAdapter;
 import com.example.quanlychitieu.auth.ProfileActivity;
+import com.example.quanlychitieu.data.model.Transaction;
 import com.example.quanlychitieu.databinding.FragmentDashboardBinding;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class DashboardFragment extends Fragment {
+public class DashboardFragment extends Fragment implements TransactionAdapter.OnTransactionClickListener {
 
     private FragmentDashboardBinding binding;
     private DashboardViewModel dashboardViewModel;
@@ -68,7 +70,6 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-
         // Quan sát dữ liệu tài chính
         observeFinancialData();
 
@@ -80,8 +81,8 @@ public class DashboardFragment extends Fragment {
         RecyclerView recyclerView = binding.recentTransactionsRecycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Khởi tạo adapter
-        recentTransactionsAdapter = new TransactionAdapter();
+        // Khởi tạo adapter với this làm OnTransactionClickListener
+        recentTransactionsAdapter = new TransactionAdapter(this);
         recyclerView.setAdapter(recentTransactionsAdapter);
     }
 
@@ -112,6 +113,30 @@ public class DashboardFragment extends Fragment {
         return currencyFormat.format(amount)
                 .replace("₫", "đ")
                 .replace(",", ".");
+    }
+
+    // Implement OnTransactionClickListener methods
+    @Override
+    public void onTransactionClick(Transaction transaction) {
+        // Navigate to transaction details or edit screen
+        Bundle args = new Bundle();
+        args.putString("transaction_id", transaction.getFirebaseId());
+        navController.navigate(R.id.action_dashboard_to_add_transaction, args);
+    }
+
+    @Override
+    public void onEditClick(Transaction transaction) {
+        // Navigate to edit transaction screen
+        Bundle args = new Bundle();
+        args.putString("transaction_id", transaction.getFirebaseId());
+        navController.navigate(R.id.action_dashboard_to_add_transaction, args);
+    }
+
+    @Override
+    public void onDeleteClick(Transaction transaction) {
+        // Handle delete action if needed in dashboard
+        // For dashboard, you might want to just show a toast and not allow deletion
+        Toast.makeText(requireContext(), "Vui lòng vào trang Giao dịch để xóa", Toast.LENGTH_SHORT).show();
     }
 
     @Override

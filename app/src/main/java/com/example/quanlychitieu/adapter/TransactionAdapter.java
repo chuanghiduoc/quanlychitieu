@@ -21,7 +21,7 @@ public class TransactionAdapter extends ListAdapter<Transaction, TransactionView
         void onDeleteClick(Transaction transaction);
     }
 
-    public TransactionAdapter() {
+    public TransactionAdapter(OnTransactionClickListener listener) {
         super(new DiffUtil.ItemCallback<Transaction>() {
             @Override
             public boolean areItemsTheSame(@NonNull Transaction oldItem, @NonNull Transaction newItem) {
@@ -36,6 +36,7 @@ public class TransactionAdapter extends ListAdapter<Transaction, TransactionView
                         oldItem.getDate().equals(newItem.getDate());
             }
         });
+        this.listener = listener;
     }
 
     @NonNull
@@ -43,7 +44,7 @@ public class TransactionAdapter extends ListAdapter<Transaction, TransactionView
     public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_transaction, parent, false);
-        return new TransactionViewHolder(view);
+        return new TransactionViewHolder(view, listener);
     }
 
     @Override
@@ -52,3 +53,4 @@ public class TransactionAdapter extends ListAdapter<Transaction, TransactionView
         holder.bind(transaction);
     }
 }
+

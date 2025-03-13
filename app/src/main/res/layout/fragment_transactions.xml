@@ -171,6 +171,39 @@
             android:textColor="@android:color/darker_gray" />
     </LinearLayout>
 
+    <!-- Loading Indicator - Now placed LAST so it's on top -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#80FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filter_card">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorColor="@color/purple_500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Đang tải dữ liệu..."
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="@id/loading_indicator"
+            app:layout_constraintStart_toStartOf="@id/loading_indicator"
+            app:layout_constraintTop_toBottomOf="@id/loading_indicator" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <!-- FAB để thêm giao dịch -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_transaction"

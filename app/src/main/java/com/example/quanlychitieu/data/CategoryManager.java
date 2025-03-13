@@ -1,7 +1,10 @@
 package com.example.quanlychitieu.data;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.example.quanlychitieu.R;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,24 +13,40 @@ public class CategoryManager {
     private static CategoryManager instance;
     private final List<String> expenseCategories;
     private final List<String> incomeCategories;
+    private final List<String> allCategories; // New combined list
 
     private CategoryManager() {
         // Danh sách cố định các danh mục chi tiêu
-        expenseCategories = Arrays.asList(
+        expenseCategories = new ArrayList<>(Arrays.asList(
                 "Ăn uống",
                 "Di chuyển",
                 "Mua sắm",
                 "Hóa đơn",
                 "Khác"
-        );
+        ));
 
         // Danh sách cố định các danh mục thu nhập
-        incomeCategories = Arrays.asList(
+        incomeCategories = new ArrayList<>(Arrays.asList(
                 "Lương",
                 "Thưởng",
                 "Quà tặng",
                 "Khác"
-        );
+        ));
+
+        // Create combined list of all categories
+        allCategories = new ArrayList<>();
+        allCategories.addAll(expenseCategories);
+
+        // Add income categories that aren't already in the list (to avoid duplicates like "Khác")
+        for (String category : incomeCategories) {
+            if (!allCategories.contains(category)) {
+                allCategories.add(category);
+            }
+        }
+
+        Log.d("CategoryManager", "Initialized with " + expenseCategories.size() +
+                " expense categories, " + incomeCategories.size() + " income categories, and " +
+                allCategories.size() + " total unique categories");
     }
 
     public static synchronized CategoryManager getInstance() {
@@ -38,10 +57,32 @@ public class CategoryManager {
     }
 
     public List<String> getExpenseCategories() {
-        return expenseCategories;
+        return new ArrayList<>(expenseCategories); // Return a copy to prevent modification
     }
 
     public List<String> getIncomeCategories() {
-        return incomeCategories;
+        return new ArrayList<>(incomeCategories); // Return a copy to prevent modification
+    }
+
+    public List<String> getAllCategories() {
+        return new ArrayList<>(allCategories); // Return a copy to prevent modification
+    }
+
+    public boolean isExpenseCategory(String category) {
+        return expenseCategories.contains(category);
+    }
+
+    public boolean isIncomeCategory(String category) {
+        return incomeCategories.contains(category);
+    }
+
+    public String getCategoryType(String category) {
+        if (isExpenseCategory(category)) {
+            return "Chi tiêu";
+        } else if (isIncomeCategory(category)) {
+            return "Thu nhập";
+        } else {
+            return "Tất cả giao dịch";
+        }
     }
 }

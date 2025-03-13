@@ -18,9 +18,6 @@
             app:destination="@id/navigation_transactions" />
     </fragment>
 
-
-
-
     <!-- Transactions (Giao dịch) -->
     <fragment
         android:id="@+id/navigation_transactions"
