@@ -45,24 +45,23 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Khởi tạo NavController
+        // Initialize NavController
         navController = Navigation.findNavController(view);
-        // Khởi tạo ViewModel một lần
+
+        // Initialize ViewModel
         dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
-        // Thiết lập RecyclerView cho các giao dịch gần đây
+        // Setup RecyclerView for recent transactions
         setupRecentTransactionsRecyclerView();
 
-        // Thiết lập click listener cho "View All" giao dịch
+        // Setup click listener for "View All" transactions
         binding.viewAllTransactions.setOnClickListener(v -> {
-            // Chuyển đến Transactions không xoá back stack
             navController.navigate(R.id.action_dashboard_to_transactions, null);
         });
 
-        // Thiết lập click listener cho hình ảnh profile
+        // Setup click listener for profile image
         binding.profileImage.setOnClickListener(v -> {
             try {
-                // Start ProfileActivity instead of navigating to a fragment
                 Intent intent = new Intent(requireActivity(), ProfileActivity.class);
                 startActivity(intent);
             } catch (Exception e) {
@@ -70,18 +69,24 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
             }
         });
 
-        // Quan sát dữ liệu tài chính
+        // Observe financial data
         observeFinancialData();
 
-        // Quan sát các giao dịch gần đây
+        // Observe recent transactions
         observeRecentTransactions();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        dashboardViewModel.refreshData();
     }
 
     private void setupRecentTransactionsRecyclerView() {
         RecyclerView recyclerView = binding.recentTransactionsRecycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        // Khởi tạo adapter với this làm OnTransactionClickListener
+        // Initialize adapter with this as OnTransactionClickListener
         recentTransactionsAdapter = new TransactionAdapter(this);
         recyclerView.setAdapter(recentTransactionsAdapter);
     }
@@ -105,7 +110,20 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
 
     private void observeRecentTransactions() {
         dashboardViewModel.getRecentTransactions().observe(getViewLifecycleOwner(), transactions -> {
-            recentTransactionsAdapter.submitList(transactions);
+            if (transactions != null) {
+                recentTransactionsAdapter.submitList(transactions);
+
+                // Show or hide static transactions if list is empty
+                if (transactions.isEmpty() && binding.staticTransactions != null) {
+                    binding.staticTransactions.setVisibility(View.VISIBLE);
+                    binding.recentTransactionsRecycler.setVisibility(View.GONE);
+                } else {
+                    if (binding.staticTransactions != null) {
+                        binding.staticTransactions.setVisibility(View.GONE);
+                    }
+                    binding.recentTransactionsRecycler.setVisibility(View.VISIBLE);
+                }
+            }
         });
     }
 
@@ -118,10 +136,10 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
     // Implement OnTransactionClickListener methods
     @Override
     public void onTransactionClick(Transaction transaction) {
-        // Navigate to transaction details or edit screen
+        // Navigate to transaction details
         Bundle args = new Bundle();
         args.putString("transaction_id", transaction.getFirebaseId());
-        navController.navigate(R.id.action_dashboard_to_add_transaction, args);
+        navController.navigate(R.id.action_dashboard_to_transaction_detail, args);
     }
 
     @Override
@@ -134,8 +152,7 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
 
     @Override
     public void onDeleteClick(Transaction transaction) {
-        // Handle delete action if needed in dashboard
-        // For dashboard, you might want to just show a toast and not allow deletion
+        // Show a toast message instead of deleting
         Toast.makeText(requireContext(), "Vui lòng vào trang Giao dịch để xóa", Toast.LENGTH_SHORT).show();
     }
 
