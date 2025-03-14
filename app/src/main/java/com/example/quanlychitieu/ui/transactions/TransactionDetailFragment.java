@@ -43,7 +43,7 @@ public class TransactionDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(TransactionsViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(TransactionsViewModel.class);
 
         // Get transaction ID from arguments
         if (getArguments() != null) {
