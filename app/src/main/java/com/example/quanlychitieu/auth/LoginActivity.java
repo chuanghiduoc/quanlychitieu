@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.quanlychitieu.MainActivity;
 import com.example.quanlychitieu.R;
@@ -36,12 +37,16 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private FirebaseFirestore db;
     private static final int RC_SIGN_IN = 9001;
+    private AuthViewModel authViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Initialize ViewModel
+        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
@@ -60,6 +65,46 @@ public class LoginActivity extends AppCompatActivity {
         binding.btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
         binding.tvRegister.setOnClickListener(v -> navigateToRegister());
         binding.tvForgotPassword.setOnClickListener(v -> handleForgotPassword());
+
+        // Observe ViewModel LiveData
+        observeViewModel();
+    }
+
+    private void observeViewModel() {
+        // Observe user authentication state
+        authViewModel.getUserLiveData().observe(this, user -> {
+            if (user != null) {
+                navigateToMainScreen();
+            }
+        });
+
+        // Observe password reset progress
+        authViewModel.getResetPasswordInProgress().observe(this, isLoading -> {
+            if (isLoading != null && isLoading) {
+                showLoading(true);
+            }
+        });
+
+        // Observe password reset success
+        authViewModel.getResetPasswordSuccess().observe(this, isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                showLoading(false);
+                String email = binding.etEmail.getText().toString().trim();
+                Toast.makeText(this,
+                        "Email đặt lại mật khẩu đã được gửi đến " + email,
+                        Toast.LENGTH_LONG).show();
+                authViewModel.clearPasswordResetState();
+            }
+        });
+
+        // Observe password reset error
+        authViewModel.getResetPasswordError().observe(this, error -> {
+            if (error != null && !error.isEmpty()) {
+                showLoading(false);
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                authViewModel.clearPasswordResetState();
+            }
+        });
     }
 
     @Override
@@ -207,24 +252,8 @@ public class LoginActivity extends AppCompatActivity {
         // Clear error
         binding.tilEmail.setError(null);
 
-        // Show loading
-        showLoading(true);
-
-        // Send password reset email
-        auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    showLoading(false);
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this,
-                                "Email đặt lại mật khẩu đã được gửi đến " + email,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this,
-                                "Không thể gửi email đặt lại mật khẩu: " +
-                                        (task.getException() != null ? task.getException().getMessage() : "Lỗi không xác định"),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+        // Use ViewModel to handle password reset
+        authViewModel.sendPasswordResetEmail(email);
     }
 
     private void navigateToMainScreen() {
