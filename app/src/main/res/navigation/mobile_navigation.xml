@@ -115,11 +115,13 @@
     <fragment
         android:id="@+id/navigation_reminders"
         android:name="com.example.quanlychitieu.ui.reminders.RemindersFragment"
-        android:label="Nhắc nhở"
+        android:label="@string/title_reminders"
         tools:layout="@layout/fragment_reminders">
-
         <action
             android:id="@+id/action_reminders_to_add_reminder"
+            app:destination="@id/navigation_add_edit_reminder" />
+        <action
+            android:id="@+id/action_reminders_to_edit_reminder"
             app:destination="@id/navigation_add_edit_reminder" />
     </fragment>
 
@@ -127,24 +129,12 @@
     <fragment
         android:id="@+id/navigation_add_edit_reminder"
         android:name="com.example.quanlychitieu.ui.reminders.AddEditReminderFragment"
-        android:label="{title}"
+        android:label="Thêm nhắc nhở"
         tools:layout="@layout/fragment_add_edit_reminder">
-
         <argument
             android:name="reminderId"
-            app:argType="string"
-            app:nullable="true" />
-
-        <argument
-            android:name="title"
-            app:argType="string"
-            android:defaultValue="Thêm nhắc nhở" />
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
 
-    <!-- Settings (Cài đặt) -->
-    <fragment
-        android:id="@+id/navigation_settings"
-        android:name="com.example.quanlychitieu.ui.settings.SettingsFragment"
-        android:label="Cài đặt"
-        tools:layout="@layout/fragment_settings" />
 </navigation>

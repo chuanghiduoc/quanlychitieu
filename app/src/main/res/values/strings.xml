@@ -22,4 +22,13 @@
     <string name="register">Đăng ký</string>
     <string name="already_have_account">Đã có tài khoản?</string>
     <string name="login_now">Đăng nhập ngay</string>
+
+    <string name="title_reminders">Nhắc nhở</string>
+    <string name="add_reminder">Thêm nhắc nhở</string>
+    <string name="edit_reminder">Chỉnh sửa nhắc nhở</string>
+    <string name="empty_reminders">Không có nhắc nhở nào</string>
+    <string name="empty_reminders_desc">Thêm nhắc nhở để không bỏ lỡ các khoản thanh toán</string>
+    <string name="mark_as_paid">Đánh dấu đã thanh toán</string>
+    <string name="upcoming_reminders">Sắp tới</string>
+    <string name="past_reminders">Đã qua</string>
 </resources>

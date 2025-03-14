@@ -14,6 +14,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.quanlychitieu.auth.LoginActivity;
 import com.example.quanlychitieu.databinding.ActivityMainBinding;
+import com.example.quanlychitieu.service.ReminderNotificationService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private static final String TAG = "MainActivity";
     private FirebaseAuth auth;
+    private ReminderNotificationService notificationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
+
+        // Initialize notification service
+        notificationService = new ReminderNotificationService(this);
 
         // Check if user is logged in
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -93,18 +98,64 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         Log.e(TAG, "Navigation failed: " + e.getMessage());
                     }
+                } else if (navController.getCurrentDestination().getId() == R.id.navigation_reminders) {
+                    try {
+                        navController.navigate(R.id.action_reminders_to_add_reminder);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Navigation failed: " + e.getMessage());
+                    }
                 }
             }
         });
+
+        // Xử lý intent từ notification
+        handleNotificationIntent(getIntent());
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    private void handleNotificationIntent(Intent intent) {
+        if (intent != null && intent.hasExtra("REMINDER_ID")) {
+            long reminderId = intent.getLongExtra("REMINDER_ID", -1);
+            String documentId = intent.getStringExtra("REMINDER_DOCUMENT_ID"); // Thêm documentId
+
+            if (reminderId != -1) {
+                Log.d(TAG, "Handling notification for reminder: " + reminderId);
+
+                // Đảm bảo chuyển đến màn hình nhắc nhở trước
+                navController.navigate(R.id.navigation_reminders);
+
+                // Sau đó mở chi tiết nhắc nhở với ID
+                Bundle args = new Bundle();
+                args.putLong("reminderId", reminderId);
+                args.putString("documentId", documentId); // Thêm documentId
+                navController.navigate(R.id.action_reminders_to_add_reminder, args);
+            }
+        }
+    }
+
 
     private void handleDestinationChange(NavDestination destination) {
         Log.d(TAG, "Navigating to: " + destination.getId());
         int destinationId = destination.getId();
 
-        // Only show FAB on dashboard and transactions screens
-        binding.fabAddTransaction.setVisibility(destinationId == R.id.navigation_dashboard ||
-                destinationId == R.id.navigation_transactions ? View.VISIBLE : View.GONE);
+        // Hiển thị FAB ở màn hình dashboard, transactions và reminders
+        boolean shouldShowFab = (destinationId == R.id.navigation_dashboard ||
+                destinationId == R.id.navigation_transactions ||
+                destinationId == R.id.navigation_reminders);
+
+        binding.fabAddTransaction.setVisibility(shouldShowFab ? View.VISIBLE : View.GONE);
+
+        // Thay đổi icon của FAB tùy theo màn hình
+        if (destinationId == R.id.navigation_reminders) {
+            binding.fabAddTransaction.setImageResource(R.drawable.ic_notification);
+        } else {
+            binding.fabAddTransaction.setImageResource(R.drawable.ic_add);
+        }
     }
 
     private void setupBottomNavigation(BottomNavigationView bottomNavigationView) {
