@@ -13,7 +13,7 @@ public class CategoryManager {
     private static CategoryManager instance;
     private final List<String> expenseCategories;
     private final List<String> incomeCategories;
-    private final List<String> allCategories; // New combined list
+    private final List<String> allCategories;
 
     private CategoryManager() {
         // Danh sách cố định các danh mục chi tiêu
