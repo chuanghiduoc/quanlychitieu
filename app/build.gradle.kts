@@ -48,6 +48,7 @@ dependencies {
     // 1️⃣ **Cloud Firestore**
     implementation("com.google.firebase:firebase-firestore")
 
+    implementation("com.google.firebase:firebase-storage")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
