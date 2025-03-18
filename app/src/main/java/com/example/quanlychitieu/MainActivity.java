@@ -1,11 +1,21 @@
 package com.example.quanlychitieu;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
@@ -13,8 +23,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.quanlychitieu.auth.LoginActivity;
+import com.example.quanlychitieu.data.repository.TransactionRepository;
 import com.example.quanlychitieu.databinding.ActivityMainBinding;
-import com.example.quanlychitieu.service.ReminderNotificationService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,7 +35,16 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private static final String TAG = "MainActivity";
     private FirebaseAuth auth;
-    private ReminderNotificationService notificationService;
+
+    // Launcher để yêu cầu quyền thông báo
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.d(TAG, "Notification permission granted");
+                } else {
+                    showNotificationPermissionRationale();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
-
-        // Initialize notification service
-        notificationService = new ReminderNotificationService(this);
 
         // Check if user is logged in
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -59,9 +75,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         navController = navHostFragment.getNavController();
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            Log.d("NavController", "Navigating to: " + destination.getId());
-        });
 
         // Define top-level destinations
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -87,29 +100,72 @@ public class MainActivity extends AppCompatActivity {
             // Navigate to add transaction screen
             if (navController.getCurrentDestination() != null) {
                 if (navController.getCurrentDestination().getId() == R.id.navigation_dashboard) {
-                    try {
-                        navController.navigate(R.id.action_dashboard_to_add_transaction);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Navigation failed: " + e.getMessage());
-                    }
+                    navController.navigate(R.id.action_dashboard_to_add_transaction);
                 } else if (navController.getCurrentDestination().getId() == R.id.navigation_transactions) {
-                    try {
-                        navController.navigate(R.id.action_transactions_to_add_transaction);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Navigation failed: " + e.getMessage());
-                    }
+                    navController.navigate(R.id.action_transactions_to_add_transaction);
                 } else if (navController.getCurrentDestination().getId() == R.id.navigation_reminders) {
-                    try {
-                        navController.navigate(R.id.action_reminders_to_add_reminder);
-                    } catch (Exception e) {
-                        Log.e(TAG, "Navigation failed: " + e.getMessage());
-                    }
+                    navController.navigate(R.id.action_reminders_to_add_reminder);
                 }
             }
         });
 
         // Xử lý intent từ notification
         handleNotificationIntent(getIntent());
+
+        // Đặt context cho TransactionRepository
+        TransactionRepository.getInstance().setContext(getApplicationContext());
+
+        // Kiểm tra quyền thông báo
+        checkNotificationPermission();
+    }
+
+    /**
+     * Kiểm tra và yêu cầu quyền thông báo nếu cần
+     */
+    private void checkNotificationPermission() {
+        // Quyền POST_NOTIFICATIONS chỉ cần thiết từ Android 13 (API 33) trở lên
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Yêu cầu quyền trực tiếp
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            } else {
+                Log.d(TAG, "Notification permission already granted");
+            }
+        } else {
+            Log.d(TAG, "Notification permission not required for this Android version");
+        }
+    }
+
+    /**
+     * Hiển thị giải thích về lý do cần quyền thông báo
+     */
+    private void showNotificationPermissionRationale() {
+        new AlertDialog.Builder(this)
+                .setTitle("Quyền thông báo")
+                .setMessage("Ứng dụng cần quyền thông báo để cảnh báo khi bạn chi tiêu vượt quá ngân sách. " +
+                        "Vui lòng cấp quyền trong cài đặt ứng dụng.")
+                .setPositiveButton("Cài đặt", (dialog, which) -> {
+                    // Mở cài đặt ứng dụng
+                    openAppSettings();
+                })
+                .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                    // Hiển thị Snackbar để nhắc nhở người dùng
+                    Toast.makeText(this, "Bạn sẽ không nhận được thông báo khi vượt ngân sách",
+                            Toast.LENGTH_LONG).show();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    /**
+     * Mở cài đặt ứng dụng
+     */
+    private void openAppSettings() {
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+        startActivity(intent);
     }
 
     @Override
@@ -121,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleNotificationIntent(Intent intent) {
         if (intent != null && intent.hasExtra("REMINDER_ID")) {
             long reminderId = intent.getLongExtra("REMINDER_ID", -1);
-            String documentId = intent.getStringExtra("REMINDER_DOCUMENT_ID"); // Thêm documentId
+            String documentId = intent.getStringExtra("REMINDER_DOCUMENT_ID");
 
             if (reminderId != -1) {
                 Log.d(TAG, "Handling notification for reminder: " + reminderId);
@@ -132,15 +188,13 @@ public class MainActivity extends AppCompatActivity {
                 // Sau đó mở chi tiết nhắc nhở với ID
                 Bundle args = new Bundle();
                 args.putLong("reminderId", reminderId);
-                args.putString("documentId", documentId); // Thêm documentId
+                args.putString("documentId", documentId);
                 navController.navigate(R.id.action_reminders_to_add_reminder, args);
             }
         }
     }
 
-
     private void handleDestinationChange(NavDestination destination) {
-        Log.d(TAG, "Navigating to: " + destination.getId());
         int destinationId = destination.getId();
 
         // Hiển thị FAB ở màn hình dashboard, transactions và reminders

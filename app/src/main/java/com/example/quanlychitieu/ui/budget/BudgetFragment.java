@@ -89,21 +89,28 @@ public class BudgetFragment extends Fragment {
 
         // Initialize adapter with click listener
         adapter = new BudgetAdapter(budget -> {
-            // Navigate to edit budget screen
-            Bundle args = new Bundle();
-            args.putString("budget_id", budget.getFirebaseId());
+            // Kiểm tra xem ngân sách đã được thiết lập chưa
+            boolean isBudgetSet = budget.getFirebaseId() != null && budget.getAmount() > 0;
 
-            // Check if navigation action exists
-            if (Navigation.findNavController(requireView()).getCurrentDestination().getAction(R.id.action_budget_to_add_budget) != null) {
+            Bundle args = new Bundle();
+
+            if (isBudgetSet) {
+                // Đã có ngân sách - điều hướng đến màn hình sửa
+                args.putString("budget_id", budget.getFirebaseId());
                 Navigation.findNavController(requireView()).navigate(
                         R.id.action_budget_to_add_budget, args);
             } else {
-                Toast.makeText(requireContext(), "Chỉnh sửa ngân sách: " + budget.getCategory(), Toast.LENGTH_SHORT).show();
+                // Chưa có ngân sách - tạo ngân sách mới với danh mục đã chọn
+                String category = budget.getCategory();
+                args.putString("selected_category", category);
+                Navigation.findNavController(requireView()).navigate(
+                        R.id.action_budget_to_add_budget, args);
             }
         });
 
         recyclerView.setAdapter(adapter);
     }
+
 
     private void setupAddBudgetButton() {
         binding.fabAddBudget.setOnClickListener(v -> {
@@ -137,13 +144,34 @@ public class BudgetFragment extends Fragment {
 
             binding.totalBudgetRemaining.setText(
                     String.format("Còn lại: %s (%d%%)", formatCurrency(remaining), percentage));
+
+            // Chuyển sang màu đỏ nếu số tiền còn lại âm (vượt quá ngân sách)
+            if (remaining < 0) {
+                binding.totalBudgetRemaining.setTextColor(getResources().getColor(R.color.expense_red, null));
+            } else {
+                // Nếu không âm, giữ màu xanh mặc định
+                binding.totalBudgetRemaining.setTextColor(getResources().getColor(R.color.income, null));
+            }
         });
 
         // Observe progress percentage
         viewModel.getProgressPercentage().observe(getViewLifecycleOwner(), progress -> {
             binding.totalBudgetProgress.setProgress(progress);
+
+            // Đổi màu thanh tiến trình dựa trên phần trăm
+            if (progress > 90) {
+                binding.totalBudgetProgress.setIndicatorColor(
+                        getResources().getColor(R.color.expense_red, null));
+            } else if (progress > 75) {
+                binding.totalBudgetProgress.setIndicatorColor(
+                        getResources().getColor(R.color.chart_2, null));
+            } else {
+                binding.totalBudgetProgress.setIndicatorColor(
+                        getResources().getColor(R.color.income, null));
+            }
         });
     }
+
 
     private void observeCategoryBudgets() {
         viewModel.getCategoryBudgets().observe(getViewLifecycleOwner(), budgets -> {

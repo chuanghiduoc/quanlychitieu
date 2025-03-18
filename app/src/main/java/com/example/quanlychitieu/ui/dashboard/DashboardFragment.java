@@ -3,6 +3,7 @@ package com.example.quanlychitieu.ui.dashboard;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -18,13 +20,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quanlychitieu.R;
+import com.example.quanlychitieu.adapter.BudgetCategoryAdapter;
 import com.example.quanlychitieu.adapter.TransactionAdapter;
 import com.example.quanlychitieu.auth.ProfileActivity;
 import com.example.quanlychitieu.data.model.Transaction;
 import com.example.quanlychitieu.databinding.FragmentDashboardBinding;
+import com.github.mikephil.charting.charts.PieChart;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Map;
 
 public class DashboardFragment extends Fragment implements TransactionAdapter.OnTransactionClickListener {
 
@@ -34,6 +39,10 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private static final String TAG = "DashboardFragment";
     private NavController navController;
+    private PieChart expenseChart;
+    private PieChart budgetChart;
+    private BudgetCategoryAdapter categoryAdapter;
+    private RecyclerView categoryRecyclerView;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,17 +78,96 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
             }
         });
 
+        // Khởi tạo biểu đồ
+        setupCharts();
+
+        // Khởi tạo RecyclerView cho danh sách danh mục
+        setupCategoryList();
+
         // Observe financial data
         observeFinancialData();
 
         // Observe recent transactions
         observeRecentTransactions();
+
+        // Observe chart data
+        observeChartData();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         dashboardViewModel.refreshData();
+
+        // Cập nhật lại biểu đồ nếu cần
+        if (expenseChart != null && budgetChart != null) {
+            expenseChart.invalidate();
+            budgetChart.invalidate();
+        }
+    }
+    private void setupCharts() {
+        // Khởi tạo biểu đồ chi tiêu
+        expenseChart = new PieChart(requireContext());
+        binding.chartContainer.addView(expenseChart);
+        ChartHelper.setupPieChart(expenseChart);
+        expenseChart.setNoDataText("Đang tải dữ liệu...");
+
+        // Khởi tạo biểu đồ ngân sách
+        budgetChart = new PieChart(requireContext());
+        binding.budgetChartContainer.addView(budgetChart);
+        ChartHelper.setupPieChart(budgetChart);
+        budgetChart.setNoDataText("Đang tải dữ liệu...");
+    }
+
+    private void setupCategoryList() {
+        // Thay thế LinearLayout với RecyclerView
+        categoryRecyclerView = new RecyclerView(requireContext());
+        categoryRecyclerView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        binding.categoryList.addView(categoryRecyclerView);
+
+        categoryRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        categoryAdapter = new BudgetCategoryAdapter(requireContext());
+        categoryRecyclerView.setAdapter(categoryAdapter);
+    }
+
+
+
+
+    private void observeChartData() {
+        // Theo dõi cả dữ liệu chi tiêu và ngân sách
+        MediatorLiveData<Pair<Map<String, Double>, Map<String, Double>>> combinedData = new MediatorLiveData<>();
+
+        combinedData.addSource(dashboardViewModel.getCategoryExpensesData(), expenses -> {
+            Map<String, Double> budgets = dashboardViewModel.getCategoryBudgetsData().getValue();
+            if (budgets != null) {
+                combinedData.setValue(new Pair<>(expenses, budgets));
+            }
+        });
+
+        combinedData.addSource(dashboardViewModel.getCategoryBudgetsData(), budgets -> {
+            Map<String, Double> expenses = dashboardViewModel.getCategoryExpensesData().getValue();
+            if (expenses != null) {
+                combinedData.setValue(new Pair<>(expenses, budgets));
+            }
+        });
+
+        // Quan sát dữ liệu kết hợp
+        combinedData.observe(getViewLifecycleOwner(), data -> {
+            if (data != null) {
+                Map<String, Double> expenses = data.first;
+                Map<String, Double> budgets = data.second;
+
+                // Cập nhật biểu đồ
+                ChartHelper.updateExpenseChart(expenseChart, expenses, requireContext());
+                ChartHelper.updateBudgetChart(budgetChart, budgets, requireContext());
+
+                // Cập nhật danh sách danh mục
+                categoryAdapter.updateData(expenses, budgets);
+            }
+        });
     }
 
     private void setupRecentTransactionsRecyclerView() {

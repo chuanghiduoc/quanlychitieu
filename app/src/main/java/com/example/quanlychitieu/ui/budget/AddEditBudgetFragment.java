@@ -59,25 +59,74 @@ public class AddEditBudgetFragment extends Fragment {
         // Check if we're editing an existing budget
         if (getArguments() != null) {
             budgetId = getArguments().getString("budget_id");
+            String selectedCategory = getArguments().getString("selected_category");
             isEditMode = budgetId != null && !budgetId.isEmpty();
 
             if (isEditMode) {
+                // Sửa ngân sách hiện có
                 binding.toolbarTitle.setText("Sửa ngân sách");
                 loadExistingBudget();
+                setupDeleteButton();
             } else {
+                // Thêm ngân sách mới
+                binding.toolbarTitle.setText("Thêm ngân sách");
                 setupDefaultDates();
+
+                // Nếu có danh mục được chọn sẵn
+                if (selectedCategory != null && !selectedCategory.isEmpty()) {
+                    setupCategoryDropdownWithPreselection(selectedCategory);
+                } else {
+                    setupCategoryDropdown();
+                }
+
+                // Ẩn nút xóa khi thêm mới
+                binding.deleteButton.setVisibility(View.GONE);
             }
         } else {
+            // Thêm ngân sách mới (không có tham số)
+            binding.toolbarTitle.setText("Thêm ngân sách");
             setupDefaultDates();
+            setupCategoryDropdown();
+
+            // Ẩn nút xóa khi thêm mới
+            binding.deleteButton.setVisibility(View.GONE);
         }
 
         setupMonthPicker();
-        setupCategoryDropdown();
         setupAmountInputFormatting();
         setupNotificationOptions();
         setupSaveButton();
         setupToolbar();
     }
+
+    // Thêm phương thức mới để thiết lập dropdown với danh mục được chọn sẵn
+    private void setupCategoryDropdownWithPreselection(String selectedCategory) {
+        // Setup with expense categories
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                CategoryManager.getInstance().getExpenseCategories()
+        );
+
+        AutoCompleteTextView categoryInput = binding.categoryInput;
+        categoryInput.setAdapter(categoryAdapter);
+
+        // Thiết lập danh mục được chọn sẵn
+        categoryInput.setText(selectedCategory, false);
+    }
+
+    // Thêm phương thức mới để thiết lập nút xóa ngân sách
+    private void setupDeleteButton() {
+        binding.deleteButton.setVisibility(View.VISIBLE);
+        binding.deleteButton.setOnClickListener(v -> {
+            if (budgetId != null) {
+                viewModel.deleteBudget(budgetId);
+                Toast.makeText(requireContext(), "Đã xóa ngân sách", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).popBackStack();
+            }
+        });
+    }
+
 
     private void setupDefaultDates() {
         // Set to first day of current month
