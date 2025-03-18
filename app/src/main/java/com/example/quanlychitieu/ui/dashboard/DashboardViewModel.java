@@ -8,15 +8,20 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import com.example.quanlychitieu.data.CategoryManager;
+import com.example.quanlychitieu.data.model.Budget;
 import com.example.quanlychitieu.data.model.Transaction;
+import com.example.quanlychitieu.data.repository.BudgetRepository;
 import com.example.quanlychitieu.data.repository.TransactionRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DashboardViewModel extends ViewModel {
@@ -27,6 +32,8 @@ public class DashboardViewModel extends ViewModel {
     private final MutableLiveData<Double> expenses = new MutableLiveData<>(0.0);
     private final MutableLiveData<Double> balance = new MutableLiveData<>(0.0);
     private final MediatorLiveData<List<Transaction>> recentTransactions = new MediatorLiveData<>();
+    private final MutableLiveData<Map<String, Double>> categoryExpensesData = new MutableLiveData<>(new HashMap<>());
+    private final MutableLiveData<Map<String, Double>> categoryBudgetsData = new MutableLiveData<>(new HashMap<>());
 
     public DashboardViewModel() {
         repository = TransactionRepository.getInstance();
@@ -36,8 +43,66 @@ public class DashboardViewModel extends ViewModel {
 
         // Load recent transactions for the current month
         loadRecentTransactions();
+
+        // Load category data for charts
+        loadCategoryData();
     }
 
+    /**
+     * Tải dữ liệu danh mục cho biểu đồ
+     */
+    private void loadCategoryData() {
+        // Lấy repository
+        TransactionRepository transactionRepo = TransactionRepository.getInstance();
+        BudgetRepository budgetRepo = BudgetRepository.getInstance();
+
+        // Lấy danh sách các danh mục chi tiêu
+        List<String> expenseCategories = CategoryManager.getInstance().getExpenseCategories();
+
+        // Khởi tạo map trống với tất cả các danh mục
+        Map<String, Double> initialExpenses = new HashMap<>();
+        Map<String, Double> initialBudgets = new HashMap<>();
+
+        for (String category : expenseCategories) {
+            initialExpenses.put(category, 0.0);
+            initialBudgets.put(category, 0.0);
+        }
+
+        // Cập nhật giá trị ban đầu
+        categoryExpensesData.setValue(initialExpenses);
+        categoryBudgetsData.setValue(initialBudgets);
+
+        // Lắng nghe dữ liệu chi tiêu theo danh mục
+        spentObserver = categorySpentAmounts -> {
+            if (categorySpentAmounts != null) {
+                Map<String, Double> expenses = new HashMap<>(initialExpenses);
+                expenses.putAll(categorySpentAmounts);
+                categoryExpensesData.setValue(expenses);
+            }
+        };
+        transactionRepo.getCategorySpentAmounts().observeForever(spentObserver);
+
+        // Lắng nghe dữ liệu ngân sách
+        budgetObserver = budgets -> {
+            if (budgets != null) {
+                Map<String, Double> budgetMap = new HashMap<>(initialBudgets);
+                for (Budget budget : budgets) {
+                    budgetMap.put(budget.getCategory(), budget.getAmount());
+                }
+                categoryBudgetsData.setValue(budgetMap);
+            }
+        };
+        budgetRepo.getActiveBudgets().observeForever(budgetObserver);
+    }
+
+    // Getter cho dữ liệu biểu đồ
+    public LiveData<Map<String, Double>> getCategoryExpensesData() {
+        return categoryExpensesData;
+    }
+
+    public LiveData<Map<String, Double>> getCategoryBudgetsData() {
+        return categoryBudgetsData;
+    }
     private void loadCurrentMonthData() {
         // Get date range for current month
         Calendar calendar = Calendar.getInstance();
@@ -84,11 +149,18 @@ public class DashboardViewModel extends ViewModel {
     // Clean up in onCleared
     @Override
     protected void onCleared() {
-        if (monthDataObserver != null) {
-            // Clean up any observers
-        }
         super.onCleared();
+        TransactionRepository transactionRepo = TransactionRepository.getInstance();
+        BudgetRepository budgetRepo = BudgetRepository.getInstance();
+
+        // Hủy đăng ký các observer
+        transactionRepo.getCategorySpentAmounts().removeObserver(spentObserver);
+        budgetRepo.getActiveBudgets().removeObserver(budgetObserver);
     }
+
+    // Khai báo observer để có thể hủy đăng ký sau này
+    private Observer<Map<String, Double>> spentObserver;
+    private Observer<List<Budget>> budgetObserver;
 
     private void calculateFinancialSummary(List<Transaction> transactions) {
         double totalIncome = 0;

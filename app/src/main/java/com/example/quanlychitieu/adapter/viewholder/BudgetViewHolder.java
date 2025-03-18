@@ -35,7 +35,13 @@ public class BudgetViewHolder extends RecyclerView.ViewHolder {
         // Format and set amounts
         String formattedSpent = formatCurrency(budget.getSpent());
         String formattedAmount = formatCurrency(budget.getAmount());
-        binding.budgetSpent.setText(String.format("%s / %s", formattedSpent, formattedAmount));
+
+        // Nếu ngân sách là 0 (chưa thiết lập), hiển thị theo cách khác
+        if (budget.getAmount() == 0) {
+            binding.budgetSpent.setText(String.format("%s / Chưa thiết lập", formattedSpent));
+        } else {
+            binding.budgetSpent.setText(String.format("%s / %s", formattedSpent, formattedAmount));
+        }
 
         // Set progress
         int progressPercentage = budget.getProgressPercentage();
@@ -44,8 +50,12 @@ public class BudgetViewHolder extends RecyclerView.ViewHolder {
         // Set percentage text with appropriate color
         binding.budgetPercentage.setText(String.format("%d%%", progressPercentage));
 
-        // Set color based on percentage
-        if (progressPercentage > 90) {
+        // Set color based on percentage and if budget is set
+        if (budget.getAmount() == 0) {
+            // Ngân sách chưa thiết lập - hiển thị màu xám
+            binding.budgetPercentage.setTextColor(Color.parseColor("#9E9E9E")); // Gray
+            binding.budgetProgress.setIndicatorColor(Color.parseColor("#9E9E9E")); // Gray
+        } else if (progressPercentage > 90) {
             binding.budgetPercentage.setTextColor(Color.parseColor("#F44336")); // Red
             binding.budgetProgress.setIndicatorColor(Color.parseColor("#F44336")); // Red
         } else if (progressPercentage > 75) {

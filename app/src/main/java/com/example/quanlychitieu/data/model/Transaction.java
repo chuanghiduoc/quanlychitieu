@@ -22,7 +22,6 @@ public class Transaction {
     private String repeatType;    // "daily", "weekly", "monthly", "yearly"
     private Date endDate;         // Ngày kết thúc (tùy chọn)
 
-    // No-args constructor for Firebase
     public Transaction() {
     }
 

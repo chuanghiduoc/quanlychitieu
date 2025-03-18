@@ -46,7 +46,6 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     private final Calendar toDateCalendar = Calendar.getInstance();
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-    // Khai báo các adapter cho danh mục
     private ArrayAdapter<String> allCategoriesAdapter;
     private ArrayAdapter<String> expenseCategoriesAdapter;
     private ArrayAdapter<String> incomeCategoriesAdapter;

@@ -138,7 +138,7 @@ public class ReminderNotificationService {
         // Sử dụng request code khác cho PendingIntent này
         PendingIntent markAsPaidPendingIntent = PendingIntent.getBroadcast(
                 context,
-                (int) reminderId + 1000, // Sử dụng ID khác để tránh xung đột
+                (int) reminderId + 1000,
                 markAsPaidIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );

@@ -191,143 +191,79 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Phân bổ chi tiêu"
+                        android:text="Phân bổ chi tiêu và ngân sách"
                         android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <!-- Placeholder cho biểu đồ - sẽ thay bằng thư viện biểu đồ thực tế -->
-
-                    <!-- Danh mục chi tiêu -->
-                    <FrameLayout
-                        android:id="@+id/chart_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginTop="8dp" />
-
+                    <!-- Container ngang cho hai biểu đồ -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
 
-                        <!-- Danh mục 1 -->
+                        <!-- Container cho biểu đồ chi tiêu -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:orientation="horizontal">
-
-                            <View
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center_vertical"
-                                android:background="#F44336" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:text="Ăn uống"
-                                android:textColor="@color/black" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="4dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1,200,000 đ (38%)"
+                                android:text="Chi tiêu thực tế"
                                 android:textColor="@color/black"
-                                android:textStyle="bold" />
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginBottom="4dp"/>
+
+                            <FrameLayout
+                                android:id="@+id/chart_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="220dp" />
                         </LinearLayout>
 
-                        <!-- Danh mục 2 -->
+                        <!-- Container cho biểu đồ ngân sách -->
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:orientation="horizontal">
-
-                            <View
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center_vertical"
-                                android:background="#4CAF50" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:text="Đi lại"
-                                android:textColor="@color/black" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="4dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="800,000 đ (25%)"
+                                android:text="Ngân sách đã cài đặt"
                                 android:textColor="@color/black"
-                                android:textStyle="bold" />
-                        </LinearLayout>
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginBottom="4dp"/>
 
-                        <!-- Danh mục 3 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:orientation="horizontal">
-
-                            <View
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center_vertical"
-                                android:background="#2196F3" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:text="Mua sắm"
-                                android:textColor="@color/black" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="700,000 đ (22%)"
-                                android:textColor="@color/black"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- Danh mục khác -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <View
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center_vertical"
-                                android:background="#FFC107" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:text="Khác"
-                                android:textColor="@color/black" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="500,000 đ (15%)"
-                                android:textColor="@color/black"
-                                android:textStyle="bold" />
+                            <FrameLayout
+                                android:id="@+id/budget_chart_container"
+                                android:layout_width="match_parent"
+                                android:layout_height="220dp" />
                         </LinearLayout>
                     </LinearLayout>
+
+
+                    <!-- Container cho danh sách danh mục -->
+                    <LinearLayout
+                        android:id="@+id/category_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+
 
             <!-- Giao dịch gần đây -->
             <com.google.android.material.card.MaterialCardView

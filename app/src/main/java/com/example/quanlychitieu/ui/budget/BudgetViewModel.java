@@ -5,15 +5,21 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.Budget;
 import com.example.quanlychitieu.data.repository.BudgetRepository;
+import com.example.quanlychitieu.data.repository.TransactionRepository;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BudgetViewModel extends ViewModel {
 
     private final BudgetRepository repository;
-    private final MediatorLiveData<List<Budget>> categoryBudgets = new MediatorLiveData<>();
+    private final TransactionRepository transactionRepository;
+    private final MediatorLiveData<List<Budget>> displayBudgets = new MediatorLiveData<>();
     private final MediatorLiveData<Double> totalBudget = new MediatorLiveData<>();
     private final MediatorLiveData<Double> totalSpent = new MediatorLiveData<>();
     private final MutableLiveData<Double> remainingAmount = new MutableLiveData<>(0.0);
@@ -24,16 +30,18 @@ public class BudgetViewModel extends ViewModel {
     private LiveData<List<Budget>> currentBudgetsSource = null;
     private LiveData<Double> currentTotalBudgetSource = null;
     private LiveData<Double> currentTotalSpentSource = null;
+    private LiveData<Map<String, Double>> currentCategorySpentSource = null;
 
     public BudgetViewModel() {
         repository = BudgetRepository.getInstance();
+        transactionRepository = TransactionRepository.getInstance();
 
         // Initialize with default values
         totalBudget.setValue(0.0);
         totalSpent.setValue(0.0);
 
-        // Load active budgets for the current month
-        loadActiveBudgets();
+        // Load active budgets and combine with all categories
+        loadBudgetsWithAllCategories();
     }
 
     private void updateRemainingAndProgress() {
@@ -49,7 +57,7 @@ public class BudgetViewModel extends ViewModel {
         }
     }
 
-    private void loadActiveBudgets() {
+    private void loadBudgetsWithAllCategories() {
         isLoading.setValue(true);
 
         // Get active budgets from repository
@@ -57,20 +65,93 @@ public class BudgetViewModel extends ViewModel {
 
         // Remove previous source if it exists
         if (currentBudgetsSource != null) {
-            categoryBudgets.removeSource(currentBudgetsSource);
+            displayBudgets.removeSource(currentBudgetsSource);
         }
 
         // Add new source
-        categoryBudgets.addSource(activeBudgets, budgets -> {
-            categoryBudgets.setValue(budgets);
+        displayBudgets.addSource(activeBudgets, budgets -> {
+            // Combine with all expense categories
+            createCompleteBudgetsList(budgets);
             isLoading.setValue(false);
         });
 
         // Update current source reference
         currentBudgetsSource = activeBudgets;
 
+        // Observe category spent amounts
+        observeCategorySpentAmounts();
+
         // Observe total budget and spent amounts
         observeTotals();
+    }
+
+    private void createCompleteBudgetsList(List<Budget> activeBudgets) {
+        // Get all expense categories
+        List<String> allCategories = CategoryManager.getInstance().getExpenseCategories();
+
+        // Create a map of existing budgets by category
+        Map<String, Budget> budgetMap = new HashMap<>();
+        if (activeBudgets != null) {
+            for (Budget budget : activeBudgets) {
+                budgetMap.put(budget.getCategory(), budget);
+            }
+        }
+
+        // Create a complete list with all categories
+        List<Budget> completeBudgetsList = new ArrayList<>();
+
+        // Get category spent amounts
+        Map<String, Double> categorySpentAmounts = repository.getCategorySpentAmounts().getValue();
+        if (categorySpentAmounts == null) {
+            categorySpentAmounts = new HashMap<>();
+        }
+
+        // Add all categories, using existing budgets when available
+        for (String category : allCategories) {
+            Budget budget = budgetMap.get(category);
+
+            if (budget == null) {
+                // Create a placeholder budget with 0 amount
+                budget = new Budget();
+                budget.setCategory(category);
+                budget.setAmount(0);
+
+                // Set spent amount from transactions
+                Double spentAmount = categorySpentAmounts.getOrDefault(category, 0.0);
+                budget.setSpent(spentAmount);
+            }
+
+            completeBudgetsList.add(budget);
+        }
+
+        // Update the display budgets
+        displayBudgets.setValue(completeBudgetsList);
+    }
+
+    private void observeCategorySpentAmounts() {
+        // Observe category spent amounts from repository
+        LiveData<Map<String, Double>> categorySpentAmounts = repository.getCategorySpentAmounts();
+
+        // Remove previous source if it exists
+        if (currentCategorySpentSource != null) {
+            displayBudgets.removeSource(currentCategorySpentSource);
+        }
+
+        // Add new source
+        displayBudgets.addSource(categorySpentAmounts, spentAmounts -> {
+            // Update the budgets list with new spent amounts
+            List<Budget> currentBudgets = displayBudgets.getValue();
+            if (currentBudgets != null) {
+                for (Budget budget : currentBudgets) {
+                    Double spentAmount = spentAmounts.getOrDefault(budget.getCategory(), 0.0);
+                    budget.setSpent(spentAmount);
+                }
+                displayBudgets.setValue(currentBudgets);
+            }
+        });
+
+        // Update current source reference
+        currentCategorySpentSource = categorySpentAmounts;
     }
 
     private void observeTotals() {
@@ -132,7 +213,7 @@ public class BudgetViewModel extends ViewModel {
     // Method to refresh data
     public void refreshBudgets() {
         // Reload active budgets
-        loadActiveBudgets();
+        loadBudgetsWithAllCategories();
     }
 
     public LiveData<Double> getTotalBudget() {
@@ -152,7 +233,7 @@ public class BudgetViewModel extends ViewModel {
     }
 
     public LiveData<List<Budget>> getCategoryBudgets() {
-        return categoryBudgets;
+        return displayBudgets;
     }
 
     public LiveData<Boolean> getIsLoading() {

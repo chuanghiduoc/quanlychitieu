@@ -37,7 +37,12 @@ public class BudgetAdapter extends ListAdapter<Budget, BudgetViewHolder> {
     private static class BudgetDiffCallback extends DiffUtil.ItemCallback<Budget> {
         @Override
         public boolean areItemsTheSame(@NonNull Budget oldItem, @NonNull Budget newItem) {
-            return oldItem.getId() == newItem.getId();
+            // Nếu cả hai đều có firebaseId, so sánh theo firebaseId
+            if (oldItem.getFirebaseId() != null && newItem.getFirebaseId() != null) {
+                return oldItem.getFirebaseId().equals(newItem.getFirebaseId());
+            }
+            // Nếu không có firebaseId, so sánh theo category
+            return oldItem.getCategory().equals(newItem.getCategory());
         }
 
         @Override

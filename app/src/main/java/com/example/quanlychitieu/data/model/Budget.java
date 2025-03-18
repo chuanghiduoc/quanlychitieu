@@ -26,10 +26,8 @@ public class Budget {
     private int notificationThreshold;     // Ngưỡng phần trăm để gửi thông báo (80, 90, 100)
     private boolean notificationSent;      // Đã gửi thông báo cho ngưỡng này chưa
 
-    // Để gửi thông báo cho các khoản chi tiêu định kỳ
-    private Map<String, Boolean> recurringExpenseNotifications; // Bản đồ chứa ID giao dịch và trạng thái thông báo
+    private Map<String, Boolean> recurringExpenseNotifications;
 
-    // Constructor không tham số dành cho Firebase
     public Budget() {
         // Khởi tạo bản đồ cho thông báo chi tiêu định kỳ
         recurringExpenseNotifications = new HashMap<>();
@@ -68,7 +66,6 @@ public class Budget {
         this.recurringExpenseNotifications = new HashMap<>();
     }
 
-    // Các phương thức hỗ trợ
 
     @Exclude
     public double getRemaining() {
@@ -80,38 +77,12 @@ public class Budget {
         return amount > 0 ? (int) ((spent / amount) * 100) : 0; // Tính phần trăm đã chi tiêu
     }
 
-    @Exclude
-    public boolean isOverBudget() {
-        return spent > amount; // Kiểm tra xem ngân sách có bị vượt quá không
+    /**
+     * Reset trạng thái thông báo để gửi thông báo mới
+     */
+    public void resetNotificationStatus() {
+        this.notificationSent = false;
     }
-
-    @Exclude
-    public boolean shouldSendNotification() {
-        if (!notificationsEnabled || notificationSent) {
-            return false;
-        }
-
-        int currentPercentage = getProgressPercentage();
-        return currentPercentage >= notificationThreshold; // Kiểm tra xem có cần gửi thông báo không
-    }
-
-    @Exclude
-    public boolean isActive() {
-        Date now = new Date();
-        return now.after(startDate) && now.before(endDate); // Kiểm tra xem ngân sách có đang hoạt động không
-    }
-
-    @Exclude
-    public boolean shouldNotifyForRecurringExpense(String transactionId) {
-        // Kiểm tra xem đã gửi thông báo cho giao dịch này chưa
-        Boolean notified = recurringExpenseNotifications.get(transactionId);
-        return notified == null || !notified;
-    }
-
-    public void markRecurringExpenseNotified(String transactionId) {
-        recurringExpenseNotifications.put(transactionId, true); // Đánh dấu đã gửi thông báo cho giao dịch định kỳ
-    }
-
     // Getter và Setter
 
     @Exclude
@@ -163,10 +134,6 @@ public class Budget {
         this.spent = spent;
     }
 
-    public void addExpense(double expense) {
-        this.spent += expense; // Thêm một khoản chi tiêu vào ngân sách
-    }
-
     public Date getStartDate() {
         return startDate;
     }
@@ -195,24 +162,15 @@ public class Budget {
         return notificationsEnabled;
     }
 
-    public void setNotificationsEnabled(boolean notificationsEnabled) {
-        this.notificationsEnabled = notificationsEnabled;
-    }
+
 
     public int getNotificationThreshold() {
         return notificationThreshold;
     }
 
-    public void setNotificationThreshold(int notificationThreshold) {
-        this.notificationThreshold = notificationThreshold;
-    }
 
     public boolean isNotificationSent() {
         return notificationSent;
-    }
-
-    public void setNotificationSent(boolean notificationSent) {
-        this.notificationSent = notificationSent;
     }
 
     public Map<String, Boolean> getRecurringExpenseNotifications() {

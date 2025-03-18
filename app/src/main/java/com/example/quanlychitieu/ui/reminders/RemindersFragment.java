@@ -102,7 +102,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
     private void observeViewModelData() {
         viewModel.getUpcomingReminders().observe(getViewLifecycleOwner(), reminders -> {
             if (tabLayout.getSelectedTabPosition() == 0) {
-                Log.d(TAG, "Observed upcoming reminders: " + (reminders != null ? reminders.size() : 0));
                 updateUI(reminders.isEmpty());
                 adapter.setReminders(reminders);
 
@@ -113,7 +112,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
 
         viewModel.getPastReminders().observe(getViewLifecycleOwner(), reminders -> {
             if (tabLayout.getSelectedTabPosition() == 1) {
-                Log.d(TAG, "Observed past reminders: " + (reminders != null ? reminders.size() : 0));
                 updateUI(reminders.isEmpty());
                 adapter.setReminders(reminders);
             }
@@ -121,7 +119,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
 
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), errorMsg -> {
             if (errorMsg != null && !errorMsg.isEmpty()) {
-                Log.e(TAG, "Error message: " + errorMsg);
                 Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
             }
         });
@@ -148,8 +145,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
     }
 
     private void updateUI(boolean isEmpty) {
-        Log.d(TAG, "Updating UI, isEmpty: " + isEmpty);
-
         if (isEmpty) {
             recyclerView.setVisibility(View.GONE);
             emptyState.setVisibility(View.VISIBLE);
@@ -167,7 +162,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
                     .setTitle("Đánh dấu đã thanh toán")
                     .setMessage("Bạn có chắc chắn muốn đánh dấu nhắc nhở này là đã thanh toán?")
                     .setPositiveButton("Đồng ý", (dialog, which) -> {
-                        Log.d(TAG, "Marking as paid: " + reminder.getTitle() + ", ID: " + reminder.getDocumentId());
                         viewModel.markReminderAsCompleted(
                                 reminder.getDocumentId(),
                                 reminder.getId(),
@@ -184,9 +178,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
 
     @Override
     public void onReminderClick(Reminder reminder) {
-        // Chuyển đến màn hình chỉnh sửa nhắc nhở
-        Log.d(TAG, "Clicked on reminder: " + reminder.getTitle() + ", ID: " + reminder.getId() + ", DocID: " + reminder.getDocumentId());
-
         // Chỉ cho phép chỉnh sửa nhắc nhở sắp tới (chưa hoàn thành)
         if (reminder.isCompleted() || reminder.isOverdue()) {
             Toast.makeText(requireContext(), "Không thể chỉnh sửa nhắc nhở đã qua", Toast.LENGTH_SHORT).show();
@@ -195,7 +186,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
 
         Bundle args = new Bundle();
         args.putLong("reminderId", reminder.getId());
-        // Truyền thêm documentId để dễ dàng tìm kiếm
         args.putString("documentId", reminder.getDocumentId());
         Navigation.findNavController(requireView()).navigate(
                 R.id.action_reminders_to_edit_reminder, args);
@@ -205,8 +195,6 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume called");
-        // Làm mới dữ liệu khi quay lại fragment
         updateReminderList(tabLayout.getSelectedTabPosition());
     }
     private void setupSwipeToDelete() {

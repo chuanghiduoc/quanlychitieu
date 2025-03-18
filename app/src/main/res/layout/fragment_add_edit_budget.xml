@@ -82,7 +82,7 @@
                     android:id="@+id/budget_amount_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
+                    android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Thông báo khi vượt ngân sách -->
@@ -181,14 +181,40 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/save_button"
+    <LinearLayout
+        android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:padding="12dp"
-        android:text="Lưu ngân sách"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Nút xóa ngân sách -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_button"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:text="Xóa"
+            android:textColor="@color/expense_red"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:strokeColor="@color/expense_red" />
+
+        <!-- Nút lưu ngân sách -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:text="Lưu"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

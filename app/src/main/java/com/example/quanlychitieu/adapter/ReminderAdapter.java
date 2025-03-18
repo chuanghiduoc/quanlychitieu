@@ -103,6 +103,8 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderViewHolder> {
 
         if (reminder.isCompleted()) {
             holder.markAsPaidButton.setVisibility(View.GONE);
+            holder.timeRemainingTextView.setText("Đã thanh toán");
+            holder.timeRemainingTextView.setTextColor(context.getResources().getColor(R.color.income_green));
         } else {
             holder.markAsPaidButton.setVisibility(View.VISIBLE);
             holder.markAsPaidButton.setOnClickListener(v -> {

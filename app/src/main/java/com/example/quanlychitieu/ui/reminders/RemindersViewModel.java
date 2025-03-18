@@ -76,8 +76,6 @@ public class RemindersViewModel extends ViewModel {
         List<Reminder> reminders = new ArrayList<>();
         Date now = new Date();
 
-        Log.d(TAG, "Upcoming documents count: " + querySnapshot.size());
-
         for (DocumentSnapshot document : querySnapshot.getDocuments()) {
             Reminder reminder = document.toObject(Reminder.class);
             if (reminder != null) {
@@ -102,8 +100,6 @@ public class RemindersViewModel extends ViewModel {
         List<Reminder> reminders = new ArrayList<>();
         Date now = new Date();
 
-        Log.d(TAG, "Processing past reminders from query");
-
         for (DocumentSnapshot document : querySnapshot.getDocuments()) {
             Reminder reminder = document.toObject(Reminder.class);
             if (reminder != null) {
@@ -112,7 +108,6 @@ public class RemindersViewModel extends ViewModel {
                 // Thêm vào danh sách nếu đã hoàn thành
                 if (reminder.isCompleted()) {
                     reminders.add(reminder);
-                    Log.d(TAG, "Added completed reminder: " + reminder.getTitle());
                 }
             }
         }
@@ -125,7 +120,6 @@ public class RemindersViewModel extends ViewModel {
                         if (reminder != null && !reminder.isCompleted()) {
                             reminder.setDocumentId(document.getId());
                             reminders.add(reminder);
-                            Log.d(TAG, "Added overdue reminder: " + reminder.getTitle());
                         }
                     }
 
