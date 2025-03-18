@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private static final String TAG = "MainActivity";
     private FirebaseAuth auth;
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 1001;
 
     // Launcher để yêu cầu quyền thông báo
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
-
+        checkStoragePermission();
         // Check if user is logged in
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -241,7 +242,22 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
     }
-
+    private void checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST_CODE);
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Cần quyền lưu trữ để xuất báo cáo", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     private boolean isTopLevelDestination(int itemId) {
         return itemId == R.id.navigation_dashboard ||
                 itemId == R.id.navigation_transactions ||
