@@ -3,8 +3,11 @@ package com.example.quanlychitieu;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private FirebaseAuth auth;
     private static final int STORAGE_PERMISSION_REQUEST_CODE = 1001;
-
+    private ActivityResultLauncher<String[]> storagePermissionLauncher;
     // Launcher để yêu cầu quyền thông báo
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -53,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
-        checkStoragePermission();
         // Check if user is logged in
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -71,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
                 .findFragmentById(R.id.nav_host_fragment_activity_main);
 
         if (navHostFragment == null) {
-            Log.e(TAG, "NavHostFragment not found");
             return;
         }
 
@@ -116,8 +117,31 @@ public class MainActivity extends AppCompatActivity {
         // Đặt context cho TransactionRepository
         TransactionRepository.getInstance().setContext(getApplicationContext());
 
+        storagePermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    boolean allGranted = true;
+                    for (Boolean granted : result.values()) {
+                        if (!granted) {
+                            allGranted = false;
+                            break;
+                        }
+                    }
+
+                    if (allGranted) {
+                        Log.d(TAG, "Storage permissions granted");
+                        // Có thể thông báo cho các Fragment biết quyền đã được cấp
+                    } else {
+                        Log.d(TAG, "Storage permissions denied");
+                        showStoragePermissionRationale();
+                    }
+                });
+
         // Kiểm tra quyền thông báo
         checkNotificationPermission();
+
+        // Kiểm tra quyền lưu trữ
+        checkStoragePermission();
     }
 
     /**
@@ -242,27 +266,86 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
     }
-    private void checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST_CODE);
-            }
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Cần quyền lưu trữ để xuất báo cáo", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
+
     private boolean isTopLevelDestination(int itemId) {
         return itemId == R.id.navigation_dashboard ||
                 itemId == R.id.navigation_transactions ||
                 itemId == R.id.navigation_budget ||
                 itemId == R.id.navigation_statistics ||
                 itemId == R.id.navigation_reminders;
+    }
+
+    /**
+     * Kiểm tra và yêu cầu quyền lưu trữ nếu cần
+     */
+    private void checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+ sử dụng cơ chế lưu trữ phạm vi
+            if (!Environment.isExternalStorageManager()) {
+                // Hiển thị dialog giải thích trước khi yêu cầu quyền
+                showStoragePermissionRationale();
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android 6-10 yêu cầu cấp quyền runtime
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // Yêu cầu quyền trực tiếp
+                storagePermissionLauncher.launch(new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                });
+            } else {
+                Log.d(TAG, "Storage permissions already granted");
+            }
+        } else {
+            // Android 5.1 và thấp hơn không cần yêu cầu quyền runtime
+            Log.d(TAG, "Storage permissions granted by default (old Android version)");
+        }
+    }
+
+    /**
+     * Hiển thị giải thích về lý do cần quyền lưu trữ
+     */
+    private void showStoragePermissionRationale() {
+        new AlertDialog.Builder(this)
+                .setTitle("Quyền lưu trữ")
+                .setMessage("Ứng dụng cần quyền lưu trữ để xuất báo cáo tài chính. " +
+                        "Vui lòng cấp quyền trong cài đặt ứng dụng.")
+                .setPositiveButton("Cài đặt", (dialog, which) -> {
+                    // Mở cài đặt quyền dựa trên phiên bản Android
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        try {
+                            // Android 11+ yêu cầu cấp quyền quản lý tất cả tệp
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            // Fallback nếu không mở được intent cụ thể
+                            openAppSettings();
+                        }
+                    } else {
+                        openAppSettings();
+                    }
+                })
+                .setNegativeButton("Để sau", (dialog, which) -> {
+                    dialog.dismiss();
+                    Toast.makeText(this, "Bạn sẽ không thể xuất báo cáo tài chính",
+                            Toast.LENGTH_LONG).show();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    // Phương thức để kiểm tra nếu tất cả quyền lưu trữ đã được cấp
+    public boolean hasStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true; // Android 5.1 và thấp hơn không cần yêu cầu quyền runtime
+        }
     }
 }
