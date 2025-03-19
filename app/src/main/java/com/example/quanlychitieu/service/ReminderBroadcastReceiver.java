@@ -8,7 +8,6 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         long reminderId = intent.getLongExtra("REMINDER_ID", -1);
-        String documentId = intent.getStringExtra("REMINDER_DOCUMENT_ID"); // Thêm documentId
         String title = intent.getStringExtra("REMINDER_TITLE");
         double amount = intent.getDoubleExtra("REMINDER_AMOUNT", 0);
 

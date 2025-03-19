@@ -44,9 +44,6 @@ public class CategoryManager {
             }
         }
 
-        Log.d("CategoryManager", "Initialized with " + expenseCategories.size() +
-                " expense categories, " + incomeCategories.size() + " income categories, and " +
-                allCategories.size() + " total unique categories");
     }
 
     public static synchronized CategoryManager getInstance() {

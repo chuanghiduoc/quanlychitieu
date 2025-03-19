@@ -64,4 +64,7 @@
     <color name="income_green">#4CAF50</color>
     <color name="expense_red">#F44336</color>
     <color name="background_light">#F5F5F5</color>
+
+    <color name="shimmer_color">#DDDDDD</color>
+
 </resources>

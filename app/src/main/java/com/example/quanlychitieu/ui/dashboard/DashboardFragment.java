@@ -25,6 +25,7 @@ import com.example.quanlychitieu.adapter.TransactionAdapter;
 import com.example.quanlychitieu.auth.ProfileActivity;
 import com.example.quanlychitieu.data.model.Transaction;
 import com.example.quanlychitieu.databinding.FragmentDashboardBinding;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.mikephil.charting.charts.PieChart;
 
 import java.text.NumberFormat;
@@ -84,6 +85,12 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
         // Khởi tạo RecyclerView cho danh sách danh mục
         setupCategoryList();
 
+        // Hiển thị shimmer loading
+        showLoadingState();
+
+        // Observe loading state
+        observeLoadingState();
+
         // Observe financial data
         observeFinancialData();
 
@@ -92,6 +99,80 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
 
         // Observe chart data
         observeChartData();
+    }
+
+    private void showLoadingState() {
+        // Hiển thị shimmer cho tổng quan tài chính
+        binding.financialOverviewShimmer.setVisibility(View.VISIBLE);
+        binding.financialOverviewCard.setVisibility(View.GONE);
+
+        // Hiển thị shimmer cho biểu đồ
+        binding.chartShimmer.setVisibility(View.VISIBLE);
+        binding.expenseChartCard.setVisibility(View.GONE);
+
+        // Hiển thị shimmer cho giao dịch gần đây
+        binding.transactionsShimmer.setVisibility(View.VISIBLE);
+        binding.recentTransactionsCard.setVisibility(View.GONE);
+
+        // Bắt đầu animation shimmer
+        startShimmerAnimations();
+    }
+
+    private void hideLoadingState() {
+        // Hiển thị nội dung thật, ẩn shimmer
+        binding.financialOverviewShimmer.setVisibility(View.GONE);
+        binding.financialOverviewCard.setVisibility(View.VISIBLE);
+
+        binding.chartShimmer.setVisibility(View.GONE);
+        binding.expenseChartCard.setVisibility(View.VISIBLE);
+
+        binding.transactionsShimmer.setVisibility(View.GONE);
+        binding.recentTransactionsCard.setVisibility(View.VISIBLE);
+
+        // Dừng animation shimmer
+        stopShimmerAnimations();
+    }
+
+    private void startShimmerAnimations() {
+        if (binding.financialOverviewShimmer instanceof ShimmerFrameLayout) {
+            ((ShimmerFrameLayout) binding.financialOverviewShimmer).startShimmer();
+        }
+        if (binding.chartShimmer instanceof ShimmerFrameLayout) {
+            ((ShimmerFrameLayout) binding.chartShimmer).startShimmer();
+        }
+        if (binding.transactionsShimmer instanceof ShimmerFrameLayout) {
+            ((ShimmerFrameLayout) binding.transactionsShimmer).startShimmer();
+        }
+    }
+
+    private void stopShimmerAnimations() {
+        if (binding.financialOverviewShimmer instanceof ShimmerFrameLayout) {
+            ((ShimmerFrameLayout) binding.financialOverviewShimmer).stopShimmer();
+        }
+        if (binding.chartShimmer instanceof ShimmerFrameLayout) {
+            ((ShimmerFrameLayout) binding.chartShimmer).stopShimmer();
+        }
+        if (binding.transactionsShimmer instanceof ShimmerFrameLayout) {
+            ((ShimmerFrameLayout) binding.transactionsShimmer).stopShimmer();
+        }
+    }
+
+    private void observeLoadingState() {
+        dashboardViewModel.getLoadingState().observe(getViewLifecycleOwner(), loadingState -> {
+            switch (loadingState) {
+                case LOADING:
+                    showLoadingState();
+                    break;
+                case SUCCESS:
+                    hideLoadingState();
+                    break;
+                case ERROR:
+                    hideLoadingState();
+                    // Hiển thị thông báo lỗi nếu cần
+                    Toast.makeText(requireContext(), "Có lỗi xảy ra khi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
     }
 
     @Override
@@ -105,6 +186,7 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
             budgetChart.invalidate();
         }
     }
+
     private void setupCharts() {
         // Khởi tạo biểu đồ chi tiêu
         expenseChart = new PieChart(requireContext());
@@ -125,7 +207,6 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
         categoryRecyclerView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
-
         binding.categoryList.addView(categoryRecyclerView);
 
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -191,8 +272,13 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
         });
 
         dashboardViewModel.getBalance().observe(getViewLifecycleOwner(), balance -> {
-            String formattedBalance = formatCurrency(balance);
-            binding.balanceAmount.setText(formattedBalance);
+            binding.balanceAmount.setText(formatCurrency(balance));
+
+            if (balance < 0) {
+                binding.balanceAmount.setTextColor(getResources().getColor(R.color.expense_red, null)); // Màu đỏ
+            } else {
+                binding.balanceAmount.setTextColor(getResources().getColor(R.color.chart_1, null)); // Màu mặc định
+            }
         });
     }
 

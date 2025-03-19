@@ -128,7 +128,6 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderViewHolder> {
     }
 
     public void setReminders(List<Reminder> reminders) {
-        Log.d("ReminderAdapter", "Setting reminders, count: " + (reminders != null ? reminders.size() : 0));
 
         if (reminders != null) {
             for (Reminder reminder : reminders) {
