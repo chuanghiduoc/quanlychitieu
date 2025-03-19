@@ -44,27 +44,29 @@ public class ChartHelper {
     public static void setupPieChart(PieChart chart) {
         chart.setUsePercentValues(true);
         chart.getDescription().setEnabled(false);
-        chart.setExtraOffsets(5, 10, 5, 5);
+//        chart.setExtraOffsets(2, 2, 2, 2);
 
         chart.setDragDecelerationFrictionCoef(0.95f);
         chart.setDrawHoleEnabled(true);
         chart.setHoleColor(Color.WHITE);
         chart.setTransparentCircleColor(Color.WHITE);
         chart.setTransparentCircleAlpha(110);
-        chart.setHoleRadius(20f);
-        chart.setTransparentCircleRadius(25f);
+        chart.setHoleRadius(0f);
+        chart.setTransparentCircleRadius(5f);
         chart.setDrawCenterText(false);
         chart.setRotationAngle(0);
         chart.setRotationEnabled(true);
         chart.setHighlightPerTapEnabled(true);
 
-        // Cấu hình chú thích
         Legend legend = chart.getLegend();
-        legend.setEnabled(false); // Ẩn chú thích vì sẽ hiển thị riêng
+        legend.setEnabled(false); // Ẩn chú thích
 
         chart.setEntryLabelColor(Color.WHITE);
         chart.setEntryLabelTextSize(12f);
+
+        chart.setDrawEntryLabels(false);
     }
+
 
     /**
      * Cập nhật dữ liệu cho biểu đồ chi tiêu

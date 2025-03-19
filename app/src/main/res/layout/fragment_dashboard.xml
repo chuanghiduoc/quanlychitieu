@@ -60,7 +60,93 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
+            <!-- Shimmer cho tổng quan tài chính -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/financial_overview_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="visible">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="150dp"
+                        android:layout_height="20dp"
+                        android:background="@color/shimmer_color" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="16dp"
+                                android:background="@color/shimmer_color" />
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@color/shimmer_color" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="16dp"
+                                android:background="@color/shimmer_color" />
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="24dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@color/shimmer_color" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/shimmer_color" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="20dp"
+                            android:background="@color/shimmer_color" />
+
+                        <View
+                            android:layout_width="150dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="end"
+                            android:background="@color/shimmer_color" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
             <!-- Card Tổng quan tài chính -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/financial_overview_card"
@@ -170,7 +256,67 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            <!-- Shimmer cho biểu đồ -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/chart_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintTop_toBottomOf="@id/financial_overview_shimmer"
+                android:visibility="visible">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="200dp"
+                        android:layout_height="20dp"
+                        android:background="@color/shimmer_color" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="16dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="200dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:background="@color/shimmer_color" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="200dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:background="@color/shimmer_color" />
+                    </LinearLayout>
+
+                    <!-- Shimmer cho danh sách danh mục -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@color/shimmer_color" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/shimmer_color" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/shimmer_color" />
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
             <!-- Biểu đồ phân bổ chi tiêu -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/expense_chart_card"
@@ -263,7 +409,149 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Shimmer cho giao dịch gần đây -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/transactions_shimmer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="80dp"
+                app:layout_constraintTop_toBottomOf="@id/chart_shimmer"
+                android:visibility="visible">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="150dp"
+                            android:layout_height="20dp"
+                            android:background="@color/shimmer_color" />
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="end"
+                            android:background="@color/shimmer_color" />
+                    </LinearLayout>
+
+                    <!-- Shimmer cho các giao dịch -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@color/shimmer_color" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="16dp"
+                                android:background="@color/shimmer_color" />
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="14dp"
+                                android:layout_marginTop="4dp"
+                                android:background="@color/shimmer_color" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="16dp"
+                            android:background="@color/shimmer_color" />
+                    </LinearLayout>
+
+                    <!-- Thêm 2 shimmer transaction khác -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@color/shimmer_color" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="16dp"
+                                android:background="@color/shimmer_color" />
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="14dp"
+                                android:layout_marginTop="4dp"
+                                android:background="@color/shimmer_color" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="16dp"
+                            android:background="@color/shimmer_color" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@color/shimmer_color" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="16dp"
+                                android:background="@color/shimmer_color" />
+
+                            <View
+                                android:layout_width="80dp"
+                                android:layout_height="14dp"
+                                android:layout_marginTop="4dp"
+                                android:background="@color/shimmer_color" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="80dp"
+                            android:layout_height="16dp"
+                            android:background="@color/shimmer_color" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
 
             <!-- Giao dịch gần đây -->
             <com.google.android.material.card.MaterialCardView
@@ -377,8 +665,6 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <!-- Giao dịch 2 and 3... -->
-                        <!-- (Keeping the existing static transaction layouts) -->
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

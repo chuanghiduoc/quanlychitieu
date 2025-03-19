@@ -22,9 +22,12 @@ import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.adapter.ReminderAdapter;
 import com.example.quanlychitieu.adapter.helper.SwipeToDeleteCallback;
 import com.example.quanlychitieu.data.model.Reminder;
+import com.example.quanlychitieu.data.model.Transaction;
+import com.example.quanlychitieu.data.repository.TransactionRepository;
 import com.example.quanlychitieu.service.ReminderNotificationService;
 import com.google.android.material.tabs.TabLayout;
 
+import java.util.Date;
 import java.util.List;
 
 public class RemindersFragment extends Fragment implements ReminderAdapter.OnReminderActionListener {
@@ -162,6 +165,10 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
                     .setTitle("Đánh dấu đã thanh toán")
                     .setMessage("Bạn có chắc chắn muốn đánh dấu nhắc nhở này là đã thanh toán?")
                     .setPositiveButton("Đồng ý", (dialog, which) -> {
+                        // Tạo giao dịch chi tiêu từ reminder
+                        createExpenseTransaction(reminder);
+
+                        // Đánh dấu reminder là đã hoàn thành
                         viewModel.markReminderAsCompleted(
                                 reminder.getDocumentId(),
                                 reminder.getId(),
@@ -171,10 +178,44 @@ public class RemindersFragment extends Fragment implements ReminderAdapter.OnRem
                     .setNegativeButton("Hủy", null)
                     .show();
         } else {
-            Log.e(TAG, "Cannot mark as paid: Invalid document ID for reminder: " + reminder.getTitle());
             Toast.makeText(requireContext(), "Không thể đánh dấu: ID không hợp lệ", Toast.LENGTH_SHORT).show();
         }
     }
+
+    /**
+     * Tạo giao dịch chi tiêu từ nhắc nhở
+     */
+    private void createExpenseTransaction(Reminder reminder) {
+        // Khởi tạo TransactionRepository
+        TransactionRepository transactionRepository = TransactionRepository.getInstance();
+        transactionRepository.setContext(requireContext());
+
+        // Tạo đối tượng Transaction mới
+        Transaction transaction = new Transaction();
+        transaction.setId(System.currentTimeMillis());
+
+        // Sử dụng danh mục của nhắc nhở làm mô tả cho giao dịch
+        String category = reminder.getCategory();
+        if (category != null && !category.isEmpty()) {
+            transaction.setDescription(category);
+        } else {
+            transaction.setDescription(reminder.getTitle());
+        }
+
+        transaction.setAmount(reminder.getAmount());
+        transaction.setCategory("Khác"); // Danh mục mặc định là "Khác"
+        transaction.setDate(new Date()); // Ngày hiện tại
+        transaction.setIncome(false); // Đánh dấu là chi tiêu
+        transaction.setNote(reminder.getTitle()); // Ghi chú là tiêu đề của nhắc nhở
+        transaction.setRepeat(false);
+
+        // Thêm giao dịch vào cơ sở dữ liệu
+        transactionRepository.addTransaction(transaction);
+
+        // Thông báo cho người dùng
+        Toast.makeText(requireContext(), "Đã tạo giao dịch chi tiêu tự động", Toast.LENGTH_SHORT).show();
+    }
+
 
     @Override
     public void onReminderClick(Reminder reminder) {

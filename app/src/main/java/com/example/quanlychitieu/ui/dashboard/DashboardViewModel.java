@@ -13,223 +13,218 @@ import com.example.quanlychitieu.data.model.Budget;
 import com.example.quanlychitieu.data.model.Transaction;
 import com.example.quanlychitieu.data.repository.BudgetRepository;
 import com.example.quanlychitieu.data.repository.TransactionRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DashboardViewModel extends ViewModel {
     private static final String TAG = "DashboardViewModel";
+    private static final String COLLECTION_USERS = "users";
+    private static final String COLLECTION_TRANSACTIONS = "transactions";
 
-    private final TransactionRepository repository;
-    private final MutableLiveData<Double> income = new MutableLiveData<>(0.0);
-    private final MutableLiveData<Double> expenses = new MutableLiveData<>(0.0);
-    private final MutableLiveData<Double> balance = new MutableLiveData<>(0.0);
-    private final MediatorLiveData<List<Transaction>> recentTransactions = new MediatorLiveData<>();
-    private final MutableLiveData<Map<String, Double>> categoryExpensesData = new MutableLiveData<>(new HashMap<>());
-    private final MutableLiveData<Map<String, Double>> categoryBudgetsData = new MutableLiveData<>(new HashMap<>());
+    public enum LoadingState { LOADING, SUCCESS, ERROR }
+    private final MutableLiveData<LoadingState> loadingState = new MutableLiveData<>(LoadingState.LOADING);
+
+    private final TransactionRepository transactionRepository;
+    private final BudgetRepository budgetRepository;
+    private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
+
+    // LiveData cho tất cả các thành phần trong dashboard
+    private final MutableLiveData<Double> income = new MutableLiveData<>();
+    private final MutableLiveData<Double> expenses = new MutableLiveData<>();
+    private final MutableLiveData<Double> balance = new MutableLiveData<>();
+    private final MutableLiveData<List<Transaction>> recentTransactions = new MutableLiveData<>();
+    private final MutableLiveData<Map<String, Double>> categoryExpensesData = new MutableLiveData<>();
+    private final MutableLiveData<Map<String, Double>> categoryBudgetsData = new MutableLiveData<>();
+
+    private ListenerRegistration transactionsListener;
+    private Observer<List<Budget>> budgetObserver;
+
+    // Biến để theo dõi xem dữ liệu đã được tải lần đầu chưa
+    private boolean isInitialDataLoaded = false;
 
     public DashboardViewModel() {
-        repository = TransactionRepository.getInstance();
+        transactionRepository = TransactionRepository.getInstance();
+        budgetRepository = BudgetRepository.getInstance();
+        db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
-        // Load data for the current month
-        loadCurrentMonthData();
+        // Đặt trạng thái đang tải
+        loadingState.setValue(LoadingState.LOADING);
 
-        // Load recent transactions for the current month
-        loadRecentTransactions();
-
-        // Load category data for charts
-        loadCategoryData();
+        // Tải tất cả dữ liệu cùng một lúc
+        loadAllDashboardData();
     }
 
     /**
-     * Tải dữ liệu danh mục cho biểu đồ
+     * Tải tất cả dữ liệu dashboard cùng một lúc
      */
-    private void loadCategoryData() {
-        // Lấy repository
-        TransactionRepository transactionRepo = TransactionRepository.getInstance();
-        BudgetRepository budgetRepo = BudgetRepository.getInstance();
-
-        // Lấy danh sách các danh mục chi tiêu
-        List<String> expenseCategories = CategoryManager.getInstance().getExpenseCategories();
-
-        // Khởi tạo map trống với tất cả các danh mục
-        Map<String, Double> initialExpenses = new HashMap<>();
-        Map<String, Double> initialBudgets = new HashMap<>();
-
-        for (String category : expenseCategories) {
-            initialExpenses.put(category, 0.0);
-            initialBudgets.put(category, 0.0);
+    private void loadAllDashboardData() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            // Đặt trạng thái lỗi nếu người dùng chưa đăng nhập
+            loadingState.setValue(LoadingState.ERROR);
+            return;
         }
 
-        // Cập nhật giá trị ban đầu
-        categoryExpensesData.setValue(initialExpenses);
-        categoryBudgetsData.setValue(initialBudgets);
+        // Lấy ngày đầu và cuối tháng hiện tại
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date startOfMonth = calendar.getTime();
 
-        // Lắng nghe dữ liệu chi tiêu theo danh mục
-        spentObserver = categorySpentAmounts -> {
-            if (categorySpentAmounts != null) {
-                Map<String, Double> expenses = new HashMap<>(initialExpenses);
-                expenses.putAll(categorySpentAmounts);
-                categoryExpensesData.setValue(expenses);
+        calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Date endOfMonth = calendar.getTime();
+
+        // Hủy đăng ký listener cũ nếu có
+        if (transactionsListener != null) {
+            transactionsListener.remove();
+        }
+
+        // Đặt trạng thái đang tải
+        loadingState.setValue(LoadingState.LOADING);
+
+        // Lắng nghe thay đổi giao dịch theo thời gian thực
+        transactionsListener = db.collection(COLLECTION_USERS)
+                .document(currentUser.getUid())
+                .collection(COLLECTION_TRANSACTIONS)
+                .whereGreaterThanOrEqualTo("date", startOfMonth)
+                .whereLessThanOrEqualTo("date", endOfMonth)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error loading transactions", error);
+                        loadingState.setValue(LoadingState.ERROR);
+                        return;
+                    }
+
+                    List<Transaction> transactions = new ArrayList<>();
+                    if (snapshots != null && !snapshots.isEmpty()) {
+                        // Chuyển đổi dữ liệu từ Firestore
+                        for (QueryDocumentSnapshot document : snapshots) {
+                            Transaction transaction = transactionRepository.documentToTransaction(document);
+                            transactions.add(transaction);
+                        }
+                    }
+
+                    // Xử lý dữ liệu ngay cả khi danh sách trống
+                    processTransactions(transactions);
+
+                    // Đặt trạng thái thành công
+                    loadingState.setValue(LoadingState.SUCCESS);
+                    isInitialDataLoaded = true;
+                });
+
+        // Tải dữ liệu ngân sách
+        loadBudgetData();
+    }
+
+    /**
+     * Xử lý danh sách giao dịch để cập nhật tất cả các thành phần
+     */
+    private void processTransactions(List<Transaction> transactions) {
+        // Khởi tạo các giá trị mặc định
+        double totalIncome = 0;
+        double totalExpenses = 0;
+        List<Transaction> recent = new ArrayList<>();
+        Map<String, Double> spentByCategory = new HashMap<>();
+
+        // Khởi tạo map với tất cả các danh mục
+        List<String> expenseCategories = CategoryManager.getInstance().getExpenseCategories();
+        for (String category : expenseCategories) {
+            spentByCategory.put(category, 0.0);
+        }
+
+        if (transactions != null && !transactions.isEmpty()) {
+            // 1. Cập nhật giao dịch gần đây (lấy 3 giao dịch mới nhất)
+            recent = transactions.stream()
+                    .sorted((t1, t2) -> t2.getDate().compareTo(t1.getDate()))
+                    .limit(3)
+                    .collect(Collectors.toList());
+
+            // 2. Tính toán tổng quan tài chính
+            for (Transaction transaction : transactions) {
+                double amount = Math.abs(transaction.getAmount());
+                boolean isIncome = transaction.isIncome();
+
+                if (isIncome) {
+                    totalIncome += amount;
+                } else {
+                    totalExpenses += amount;
+
+                    // 3. Cập nhật chi tiêu theo danh mục cho biểu đồ
+                    String category = transaction.getCategory();
+                    double currentAmount = spentByCategory.getOrDefault(category, 0.0);
+                    spentByCategory.put(category, currentAmount + amount);
+                }
             }
-        };
-        transactionRepo.getCategorySpentAmounts().observeForever(spentObserver);
+        }
 
-        // Lắng nghe dữ liệu ngân sách
+        // Cập nhật tất cả LiveData cùng một lúc để tránh nhấp nháy
+        income.setValue(totalIncome);
+        expenses.setValue(totalExpenses);
+        balance.setValue(totalIncome - totalExpenses);
+        recentTransactions.setValue(recent);
+        categoryExpensesData.setValue(spentByCategory);
+    }
+
+    /**
+     * Tải dữ liệu ngân sách
+     */
+    private void loadBudgetData() {
+        // Hủy đăng ký listener cũ nếu có
+        if (budgetObserver != null) {
+            budgetRepository.getActiveBudgets().removeObserver(budgetObserver);
+        }
+
+        // Lắng nghe thay đổi ngân sách
         budgetObserver = budgets -> {
+            // Khởi tạo map với tất cả các danh mục
+            List<String> expenseCategories = CategoryManager.getInstance().getExpenseCategories();
+            Map<String, Double> budgetMap = new HashMap<>();
+            for (String category : expenseCategories) {
+                budgetMap.put(category, 0.0);
+            }
+
             if (budgets != null) {
-                Map<String, Double> budgetMap = new HashMap<>(initialBudgets);
+                // Cập nhật ngân sách cho từng danh mục
                 for (Budget budget : budgets) {
                     budgetMap.put(budget.getCategory(), budget.getAmount());
                 }
-                categoryBudgetsData.setValue(budgetMap);
             }
-        };
-        budgetRepo.getActiveBudgets().observeForever(budgetObserver);
-    }
 
-    // Getter cho dữ liệu biểu đồ
-    public LiveData<Map<String, Double>> getCategoryExpensesData() {
-        return categoryExpensesData;
-    }
-
-    public LiveData<Map<String, Double>> getCategoryBudgetsData() {
-        return categoryBudgetsData;
-    }
-    private void loadCurrentMonthData() {
-        // Get date range for current month
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date startDate = calendar.getTime();
-
-        calendar = Calendar.getInstance(); // Reset to today
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-        Date endDate = calendar.getTime();
-
-
-        // Get transactions for current month
-        LiveData<List<Transaction>> monthlyTransactions =
-                repository.getFilteredTransactions(startDate, endDate, "Tất cả danh mục", "Tất cả giao dịch");
-
-        // Observe continuously instead of using MediatorLiveData with removal
-        if (monthDataObserver != null) {
-            monthlyTransactions.removeObserver(monthDataObserver);
-        }
-
-        monthDataObserver = transactions -> {
-            if (transactions != null) {
-                calculateFinancialSummary(transactions);
-            } else {
-                income.setValue(0.0);
-                expenses.setValue(0.0);
-                balance.setValue(0.0);
-            }
+            // Cập nhật LiveData
+            categoryBudgetsData.setValue(budgetMap);
         };
 
-        monthlyTransactions.observeForever(monthDataObserver);
+        budgetRepository.getActiveBudgets().observeForever(budgetObserver);
     }
 
-    // Add this field to the class
-    private Observer<List<Transaction>> monthDataObserver;
-
-    // Clean up in onCleared
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        TransactionRepository transactionRepo = TransactionRepository.getInstance();
-        BudgetRepository budgetRepo = BudgetRepository.getInstance();
-
-        // Hủy đăng ký các observer
-        transactionRepo.getCategorySpentAmounts().removeObserver(spentObserver);
-        budgetRepo.getActiveBudgets().removeObserver(budgetObserver);
+    // Getter cho trạng thái tải
+    public LiveData<LoadingState> getLoadingState() {
+        return loadingState;
     }
 
-    // Khai báo observer để có thể hủy đăng ký sau này
-    private Observer<Map<String, Double>> spentObserver;
-    private Observer<List<Budget>> budgetObserver;
-
-    private void calculateFinancialSummary(List<Transaction> transactions) {
-        double totalIncome = 0;
-        double totalExpenses = 0;
-
-        for (Transaction transaction : transactions) {
-            double originalAmount = transaction.getAmount();
-            double amount = Math.abs(originalAmount);
-            boolean isIncome = transaction.isIncome();
-
-            if (isIncome) {
-                totalIncome += amount;
-                Log.d(TAG, "Added to income, new total: " + totalIncome);
-            } else {
-                totalExpenses += amount;
-                Log.d(TAG, "Added to expenses, new total: " + totalExpenses);
-            }
-        }
-
-
-        // Update the LiveData values
-        income.setValue(totalIncome);
-        expenses.setValue(totalExpenses);
-        // Calculate balance as income minus expenses
-        double calculatedBalance = totalIncome - totalExpenses;
-        balance.setValue(calculatedBalance);
-
-    }
-
-
-    private void loadRecentTransactions() {
-        // Get date range for current month
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date startDate = calendar.getTime();
-
-        calendar = Calendar.getInstance(); // Reset to today
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-        Date endDate = calendar.getTime();
-
-        // Get transactions for the current month
-        LiveData<List<Transaction>> monthlyTransactions =
-                repository.getFilteredTransactions(startDate, endDate, "Tất cả danh mục", "Tất cả giao dịch");
-
-        recentTransactions.addSource(monthlyTransactions, transactions -> {
-            if (transactions != null && !transactions.isEmpty()) {
-                // Sort by date (newest first) and take the first 3
-                List<Transaction> recent = transactions.stream()
-                        .sorted((t1, t2) -> t2.getDate().compareTo(t1.getDate()))
-                        .limit(3)
-                        .collect(Collectors.toList());
-
-                recentTransactions.setValue(recent);
-            } else {
-                recentTransactions.setValue(new ArrayList<>());
-            }
-
-            // Remove the source after processing
-            recentTransactions.removeSource(monthlyTransactions);
-        });
-    }
-
+    // Getters cho các LiveData
     public LiveData<Double> getIncome() {
         return income;
     }
@@ -246,9 +241,35 @@ public class DashboardViewModel extends ViewModel {
         return recentTransactions;
     }
 
-    // Method to refresh data
+    public LiveData<Map<String, Double>> getCategoryExpensesData() {
+        return categoryExpensesData;
+    }
+
+    public LiveData<Map<String, Double>> getCategoryBudgetsData() {
+        return categoryBudgetsData;
+    }
+
+    // Phương thức kiểm tra xem dữ liệu đã được tải chưa
+    public boolean isDataLoaded() {
+        return isInitialDataLoaded;
+    }
+
+    // Phương thức làm mới dữ liệu
     public void refreshData() {
-        loadCurrentMonthData();
-        loadRecentTransactions();
+        loadAllDashboardData();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
+        // Hủy đăng ký tất cả listener khi ViewModel bị hủy
+        if (transactionsListener != null) {
+            transactionsListener.remove();
+        }
+
+        if (budgetObserver != null) {
+            budgetRepository.getActiveBudgets().removeObserver(budgetObserver);
+        }
     }
 }

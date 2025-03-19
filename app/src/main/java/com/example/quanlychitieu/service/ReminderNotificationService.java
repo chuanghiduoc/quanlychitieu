@@ -133,7 +133,8 @@ public class ReminderNotificationService {
         Intent markAsPaidIntent = new Intent(context, ReminderActionReceiver.class);
         markAsPaidIntent.setAction("MARK_AS_PAID");
         markAsPaidIntent.putExtra("REMINDER_ID", reminderId);
-        markAsPaidIntent.putExtra("REMINDER_DOCUMENT_ID", "");
+        markAsPaidIntent.putExtra("REMINDER_TITLE", title);
+        markAsPaidIntent.putExtra("REMINDER_AMOUNT", amount);
 
         // Sử dụng request code khác cho PendingIntent này
         PendingIntent markAsPaidPendingIntent = PendingIntent.getBroadcast(
@@ -150,13 +151,11 @@ public class ReminderNotificationService {
                 .setContentText(title + ": " + currencyFormat.format(amount))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
-                .addAction(R.drawable.ic_check, "Đã thanh toán? Click vào đây", markAsPaidPendingIntent)
+                .addAction(R.drawable.ic_check, "Đã thanh toán", markAsPaidPendingIntent)
                 .setAutoCancel(true);
 
         // Hiển thị notification
         notificationManager.notify((int) reminderId, builder.build());
     }
-
-
 
 }

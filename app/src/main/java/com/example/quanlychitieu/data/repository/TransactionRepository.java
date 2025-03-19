@@ -371,11 +371,8 @@ public class TransactionRepository {
     private void checkBudgetThresholdAfterTransaction(String category) {
         // Kiểm tra xem context đã được đặt chưa
         if (context == null) {
-            Log.e(TAG, "Context is null. Cannot check budget threshold.");
             return;
         }
-
-        Log.d(TAG, "Checking budget threshold after transaction for category: " + category);
 
         // Sử dụng Handler để chạy trên main thread
         new Handler(Looper.getMainLooper()).post(() -> {
@@ -388,14 +385,8 @@ public class TransactionRepository {
                     budgetRepository.getBudgetByCategory(category).removeObserver(this);
 
                     if (budget != null) {
-                        Log.d(TAG, "Found budget for " + category + ": amount=" + budget.getAmount() +
-                                ", spent=" + budget.getSpent() +
-                                ", threshold=" + budget.getNotificationThreshold() + "%, " +
-                                "progress=" + budget.getProgressPercentage() + "%");
-
                         // Kiểm tra xem thông báo có được bật cho ngân sách này không
                         if (!budget.isNotificationsEnabled()) {
-                            Log.d(TAG, "Notifications disabled for " + category);
                             return;
                         }
 
@@ -469,9 +460,6 @@ public class TransactionRepository {
                 // Mỗi danh mục sẽ có ID thông báo riêng để tránh ghi đè
                 int notificationId = budget.getCategory().hashCode();
                 notificationManager.notify(notificationId, builder.build());
-
-                Log.d(TAG, "Successfully sent notification for budget: " + budget.getCategory() +
-                        " at " + budget.getProgressPercentage() + "% usage");
             } else {
                 Log.e(TAG, "NotificationManager is null, couldn't send notification");
             }
@@ -597,7 +585,7 @@ public class TransactionRepository {
     }
 
     // Method for QueryDocumentSnapshot (from query results)
-    private Transaction documentToTransaction(QueryDocumentSnapshot document) {
+    public Transaction documentToTransaction(QueryDocumentSnapshot document) {
         String firebaseId = document.getId();
         return extractTransactionFromDocument(document, firebaseId);
     }

@@ -56,10 +56,10 @@ public class BudgetCategoryAdapter extends RecyclerView.Adapter<BudgetCategoryAd
             double spent = expenses.getOrDefault(category, 0.0);
             double budget = budgets.getOrDefault(category, 0.0);
 
-            // Tính phần trăm
+            // Tính phần trăm chính xác, không giới hạn ở 100%
             int percentage = 0;
             if (budget > 0) {
-                percentage = (int) Math.min(100, (spent / budget) * 100);
+                percentage = (int) Math.round((spent / budget) * 100);
             }
 
             // Lấy màu cho danh mục
@@ -100,13 +100,25 @@ public class BudgetCategoryAdapter extends RecyclerView.Adapter<BudgetCategoryAd
         String amountText = formattedSpent + " / " + formattedBudget + " (" + item.percentage + "%)";
         holder.amountText.setText(amountText);
 
-        // Cập nhật thanh tiến trình
-        holder.progressBar.setProgress(item.percentage);
-        holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(item.color));
+        // Cập nhật thanh tiến trình - giới hạn ở 100% chỉ cho UI
+        holder.progressBar.setProgress(Math.min(100, item.percentage));
 
-        // Đổi màu chữ nếu vượt ngân sách
+        // Đổi màu thanh tiến trình dựa trên phần trăm
+        int progressColor;
+        if (item.percentage >= 100) {
+            progressColor = ContextCompat.getColor(context, R.color.expense_red);
+        } else if (item.percentage >= 80) {
+            progressColor = ContextCompat.getColor(context, R.color.chart_2);
+        } else {
+            progressColor = item.color;
+        }
+        holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(progressColor));
+
+        // Đổi màu chữ dựa trên phần trăm
         if (item.percentage >= 100) {
             holder.amountText.setTextColor(ContextCompat.getColor(context, R.color.expense_red));
+        } else if (item.percentage >= 80) {
+            holder.amountText.setTextColor(ContextCompat.getColor(context, R.color.chart_2));
         } else {
             holder.amountText.setTextColor(ContextCompat.getColor(context, R.color.black));
         }

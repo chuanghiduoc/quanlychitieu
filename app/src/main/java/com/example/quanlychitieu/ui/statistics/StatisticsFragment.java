@@ -241,7 +241,7 @@ public class StatisticsFragment extends Fragment {
         leftAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return formatCurrency(value);
+                return formatShortCurrency(value);
             }
         });
 
@@ -250,11 +250,13 @@ public class StatisticsFragment extends Fragment {
         // Configure legend
         Legend legend = barChart.getLegend();
         legend.setEnabled(true);
-        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        legend.setOrientation(Legend.LegendOrientation.VERTICAL);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         legend.setDrawInside(false);
         legend.setTextSize(12f);
+        legend.setXEntrySpace(20f);
+        barChart.setExtraBottomOffset(15f);
     }
 
     private void setupCategoryList() {
@@ -350,7 +352,7 @@ public class StatisticsFragment extends Fragment {
             @Override
             public String getFormattedValue(float value) {
                 if (value == 0) return "";
-                return formatCurrency(value);
+                return formatShortCurrency(value);
             }
         });
 
@@ -361,7 +363,7 @@ public class StatisticsFragment extends Fragment {
             @Override
             public String getFormattedValue(float value) {
                 if (value == 0) return "";
-                return formatCurrency(value);
+                return formatShortCurrency(value);
             }
         });
 
@@ -373,7 +375,7 @@ public class StatisticsFragment extends Fragment {
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
 
         // Group bars
-        float groupSpace = 0.2f;
+        float groupSpace = 0.3f;
         float barSpace = 0f;
         barData.groupBars(0, groupSpace, barSpace);
 
@@ -539,6 +541,18 @@ public class StatisticsFragment extends Fragment {
         public Pair(F first, S second) {
             this.first = first;
             this.second = second;
+        }
+    }
+    private String formatShortCurrency(float value) {
+        // Định dạng số tiền ngắn gọn
+        if (value >= 1_000_000_000) {
+            return String.format("%.1fB", value / 1_000_000_000);
+        } else if (value >= 1_000_000) {
+            return String.format("%.1fM", value / 1_000_000);
+        } else if (value >= 1_000) {
+            return String.format("%.1fK", value / 1_000);
+        } else {
+            return String.format("%.0f", value);
         }
     }
 }
