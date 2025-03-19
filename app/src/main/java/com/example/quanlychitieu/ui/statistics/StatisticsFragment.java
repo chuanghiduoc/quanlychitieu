@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.quanlychitieu.MainActivity;
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.adapter.CategoryStatisticsAdapter;
 import com.example.quanlychitieu.databinding.FragmentStatisticsBinding;
@@ -57,7 +58,7 @@ public class StatisticsFragment extends Fragment {
     private CategoryStatisticsAdapter categoryAdapter;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private Calendar currentPeriod = Calendar.getInstance();
-    private String currentPeriodType = "month"; // Default period type
+    private String currentPeriodType = "month";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -444,6 +445,15 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void exportReport() {
+        if (getActivity() instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            if (!mainActivity.hasStoragePermission()) {
+                Toast.makeText(requireContext(),
+                        "Cần quyền lưu trữ để xuất báo cáo", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         try {
             // Get period string for filename
             String periodStr;
