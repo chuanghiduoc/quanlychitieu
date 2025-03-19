@@ -180,6 +180,7 @@
         android:layout_margin="16dp"
         android:contentDescription="Thêm ngân sách mới"
         android:src="@drawable/ic_add"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

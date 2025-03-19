@@ -51,8 +51,6 @@ public class BudgetFragment extends Fragment {
         // Setup RecyclerView
         setupRecyclerView();
 
-        // Setup FAB
-        setupAddBudgetButton();
 
         // Update title with current month/year
         updateTitleWithCurrentMonth();
@@ -111,17 +109,6 @@ public class BudgetFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-
-    private void setupAddBudgetButton() {
-        binding.fabAddBudget.setOnClickListener(v -> {
-            // Navigate to add budget screen
-            if (Navigation.findNavController(v).getCurrentDestination().getAction(R.id.action_budget_to_add_budget) != null) {
-                Navigation.findNavController(v).navigate(R.id.action_budget_to_add_budget);
-            } else {
-                Toast.makeText(requireContext(), "Thêm ngân sách mới", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     private void observeTotalBudget() {
         // Observe total budget amount
