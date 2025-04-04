@@ -1,9 +1,5 @@
 package com.example.quanlychitieu.data;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.example.quanlychitieu.R;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

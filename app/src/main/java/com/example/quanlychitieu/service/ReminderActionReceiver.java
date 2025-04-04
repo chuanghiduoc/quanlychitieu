@@ -20,7 +20,6 @@ public class ReminderActionReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         long reminderId = intent.getLongExtra("REMINDER_ID", -1);
-        String documentId = intent.getStringExtra("REMINDER_DOCUMENT_ID");
 
         if ("MARK_AS_PAID".equals(action) && reminderId != -1) {
             // Hiển thị Toast để người dùng biết hành động đang được xử lý
