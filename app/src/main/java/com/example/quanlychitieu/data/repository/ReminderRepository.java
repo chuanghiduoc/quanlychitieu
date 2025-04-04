@@ -31,22 +31,13 @@ public class ReminderRepository {
     }
 
 
-    // Lấy reference đến collection reminders của user hiện tại
-// Kiểm tra đường dẫn collection
     private CollectionReference getRemindersCollection() {
         String userId = auth.getCurrentUser().getUid();
-        Log.d("ReminderRepository", "Getting reminders for user: " + userId);
 
-        // Kiểm tra xem dữ liệu đang ở collection nào
-        // Thử cả hai cách tổ chức dữ liệu
 
-        // Cách 1: Sub-collection trong users (đề xuất)
         CollectionReference subCollection = db.collection(COLLECTION_USERS)
                 .document(userId)
                 .collection(SUBCOLLECTION_REMINDERS);
-
-        // Log đường dẫn để debug
-        Log.d("ReminderRepository", "Sub-collection path: " + subCollection.getPath());
 
         return subCollection;
     }
