@@ -7,6 +7,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -69,14 +70,9 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
             navController.navigate(R.id.action_dashboard_to_transactions, null);
         });
 
-        // Setup click listener for profile image
+        // Setup click listener for profile image - Cập nhật phương thức này
         binding.profileImage.setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent(requireActivity(), ProfileActivity.class);
-                startActivity(intent);
-            } catch (Exception e) {
-                Log.e(TAG, "Navigation to profile failed: " + e.getMessage(), e);
-            }
+            showProfileMenu(v);
         });
 
         // Khởi tạo biểu đồ
@@ -99,6 +95,66 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
 
         // Observe chart data
         observeChartData();
+    }
+
+    /**
+     * Hiển thị menu tùy chọn khi nhấn vào icon người dùng
+     */
+    private void showProfileMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(requireContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.profile_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.menu_profile_settings) {
+                // Mở màn hình cài đặt tài khoản
+                navigateToProfileSettings();
+                return true;
+            } else if (itemId == R.id.menu_category_management) {
+                // Mở màn hình quản lý danh mục
+                navigateToCategoryManagement();
+                return true;
+            }
+
+            return false;
+        });
+
+        popupMenu.show();
+    }
+
+    /**
+     * Điều hướng đến màn hình cài đặt tài khoản
+     */
+    private void navigateToProfileSettings() {
+        try {
+            Intent intent = new Intent(requireActivity(), ProfileActivity.class);
+            startActivity(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "Navigation to profile failed: " + e.getMessage(), e);
+            Toast.makeText(requireContext(), "Không thể mở màn hình cài đặt tài khoản", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Điều hướng đến màn hình quản lý danh mục
+     */
+    private void navigateToCategoryManagement() {
+        try {
+            // Kiểm tra xem đã có CategoryManagementFragment trong navigation graph chưa
+            if (navController.getGraph().findNode(R.id.category_management_fragment) != null) {
+                // Thêm CategoryManagementFragment vào navigation graph
+                navController.navigate(R.id.category_management_fragment);
+            } else {
+                // Nếu không có trong navigation graph, mở thông qua MainActivity
+                Intent intent = new Intent(requireActivity().getIntent());
+                intent.putExtra("open_category_management", true);
+                requireActivity().startActivity(intent);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Navigation to category management failed: " + e.getMessage(), e);
+            Toast.makeText(requireContext(), "Không thể mở màn hình quản lý danh mục", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showLoadingState() {
@@ -145,6 +201,7 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
         }
     }
 
+
     private void stopShimmerAnimations() {
         if (binding.financialOverviewShimmer instanceof ShimmerFrameLayout) {
             ((ShimmerFrameLayout) binding.financialOverviewShimmer).stopShimmer();
@@ -174,7 +231,6 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
             }
         });
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -213,9 +269,6 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
         categoryAdapter = new BudgetCategoryAdapter(requireContext());
         categoryRecyclerView.setAdapter(categoryAdapter);
     }
-
-
-
 
     private void observeChartData() {
         // Theo dõi cả dữ liệu chi tiêu và ngân sách

@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +25,7 @@ import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.Transaction;
 import com.example.quanlychitieu.data.repository.TransactionRepository;
 import com.example.quanlychitieu.databinding.FragmentAddEditTransactionBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -263,8 +266,47 @@ public class AddEditTransactionFragment extends Fragment {
     }
 
     private void setupCategoryDropdown() {
-        // Initially setup with expense categories (default selection)
+        // Thiết lập ban đầu với danh mục chi tiêu (lựa chọn mặc định)
         updateCategoryDropdown(false);
+
+        // Thêm nút thêm danh mục mới
+        binding.addCategoryButton.setOnClickListener(v -> {
+            showAddCategoryDialog();
+        });
+    }
+
+
+    private void showAddCategoryDialog() {
+        boolean isIncome = binding.incomeRadio.isChecked();
+        String dialogTitle = isIncome ? "Thêm danh mục thu nhập" : "Thêm danh mục chi tiêu";
+
+        // Tạo dialog với EditText để nhập tên danh mục mới
+        EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint("Nhập tên danh mục");
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(dialogTitle)
+                .setView(input)
+                .setPositiveButton("Thêm", (dialog, which) -> {
+                    String newCategory = input.getText().toString().trim();
+                    if (!newCategory.isEmpty()) {
+                        // Thêm danh mục mới vào CategoryManager
+                        if (isIncome) {
+                            CategoryManager.getInstance().addCustomIncomeCategory(newCategory);
+                        } else {
+                            CategoryManager.getInstance().addCustomExpenseCategory(newCategory);
+                        }
+
+                        // Cập nhật dropdown với danh mục mới
+                        updateCategoryDropdown(isIncome);
+
+                        // Tự động chọn danh mục vừa thêm
+                        binding.categoryInput.setText(newCategory, false);
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     private void updateCategoryDropdown(boolean isIncome) {
@@ -287,7 +329,7 @@ public class AddEditTransactionFragment extends Fragment {
         categoryInput.setAdapter(categoryAdapter);
 
         // Set default selection if adapter has items
-        if (categoryAdapter.getCount() > 0) {
+        if (categoryAdapter.getCount() > 0 && (categoryInput.getText() == null || categoryInput.getText().toString().isEmpty())) {
             categoryInput.setText(categoryAdapter.getItem(0), false);
         }
     }

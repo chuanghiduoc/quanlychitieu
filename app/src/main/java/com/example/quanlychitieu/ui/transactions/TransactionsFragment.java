@@ -50,14 +50,23 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     private ArrayAdapter<String> expenseCategoriesAdapter;
     private ArrayAdapter<String> incomeCategoriesAdapter;
 
+    private void refreshCategoryAdapters() {
+        initCategoryAdapters();
+
+        // Cập nhật adapter cho dropdown danh mục hiện tại
+        String currentTransactionType = binding.transactionTypeInput.getText().toString();
+        updateCategoryFilterBasedOnTransactionType(currentTransactionType);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         viewModel.refreshTransactions();
-        // Restore dropdown selections
+        // Làm mới adapter danh mục khi quay lại fragment
+        refreshCategoryAdapters();
+        // Khôi phục lựa chọn dropdown
         restoreDropdownSelections();
     }
-
     private void restoreDropdownSelections() {
         // Get the current selections
         String currentTransactionType = binding.transactionTypeInput.getText().toString();
@@ -153,8 +162,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         // Tạo adapter cho tất cả danh mục
         List<String> allCategories = new ArrayList<>();
         allCategories.add("Tất cả danh mục");
-        allCategories.addAll(CategoryManager.getInstance().getExpenseCategories());
-        allCategories.addAll(CategoryManager.getInstance().getIncomeCategories());
+        allCategories.addAll(CategoryManager.getInstance().getAllCategories());
         allCategoriesAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
@@ -181,7 +189,6 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
                 incomeCategories
         );
     }
-
     private void setupDatePickers() {
         // Set from date to first day of current month
         fromDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
