@@ -136,5 +136,9 @@
             app:argType="long"
             android:defaultValue="-1L" />
     </fragment>
-
+    <fragment
+        android:id="@+id/category_management_fragment"
+        android:name="com.example.quanlychitieu.ui.settings.CategoryManagementFragment"
+        android:label="Quản lý danh mục"
+        tools:layout="@layout/fragment_category_management" />
 </navigation>

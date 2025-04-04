@@ -348,4 +348,15 @@ public class MainActivity extends AppCompatActivity {
             return true; // Android 5.1 và thấp hơn không cần yêu cầu quyền runtime
         }
     }
+
+    public void navigateToCategoryManagement() {
+        if (navController != null) {
+            try {
+                navController.navigate(R.id.category_management_fragment);
+            } catch (Exception e) {
+                Log.e(TAG, "Error navigating to category management: " + e.getMessage());
+                Toast.makeText(this, "Không thể mở màn hình quản lý danh mục", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }

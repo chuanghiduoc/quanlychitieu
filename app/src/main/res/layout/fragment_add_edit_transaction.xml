@@ -85,20 +85,36 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Danh mục -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/category_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Danh mục">
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
 
-                <AutoCompleteTextView
-                    android:id="@+id/category_input"
-                    android:layout_width="match_parent"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/category_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:hint="Danh mục">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/category_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/add_category_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:icon="@drawable/ic_add"
+                    app:iconGravity="textStart"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            </LinearLayout>
 
             <!-- Ngày -->
             <com.google.android.material.textfield.TextInputLayout

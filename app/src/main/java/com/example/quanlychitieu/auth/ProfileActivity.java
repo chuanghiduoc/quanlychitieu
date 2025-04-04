@@ -11,8 +11,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.example.quanlychitieu.MainActivity;
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.databinding.ActivityProfileBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,7 +97,19 @@ public class ProfileActivity extends AppCompatActivity {
         // Xử lý sự kiện click vào các tùy chọn
         binding.tvEditProfile.setOnClickListener(v -> openEditProfileDialog());
         binding.tvChangePassword.setOnClickListener(v -> openChangePasswordDialog());
+
+        // Thêm xử lý sự kiện cho nút quản lý danh mục
+
         binding.tvLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
+    }
+
+    // Phương thức mới để chuyển đến màn hình quản lý danh mục
+    private void navigateToCategoryManagement() {
+        // Tạo Intent để mở MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        // Thêm flag để chỉ định rằng bạn muốn mở màn hình quản lý danh mục
+        intent.putExtra("open_category_management", true);
+        startActivity(intent);
     }
 
     private void openImagePicker() {
