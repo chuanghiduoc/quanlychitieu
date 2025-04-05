@@ -24,4 +24,5 @@
         android:id="@+id/navigation_reminders"
         android:icon="@drawable/ic_reminders"
         android:title="Nhắc nhở" />
+
 </menu>

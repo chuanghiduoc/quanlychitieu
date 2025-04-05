@@ -13,7 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,7 +25,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.quanlychitieu.data.CategoryManager;
+import com.example.quanlychitieu.data.model.FinancialGoal;
 import com.example.quanlychitieu.data.model.Transaction;
+import com.example.quanlychitieu.data.repository.FinancialGoalRepository;
 import com.example.quanlychitieu.data.repository.TransactionRepository;
 import com.example.quanlychitieu.databinding.FragmentAddEditTransactionBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -32,8 +37,10 @@ import com.google.firebase.auth.FirebaseUser;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -50,7 +57,10 @@ public class AddEditTransactionFragment extends Fragment {
 
     private String transactionId;
     private boolean isEditMode = false;
-
+    private Spinner goalSpinner;
+    private CheckBox contributeToGoalCheckbox;
+    private LinearLayout goalSelectionLayout;
+    private List<FinancialGoal> availableGoals;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -86,6 +96,8 @@ public class AddEditTransactionFragment extends Fragment {
         setupAmountInputFormatting();
         setupSaveButton();
         setupToolbar();
+        setupGoalContribution();
+
     }
 
     private void setupAmountInputFormatting() {
@@ -441,7 +453,19 @@ public class AddEditTransactionFragment extends Fragment {
             endDate = endDateCalendar.getTime();
         }
 
+        // Kiểm tra nếu đóng góp vào mục tiêu
+        boolean isContributeToGoal = binding.contributeToGoalCheckbox.isChecked();
+        String goalId = null;
+
+        if (isContributeToGoal && availableGoals != null && !availableGoals.isEmpty()) {
+            int selectedPosition = binding.goalSpinner.getSelectedItemPosition();
+            if (selectedPosition >= 0 && selectedPosition < availableGoals.size()) {
+                goalId = availableGoals.get(selectedPosition).getFirebaseId();
+            }
+        }
+
         Transaction transaction;
+
         if (isEditMode) {
             transaction = new Transaction();
             transaction.setFirebaseId(transactionId);
@@ -456,6 +480,8 @@ public class AddEditTransactionFragment extends Fragment {
             transaction.setRepeatType(repeatType);
             transaction.setEndDate(endDate);
             transaction.setUserId(currentUser.getUid());
+            transaction.setGoalContribution(isContributeToGoal);
+            transaction.setGoalId(goalId);
 
             repository.updateTransaction(transaction);
             Toast.makeText(requireContext(), "Giao dịch đã được cập nhật", Toast.LENGTH_SHORT).show();
@@ -473,6 +499,8 @@ public class AddEditTransactionFragment extends Fragment {
             transaction.setRepeatType(repeatType);
             transaction.setEndDate(endDate);
             transaction.setUserId(currentUser.getUid());
+            transaction.setGoalContribution(isContributeToGoal);
+            transaction.setGoalId(goalId);
 
             repository.addTransaction(transaction);
 
@@ -486,6 +514,7 @@ public class AddEditTransactionFragment extends Fragment {
 
         Navigation.findNavController(requireView()).popBackStack();
     }
+
 
     private void generateRecurringTransactions(Transaction baseTransaction) {
         if (!baseTransaction.isRepeat() || baseTransaction.getRepeatType() == null) {
@@ -564,6 +593,78 @@ public class AddEditTransactionFragment extends Fragment {
         }
     }
 
+    private void setupGoalContribution() {
+        // Ánh xạ các view
+        contributeToGoalCheckbox = binding.contributeToGoalCheckbox;
+        goalSelectionLayout = binding.goalSelectionLayout;
+        goalSpinner = binding.goalSpinner;
+
+        // Mặc định ẩn phần chọn mục tiêu
+        goalSelectionLayout.setVisibility(View.GONE);
+
+        // Hiển thị/ẩn phần chọn mục tiêu dựa trên checkbox
+        contributeToGoalCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            goalSelectionLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+
+            // Nếu đóng góp vào mục tiêu, tự động chọn loại giao dịch là chi tiêu
+            if (isChecked) {
+                binding.expenseRadio.setChecked(true);
+                // Tải danh sách mục tiêu
+                loadAvailableGoals();
+            }
+        });
+
+        // Chỉ cho phép đóng góp vào mục tiêu nếu là giao dịch chi tiêu
+        binding.transactionTypeGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            boolean isExpense = (checkedId == binding.expenseRadio.getId());
+            contributeToGoalCheckbox.setEnabled(isExpense);
+
+            if (!isExpense && contributeToGoalCheckbox.isChecked()) {
+                contributeToGoalCheckbox.setChecked(false);
+            }
+        });
+    }
+
+    // Phương thức mới để tải danh sách mục tiêu
+    private void loadAvailableGoals() {
+        FinancialGoalRepository goalRepository = FinancialGoalRepository.getInstance();
+        goalRepository.getGoals().observe(getViewLifecycleOwner(), goals -> {
+            if (goals != null && !goals.isEmpty()) {
+                // Lọc ra các mục tiêu chưa hoàn thành
+                availableGoals = new ArrayList<>();
+                for (FinancialGoal goal : goals) {
+                    if (!goal.isCompleted()) {
+                        availableGoals.add(goal);
+                    }
+                }
+
+                if (!availableGoals.isEmpty()) {
+                    // Tạo adapter cho spinner
+                    List<String> goalNames = new ArrayList<>();
+                    for (FinancialGoal goal : availableGoals) {
+                        goalNames.add(goal.getName());
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            goalNames
+                    );
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    goalSpinner.setAdapter(adapter);
+                } else {
+                    // Không có mục tiêu nào khả dụng
+                    contributeToGoalCheckbox.setChecked(false);
+                    contributeToGoalCheckbox.setEnabled(false);
+                    Toast.makeText(requireContext(), "Không có mục tiêu nào để đóng góp", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // Không có mục tiêu nào
+                contributeToGoalCheckbox.setChecked(false);
+                contributeToGoalCheckbox.setEnabled(false);
+            }
+        });
+    }
 
     private void setupToolbar() {
         binding.toolbar.setNavigationOnClickListener(v -> {

@@ -351,7 +351,7 @@ public class TransactionRepository {
                 .add(transactionMap)
                 .addOnSuccessListener(documentReference -> {
                     transaction.setFirebaseId(documentReference.getId());
-                    loadTransactions(); // 🛠 Cập nhật danh sách sau khi thêm
+                    loadTransactions(); // Cập nhật danh sách sau khi thêm
 
                     // Cập nhật giao dịch tháng hiện tại nếu giao dịch thuộc tháng hiện tại
                     if (isCurrentMonth(transaction.getDate())) {
@@ -363,6 +363,8 @@ public class TransactionRepository {
                     }
                 });
     }
+
+
     public void setContext(Context context) {
         this.context = context;
         Log.d(TAG, "Context set for TransactionRepository");
@@ -613,6 +615,10 @@ public class TransactionRepository {
         String repeatType = document.getString("repeatType");
         Date endDate = document.getDate("endDate");
 
+        String goalId = document.getString("goalId");
+        boolean isGoalContribution = document.getBoolean("isGoalContribution") != null ?
+                document.getBoolean("isGoalContribution") : false;
+
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setDescription(description);
@@ -626,6 +632,8 @@ public class TransactionRepository {
         transaction.setFirebaseId(firebaseId);
         transaction.setRepeatType(repeatType);
         transaction.setEndDate(endDate);
+        transaction.setGoalId(goalId);
+        transaction.setGoalContribution(isGoalContribution);
 
         return transaction;
     }
@@ -642,6 +650,8 @@ public class TransactionRepository {
         map.put("repeat", transaction.isRepeat());
         map.put("repeatType", transaction.getRepeatType());
         map.put("endDate", transaction.getEndDate());
+        map.put("goalId", transaction.getGoalId());
+        map.put("isGoalContribution", transaction.isGoalContribution());
 
         // Add user ID if available
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -653,4 +663,5 @@ public class TransactionRepository {
 
         return map;
     }
+
 }

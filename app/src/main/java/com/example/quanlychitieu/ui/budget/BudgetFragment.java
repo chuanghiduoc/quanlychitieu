@@ -18,10 +18,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.adapter.BudgetAdapter;
 import com.example.quanlychitieu.data.model.Budget;
+import com.example.quanlychitieu.data.model.FinancialGoal;
 import com.example.quanlychitieu.databinding.FragmentBudgetBinding;
+import com.example.quanlychitieu.ui.goals.GoalPreviewAdapter;
+import com.example.quanlychitieu.ui.goals.GoalsViewModel;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -30,7 +34,9 @@ public class BudgetFragment extends Fragment {
 
     private FragmentBudgetBinding binding;
     private BudgetViewModel viewModel;
+    private GoalsViewModel goalsViewModel; // Thêm ViewModel cho mục tiêu
     private BudgetAdapter adapter;
+    private GoalPreviewAdapter goalPreviewAdapter; // Thêm adapter cho preview mục tiêu
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
 
@@ -45,12 +51,15 @@ public class BudgetFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ViewModel
+        // Initialize ViewModels
         viewModel = new ViewModelProvider(this).get(BudgetViewModel.class);
+        goalsViewModel = new ViewModelProvider(this).get(GoalsViewModel.class);
 
-        // Setup RecyclerView
+        // Setup RecyclerView cho ngân sách
         setupRecyclerView();
 
+        // Setup RecyclerView cho preview mục tiêu
+        setupGoalPreviewRecyclerView();
 
         // Update title with current month/year
         updateTitleWithCurrentMonth();
@@ -60,6 +69,12 @@ public class BudgetFragment extends Fragment {
 
         // Observe category budgets
         observeCategoryBudgets();
+
+        // Observe goal data
+        observeGoalData();
+
+        // Setup nút xem tất cả mục tiêu
+        setupViewAllGoalsButton();
     }
 
     @Override
@@ -109,6 +124,47 @@ public class BudgetFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    // Thiết lập RecyclerView cho preview mục tiêu
+    private void setupGoalPreviewRecyclerView() {
+        goalPreviewAdapter = new GoalPreviewAdapter(new ArrayList<>(), goal -> {
+            // Xử lý khi nhấn vào một mục tiêu
+            Bundle args = new Bundle();
+            args.putString("goal_id", goal.getFirebaseId());
+            Navigation.findNavController(requireView()).navigate(
+                    R.id.goalDetailsFragment, args);
+        });
+
+        binding.goalsPreviewRecyclerView.setAdapter(goalPreviewAdapter);
+    }
+
+    // Thiết lập nút xem tất cả mục tiêu
+    private void setupViewAllGoalsButton() {
+        binding.viewAllGoalsButton.setOnClickListener(v -> {
+            Navigation.findNavController(requireView()).navigate(
+                    R.id.goalsFragment);
+        });
+    }
+
+    // Quan sát dữ liệu mục tiêu
+    private void observeGoalData() {
+        goalsViewModel.getGoals().observe(getViewLifecycleOwner(), goals -> {
+            if (goals != null && !goals.isEmpty()) {
+                // Cập nhật số lượng mục tiêu
+                binding.goalsCount.setText(String.valueOf(goals.size()));
+
+                // Hiển thị preview mục tiêu (tối đa 3 mục tiêu)
+                List<FinancialGoal> previewGoals = goals.size() > 3 ? goals.subList(0, 3) : goals;
+                goalPreviewAdapter.updateGoals(previewGoals);
+
+                binding.goalsPreviewRecyclerView.setVisibility(View.VISIBLE);
+                binding.goalsEmptyState.setVisibility(View.GONE);
+            } else {
+                binding.goalsCount.setText("0");
+                binding.goalsPreviewRecyclerView.setVisibility(View.GONE);
+                binding.goalsEmptyState.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
     private void observeTotalBudget() {
         // Observe total budget amount

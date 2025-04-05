@@ -40,8 +40,7 @@ public class AddEditBudgetFragment extends Fragment {
 
     private final Calendar startDateCalendar = Calendar.getInstance();
     private final Calendar endDateCalendar = Calendar.getInstance();
-    private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", new Locale("vi", "VN"));
 
     @Nullable
     @Override
@@ -290,40 +289,39 @@ public class AddEditBudgetFragment extends Fragment {
     }
 
     private boolean validateForm() {
-        boolean isValid = true;
+        return validateCategory() & validateAmount(); // dùng & thay vì && để cả hai hàm đều chạy (trả về lỗi nếu cả hai đều sai)
+    }
 
-        // Validate category
+    private boolean validateCategory() {
         String category = binding.categoryInput.getText().toString().trim();
         if (TextUtils.isEmpty(category)) {
             binding.categoryLayout.setError("Vui lòng chọn danh mục");
-            isValid = false;
+            return false;
         } else {
             binding.categoryLayout.setError(null);
+            return true;
         }
+    }
 
-        // Validate amount
+    private boolean validateAmount() {
         String amountText = binding.budgetAmountInput.getText().toString().trim();
         if (TextUtils.isEmpty(amountText)) {
             binding.budgetAmountLayout.setError("Vui lòng nhập số tiền ngân sách");
-            isValid = false;
-        } else {
-            try {
-                // Remove formatting before parsing
-                String cleanAmount = amountText.replace(".", "");
-                double amount = Double.parseDouble(cleanAmount);
-                if (amount <= 0) {
-                    binding.budgetAmountLayout.setError("Số tiền phải lớn hơn 0");
-                    isValid = false;
-                } else {
-                    binding.budgetAmountLayout.setError(null);
-                }
-            } catch (NumberFormatException e) {
-                binding.budgetAmountLayout.setError("Số tiền không hợp lệ");
-                isValid = false;
-            }
+            return false;
         }
 
-        return isValid;
+        try {
+            double amount = Double.parseDouble(amountText.replace(".", ""));
+            if (amount <= 0) {
+                binding.budgetAmountLayout.setError("Số tiền phải lớn hơn 0");
+                return false;
+            }
+            binding.budgetAmountLayout.setError(null);
+            return true;
+        } catch (NumberFormatException e) {
+            binding.budgetAmountLayout.setError("Số tiền không hợp lệ");
+            return false;
+        }
     }
 
     private void saveBudget() {

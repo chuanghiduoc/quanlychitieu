@@ -21,6 +21,8 @@ public class Transaction {
     private String userId;      // ID của người dùng sở hữu giao dịch
     private String repeatType;    // "daily", "weekly", "monthly", "yearly"
     private Date endDate;         // Ngày kết thúc (tùy chọn)
+    private String goalId;     // ID của mục tiêu nếu giao dịch này đóng góp vào mục tiêu
+    private boolean isGoalContribution; // Đánh dấu đây là giao dịch đóng góp vào mục tiêu
 
     public Transaction() {
     }
@@ -179,5 +181,19 @@ public class Transaction {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+    public String getGoalId() {
+        return goalId;
+    }
 
+    public void setGoalId(String goalId) {
+        this.goalId = goalId;
+    }
+
+    public boolean isGoalContribution() {
+        return isGoalContribution;
+    }
+
+    public void setGoalContribution(boolean goalContribution) {
+        isGoalContribution = goalContribution;
+    }
 }
