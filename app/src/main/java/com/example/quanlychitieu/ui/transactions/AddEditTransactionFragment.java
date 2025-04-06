@@ -96,7 +96,6 @@ public class AddEditTransactionFragment extends Fragment {
         setupAmountInputFormatting();
         setupSaveButton();
         setupToolbar();
-        setupGoalContribution();
 
     }
 
@@ -453,16 +452,6 @@ public class AddEditTransactionFragment extends Fragment {
             endDate = endDateCalendar.getTime();
         }
 
-        // Kiểm tra nếu đóng góp vào mục tiêu
-        boolean isContributeToGoal = binding.contributeToGoalCheckbox.isChecked();
-        String goalId = null;
-
-        if (isContributeToGoal && availableGoals != null && !availableGoals.isEmpty()) {
-            int selectedPosition = binding.goalSpinner.getSelectedItemPosition();
-            if (selectedPosition >= 0 && selectedPosition < availableGoals.size()) {
-                goalId = availableGoals.get(selectedPosition).getFirebaseId();
-            }
-        }
 
         Transaction transaction;
 
@@ -480,8 +469,6 @@ public class AddEditTransactionFragment extends Fragment {
             transaction.setRepeatType(repeatType);
             transaction.setEndDate(endDate);
             transaction.setUserId(currentUser.getUid());
-            transaction.setGoalContribution(isContributeToGoal);
-            transaction.setGoalId(goalId);
 
             repository.updateTransaction(transaction);
             Toast.makeText(requireContext(), "Giao dịch đã được cập nhật", Toast.LENGTH_SHORT).show();
@@ -499,8 +486,6 @@ public class AddEditTransactionFragment extends Fragment {
             transaction.setRepeatType(repeatType);
             transaction.setEndDate(endDate);
             transaction.setUserId(currentUser.getUid());
-            transaction.setGoalContribution(isContributeToGoal);
-            transaction.setGoalId(goalId);
 
             repository.addTransaction(transaction);
 
@@ -593,37 +578,6 @@ public class AddEditTransactionFragment extends Fragment {
         }
     }
 
-    private void setupGoalContribution() {
-        // Ánh xạ các view
-        contributeToGoalCheckbox = binding.contributeToGoalCheckbox;
-        goalSelectionLayout = binding.goalSelectionLayout;
-        goalSpinner = binding.goalSpinner;
-
-        // Mặc định ẩn phần chọn mục tiêu
-        goalSelectionLayout.setVisibility(View.GONE);
-
-        // Hiển thị/ẩn phần chọn mục tiêu dựa trên checkbox
-        contributeToGoalCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            goalSelectionLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-
-            // Nếu đóng góp vào mục tiêu, tự động chọn loại giao dịch là chi tiêu
-            if (isChecked) {
-                binding.expenseRadio.setChecked(true);
-                // Tải danh sách mục tiêu
-                loadAvailableGoals();
-            }
-        });
-
-        // Chỉ cho phép đóng góp vào mục tiêu nếu là giao dịch chi tiêu
-        binding.transactionTypeGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            boolean isExpense = (checkedId == binding.expenseRadio.getId());
-            contributeToGoalCheckbox.setEnabled(isExpense);
-
-            if (!isExpense && contributeToGoalCheckbox.isChecked()) {
-                contributeToGoalCheckbox.setChecked(false);
-            }
-        });
-    }
 
     // Phương thức mới để tải danh sách mục tiêu
     private void loadAvailableGoals() {
