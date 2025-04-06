@@ -161,6 +161,9 @@
         <action
             android:id="@+id/action_goalsFragment_to_goalDetailsFragment"
             app:destination="@id/goalDetailsFragment" />
+        <action
+            android:id="@+id/action_goalsFragment_to_financialAdvisorFragment"
+            app:destination="@id/financialAdvisorFragment" />
     </fragment>
 
     <!-- Màn hình thêm/sửa mục tiêu -->
@@ -188,5 +191,12 @@
             android:id="@+id/action_goalDetailsFragment_to_addEditGoalFragment"
             app:destination="@id/addEditGoalFragment" />
     </fragment>
+
+    <!-- Màn hình tư vấn tài chính AI -->
+    <fragment
+        android:id="@+id/financialAdvisorFragment"
+        android:name="com.example.quanlychitieu.ui.goals.FinancialAdvisorFragment"
+        android:label="Tư vấn tài chính"
+        tools:layout="@layout/fragment_financial_advisor" />
 
 </navigation>

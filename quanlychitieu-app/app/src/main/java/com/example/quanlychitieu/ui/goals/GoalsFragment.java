@@ -57,6 +57,13 @@ public class GoalsFragment extends Fragment implements GoalAdapter.GoalClickList
             Navigation.findNavController(requireView())
                     .navigate(R.id.action_goalsFragment_to_addEditGoalFragment);
         });
+        
+        // Thiết lập nút tư vấn tài chính
+        binding.fabFinancialAdvisor.setOnClickListener(v -> {
+            // Chuyển đến màn hình tư vấn tài chính
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_goalsFragment_to_financialAdvisorFragment);
+        });
     }
 
 
