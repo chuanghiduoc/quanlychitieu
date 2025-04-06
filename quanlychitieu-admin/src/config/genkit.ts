@@ -62,7 +62,7 @@ ${financialData.goals
 
 **Câu hỏi của người dùng**: ${input.message}
 
-Hãy đưa ra phân tích với các mục sau (sử dụng định dạng markdown để làm nổi bật):
+Hãy đưa ra phân tích ngắn gọn nhưng đầy đủ các ý kiến với các mục sau (sử dụng định dạng markdown để làm nổi bật):
 
 ### 1. Phân tích tình hình tài chính hiện tại
 ### 2. Những điểm cần lưu ý hoặc cải thiện
