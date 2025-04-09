@@ -37,7 +37,7 @@ public class StatisticsViewModel extends ViewModel {
     }
 
     public void loadFinancialData(Date startDate, Date endDate) {
-        // Get transactions for the period
+        // Lấy các giao dịch cho khoảng thời gian
         repository.getFilteredTransactions(startDate, endDate, "Tất cả danh mục", "Tất cả giao dịch")
                 .observeForever(transactions -> {
                     if (transactions != null) {
@@ -53,7 +53,7 @@ public class StatisticsViewModel extends ViewModel {
         double totalExpenses = 0;
         Map<String, Double> expensesByCategory = new HashMap<>();
 
-        // Process each transaction
+        // Xử lý từng giao dịch
         for (Transaction transaction : transactions) {
             double amount = Math.abs(transaction.getAmount());
 
@@ -62,34 +62,34 @@ public class StatisticsViewModel extends ViewModel {
             } else {
                 totalExpenses += amount;
 
-                // Add to category expenses
+                // Thêm vào chi phí theo danh mục
                 String category = transaction.getCategory();
                 double currentAmount = expensesByCategory.getOrDefault(category, 0.0);
                 expensesByCategory.put(category, currentAmount + amount);
             }
         }
 
-        // Update LiveData values
+        // Cập nhật các giá trị LiveData
         income.setValue(totalIncome);
         expenses.setValue(totalExpenses);
         balance.setValue(totalIncome - totalExpenses);
 
-        // Sort categories by amount (descending)
+        // Sắp xếp các danh mục theo số tiền (giảm dần)
         Map<String, Double> sortedExpenses = sortCategoriesByAmount(expensesByCategory);
         categoryExpenses.setValue(sortedExpenses);
 
-        // Process time series data
+        // Xử lý dữ liệu chuỗi thời gian
         processTimeSeriesData(transactions, startDate, endDate);
     }
 
     private Map<String, Double> sortCategoriesByAmount(Map<String, Double> unsortedMap) {
-        // Convert to list for sorting
+        // Chuyển đổi thành danh sách để sắp xếp
         List<Map.Entry<String, Double>> list = new ArrayList<>(unsortedMap.entrySet());
 
-        // Sort by value (amount) in descending order
+        // Sắp xếp theo giá trị (số tiền) theo thứ tự giảm dần
         Collections.sort(list, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
 
-        // Put back into LinkedHashMap to maintain order
+        // Đặt lại vào LinkedHashMap để duy trì thứ tự
         Map<String, Double> sortedMap = new LinkedHashMap<>();
         for (Map.Entry<String, Double> entry : list) {
             sortedMap.put(entry.getKey(), entry.getValue());
@@ -99,7 +99,7 @@ public class StatisticsViewModel extends ViewModel {
     }
 
     private void processTimeSeriesData(List<Transaction> transactions, Date startDate, Date endDate) {
-        // Determine time interval based on date range
+        // Xác định khoảng thời gian dựa trên phạm vi ngày
         Calendar start = Calendar.getInstance();
         start.setTime(startDate);
 
@@ -117,7 +117,7 @@ public class StatisticsViewModel extends ViewModel {
             interval = "year";
         }
 
-        // Create time series data
+        // Tạo dữ liệu chuỗi thời gian
         TimeSeriesData data = createTimeSeriesData(transactions, startDate, endDate, interval);
         timeSeriesData.setValue(data);
     }
@@ -126,11 +126,11 @@ public class StatisticsViewModel extends ViewModel {
                                                 Date startDate,
                                                 Date endDate,
                                                 String interval) {
-        // Create maps for income and expenses by time period
+        // Tạo bản đồ cho thu nhập và chi phí theo khoảng thời gian
         Map<String, Double> incomeByPeriod = new TreeMap<>();
         Map<String, Double> expensesByPeriod = new TreeMap<>();
 
-        // Format pattern based on interval
+        // Định dạng mẫu dựa trên khoảng thời gian
         String pattern;
         int calendarField;
 
@@ -155,7 +155,7 @@ public class StatisticsViewModel extends ViewModel {
 
         SimpleDateFormat formatter = new SimpleDateFormat(pattern, Locale.getDefault());
 
-        // Initialize periods
+        // Khởi tạo các khoảng thời gian
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startDate);
 
@@ -167,11 +167,11 @@ public class StatisticsViewModel extends ViewModel {
             incomeByPeriod.put(periodKey, 0.0);
             expensesByPeriod.put(periodKey, 0.0);
 
-            // Increment to next period
+            // Tăng lên khoảng thời gian tiếp theo
             calendar.add(calendarField, 1);
         }
 
-        // Process transactions
+        // Xử lý các giao dịch
         for (Transaction transaction : transactions) {
             String periodKey = formatter.format(transaction.getDate());
             double amount = Math.abs(transaction.getAmount());
@@ -185,7 +185,7 @@ public class StatisticsViewModel extends ViewModel {
             }
         }
 
-        // Convert to lists for chart
+        // Chuyển đổi thành danh sách cho biểu đồ
         List<String> labels = new ArrayList<>(incomeByPeriod.keySet());
         List<Float> incomeValues = new ArrayList<>();
         List<Float> expenseValues = new ArrayList<>();
@@ -206,7 +206,7 @@ public class StatisticsViewModel extends ViewModel {
         timeSeriesData.setValue(new TimeSeriesData());
     }
 
-    // Getters for LiveData
+    // Getters cho LiveData
     public LiveData<Double> getIncome() {
         return income;
     }
