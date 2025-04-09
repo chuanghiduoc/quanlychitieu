@@ -34,9 +34,9 @@ public class BudgetFragment extends Fragment {
 
     private FragmentBudgetBinding binding;
     private BudgetViewModel viewModel;
-    private GoalsViewModel goalsViewModel; // Thêm ViewModel cho mục tiêu
+    private GoalsViewModel goalsViewModel;
     private BudgetAdapter adapter;
-    private GoalPreviewAdapter goalPreviewAdapter; // Thêm adapter cho preview mục tiêu
+    private GoalPreviewAdapter goalPreviewAdapter;
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
     private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
 

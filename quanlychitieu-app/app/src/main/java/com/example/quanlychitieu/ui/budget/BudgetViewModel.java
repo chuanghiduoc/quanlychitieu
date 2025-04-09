@@ -17,79 +17,79 @@ import java.util.Map;
 
 public class BudgetViewModel extends ViewModel {
 
-    private final BudgetRepository repository;
-    private final TransactionRepository transactionRepository;
-    private final MediatorLiveData<List<Budget>> displayBudgets = new MediatorLiveData<>();
-    private final MediatorLiveData<Double> totalBudget = new MediatorLiveData<>();
-    private final MediatorLiveData<Double> totalSpent = new MediatorLiveData<>();
-    private final MutableLiveData<Double> remainingAmount = new MutableLiveData<>(0.0);
-    private final MutableLiveData<Integer> progressPercentage = new MutableLiveData<>(0);
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true);
+    private final BudgetRepository repository; // Kho lưu trữ ngân sách
+    private final TransactionRepository transactionRepository; // Kho lưu trữ giao dịch
+    private final MediatorLiveData<List<Budget>> displayBudgets = new MediatorLiveData<>(); // LiveData trung gian để hiển thị danh sách ngân sách
+    private final MediatorLiveData<Double> totalBudget = new MediatorLiveData<>(); // LiveData trung gian cho tổng ngân sách
+    private final MediatorLiveData<Double> totalSpent = new MediatorLiveData<>(); // LiveData trung gian cho tổng chi tiêu
+    private final MutableLiveData<Double> remainingAmount = new MutableLiveData<>(0.0); // LiveData có thể thay đổi cho số tiền còn lại
+    private final MutableLiveData<Integer> progressPercentage = new MutableLiveData<>(0); // LiveData có thể thay đổi cho phần trăm tiến độ
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(true); // LiveData có thể thay đổi cho trạng thái đang tải
 
-    // Keep track of current active sources
-    private LiveData<List<Budget>> currentBudgetsSource = null;
-    private LiveData<Double> currentTotalBudgetSource = null;
-    private LiveData<Double> currentTotalSpentSource = null;
-    private LiveData<Map<String, Double>> currentCategorySpentSource = null;
+    // Theo dõi các nguồn dữ liệu hiện đang hoạt động
+    private LiveData<List<Budget>> currentBudgetsSource = null; // Nguồn LiveData hiện tại cho danh sách ngân sách
+    private LiveData<Double> currentTotalBudgetSource = null; // Nguồn LiveData hiện tại cho tổng ngân sách
+    private LiveData<Double> currentTotalSpentSource = null; // Nguồn LiveData hiện tại cho tổng chi tiêu
+    private LiveData<Map<String, Double>> currentCategorySpentSource = null; // Nguồn LiveData hiện tại cho số tiền đã chi theo danh mục
 
     public BudgetViewModel() {
-        repository = BudgetRepository.getInstance();
-        transactionRepository = TransactionRepository.getInstance();
+        repository = BudgetRepository.getInstance(); // Lấy instance của BudgetRepository
+        transactionRepository = TransactionRepository.getInstance(); // Lấy instance của TransactionRepository
 
-        // Initialize with default values
+        // Khởi tạo với các giá trị mặc định
         totalBudget.setValue(0.0);
         totalSpent.setValue(0.0);
 
-        // Load active budgets and combine with all categories
+        // Tải ngân sách đang hoạt động và kết hợp với tất cả các danh mục
         loadBudgetsWithAllCategories();
     }
 
     private void updateRemainingAndProgress() {
-        Double budget = totalBudget.getValue();
-        Double spent = totalSpent.getValue();
+        Double budget = totalBudget.getValue(); // Lấy giá trị tổng ngân sách
+        Double spent = totalSpent.getValue(); // Lấy giá trị tổng chi tiêu
 
         if (budget != null && spent != null) {
-            double remaining = budget - spent;
+            double remaining = budget - spent; // Tính số tiền còn lại
             remainingAmount.setValue(remaining);
 
-            int progress = budget > 0 ? (int) ((spent / budget) * 100) : 0;
+            int progress = budget > 0 ? (int) ((spent / budget) * 100) : 0; // Tính phần trăm tiến độ
             progressPercentage.setValue(progress);
         }
     }
 
     private void loadBudgetsWithAllCategories() {
-        isLoading.setValue(true);
+        isLoading.setValue(true); // Đặt trạng thái đang tải là true
 
-        // Get active budgets from repository
+        // Lấy ngân sách đang hoạt động từ repository
         LiveData<List<Budget>> activeBudgets = repository.getActiveBudgets();
 
-        // Remove previous source if it exists
+        // Xóa nguồn dữ liệu trước đó nếu có
         if (currentBudgetsSource != null) {
             displayBudgets.removeSource(currentBudgetsSource);
         }
 
-        // Add new source
+        // Thêm nguồn dữ liệu mới
         displayBudgets.addSource(activeBudgets, budgets -> {
-            // Combine with all expense categories
+            // Kết hợp với tất cả các danh mục chi tiêu
             createCompleteBudgetsList(budgets);
-            isLoading.setValue(false);
+            isLoading.setValue(false); // Đặt trạng thái đang tải là false sau khi dữ liệu được tải
         });
 
-        // Update current source reference
+        // Cập nhật tham chiếu nguồn dữ liệu hiện tại
         currentBudgetsSource = activeBudgets;
 
-        // Observe category spent amounts
+        // Theo dõi số tiền đã chi theo danh mục
         observeCategorySpentAmounts();
 
-        // Observe total budget and spent amounts
+        // Theo dõi tổng ngân sách và tổng số tiền đã chi
         observeTotals();
     }
 
     private void createCompleteBudgetsList(List<Budget> activeBudgets) {
-        // Get all expense categories
+        // Lấy tất cả các danh mục chi tiêu
         List<String> allCategories = CategoryManager.getInstance().getExpenseCategories();
 
-        // Create a map of existing budgets by category
+        // Tạo một map chứa các ngân sách hiện có theo danh mục
         Map<String, Budget> budgetMap = new HashMap<>();
         if (activeBudgets != null) {
             for (Budget budget : activeBudgets) {
@@ -97,26 +97,26 @@ public class BudgetViewModel extends ViewModel {
             }
         }
 
-        // Create a complete list with all categories
+        // Tạo một danh sách hoàn chỉnh với tất cả các danh mục
         List<Budget> completeBudgetsList = new ArrayList<>();
 
-        // Get category spent amounts
+        // Lấy số tiền đã chi theo danh mục
         Map<String, Double> categorySpentAmounts = repository.getCategorySpentAmounts().getValue();
         if (categorySpentAmounts == null) {
             categorySpentAmounts = new HashMap<>();
         }
 
-        // Add all categories, using existing budgets when available
+        // Thêm tất cả các danh mục, sử dụng ngân sách hiện có nếu có
         for (String category : allCategories) {
             Budget budget = budgetMap.get(category);
 
             if (budget == null) {
-                // Create a placeholder budget with 0 amount
+                // Tạo một ngân sách giữ chỗ với số tiền là 0
                 budget = new Budget();
                 budget.setCategory(category);
                 budget.setAmount(0);
 
-                // Set spent amount from transactions
+                // Đặt số tiền đã chi từ các giao dịch
                 Double spentAmount = categorySpentAmounts.getOrDefault(category, 0.0);
                 budget.setSpent(spentAmount);
             }
@@ -124,22 +124,22 @@ public class BudgetViewModel extends ViewModel {
             completeBudgetsList.add(budget);
         }
 
-        // Update the display budgets
+        // Cập nhật danh sách ngân sách hiển thị
         displayBudgets.setValue(completeBudgetsList);
     }
 
     private void observeCategorySpentAmounts() {
-        // Observe category spent amounts from repository
+        // Theo dõi số tiền đã chi theo danh mục từ repository
         LiveData<Map<String, Double>> categorySpentAmounts = repository.getCategorySpentAmounts();
 
-        // Remove previous source if it exists
+        // Xóa nguồn dữ liệu trước đó nếu có
         if (currentCategorySpentSource != null) {
             displayBudgets.removeSource(currentCategorySpentSource);
         }
 
-        // Add new source
+        // Thêm nguồn dữ liệu mới
         displayBudgets.addSource(categorySpentAmounts, spentAmounts -> {
-            // Update the budgets list with new spent amounts
+            // Cập nhật danh sách ngân sách với số tiền đã chi mới
             List<Budget> currentBudgets = displayBudgets.getValue();
             if (currentBudgets != null) {
                 for (Budget budget : currentBudgets) {
@@ -150,69 +150,69 @@ public class BudgetViewModel extends ViewModel {
             }
         });
 
-        // Update current source reference
+        // Cập nhật tham chiếu nguồn dữ liệu hiện tại
         currentCategorySpentSource = categorySpentAmounts;
     }
 
     private void observeTotals() {
-        // Observe the total budget amount from repository
+        // Theo dõi tổng số tiền ngân sách từ repository
         LiveData<Double> repositoryTotalBudget = repository.getTotalBudget();
 
-        // Remove previous source if it exists
+        // Xóa nguồn dữ liệu trước đó nếu có
         if (currentTotalBudgetSource != null) {
             totalBudget.removeSource(currentTotalBudgetSource);
         }
 
-        // Add new source
+        // Thêm nguồn dữ liệu mới
         totalBudget.addSource(repositoryTotalBudget, value -> {
             totalBudget.setValue(value);
             updateRemainingAndProgress();
         });
 
-        // Update current source reference
+        // Cập nhật tham chiếu nguồn dữ liệu hiện tại
         currentTotalBudgetSource = repositoryTotalBudget;
 
-        // Observe the total spent amount from repository
+        // Theo dõi tổng số tiền đã chi từ repository
         LiveData<Double> repositoryTotalSpent = repository.getTotalSpent();
 
-        // Remove previous source if it exists
+        // Xóa nguồn dữ liệu trước đó nếu có
         if (currentTotalSpentSource != null) {
             totalSpent.removeSource(currentTotalSpentSource);
         }
 
-        // Add new source
+        // Thêm nguồn dữ liệu mới
         totalSpent.addSource(repositoryTotalSpent, value -> {
             totalSpent.setValue(value);
             updateRemainingAndProgress();
         });
 
-        // Update current source reference
+        // Cập nhật tham chiếu nguồn dữ liệu hiện tại
         currentTotalSpentSource = repositoryTotalSpent;
     }
 
-    // Method to get a specific budget by ID
+    // Phương thức để lấy một ngân sách cụ thể theo ID
     public LiveData<Budget> getBudgetById(String budgetId) {
         return repository.getBudgetById(budgetId);
     }
 
-    // Method to add a new budget
+    // Phương thức để thêm một ngân sách mới
     public void addBudget(Budget budget) {
         repository.addBudget(budget);
     }
 
-    // Method to update a budget
+    // Phương thức để cập nhật một ngân sách
     public void updateBudget(Budget budget) {
         repository.updateBudget(budget);
     }
 
-    // Method to delete a budget
+    // Phương thức để xóa một ngân sách
     public void deleteBudget(String budgetId) {
         repository.deleteBudget(budgetId);
     }
 
-    // Method to refresh data
+    // Phương thức để làm mới dữ liệu
     public void refreshBudgets() {
-        // Reload active budgets
+        // Tải lại ngân sách đang hoạt động
         loadBudgetsWithAllCategories();
     }
 

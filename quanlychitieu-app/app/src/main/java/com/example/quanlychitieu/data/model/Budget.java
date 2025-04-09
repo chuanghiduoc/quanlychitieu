@@ -138,9 +138,6 @@ public class Budget {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
 
     public Date getEndDate() {
         return endDate;

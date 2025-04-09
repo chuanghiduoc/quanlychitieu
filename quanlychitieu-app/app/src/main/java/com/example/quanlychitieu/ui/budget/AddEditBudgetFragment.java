@@ -55,7 +55,7 @@ public class AddEditBudgetFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(BudgetViewModel.class);
 
-        // Check if we're editing an existing budget
+        // Kiểm tra xem chúng ta đang chỉnh sửa ngân sách hiện có hay không
         if (getArguments() != null) {
             budgetId = getArguments().getString("budget_id");
             String selectedCategory = getArguments().getString("selected_category");
@@ -100,7 +100,7 @@ public class AddEditBudgetFragment extends Fragment {
 
     // Thêm phương thức mới để thiết lập dropdown với danh mục được chọn sẵn
     private void setupCategoryDropdownWithPreselection(String selectedCategory) {
-        // Setup with expense categories
+        // Thiết lập với các danh mục chi tiêu
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
@@ -128,13 +128,13 @@ public class AddEditBudgetFragment extends Fragment {
 
 
     private void setupDefaultDates() {
-        // Set to first day of current month
+        // Đặt thành ngày đầu tiên của tháng hiện tại
         startDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
 
-        // Set to last day of current month
+        // Đặt thành ngày cuối cùng của tháng hiện tại
         endDateCalendar.set(Calendar.DAY_OF_MONTH, endDateCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 
-        // Display the month and year
+        // Hiển thị tháng và năm
         binding.monthInput.setText(monthYearFormat.format(startDateCalendar.getTime()));
     }
 
@@ -147,25 +147,25 @@ public class AddEditBudgetFragment extends Fragment {
     }
 
     private void populateFormWithBudgetData(Budget budget) {
-        // Set dates
+        // Đặt ngày tháng
         startDateCalendar.setTime(budget.getStartDate());
         endDateCalendar.setTime(budget.getEndDate());
         binding.monthInput.setText(monthYearFormat.format(startDateCalendar.getTime()));
 
-        // Set category
+        // Đặt danh mục
         binding.categoryInput.setText(budget.getCategory(), false);
 
-        // Set amount
+        // Đặt số tiền
         DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(new Locale("vi", "VN"));
         formatter.applyPattern("#,###");
         String formattedAmount = formatter.format(budget.getAmount()).replace(",", ".");
         binding.budgetAmountInput.setText(formattedAmount);
 
-        // Set notification options
+        // Đặt tùy chọn thông báo
         binding.notificationSwitch.setChecked(budget.isNotificationsEnabled());
         binding.notificationOptions.setVisibility(budget.isNotificationsEnabled() ? View.VISIBLE : View.GONE);
 
-        // Set notification threshold
+        // Đặt ngưỡng thông báo
         int threshold = budget.getNotificationThreshold();
         if (threshold == 80) {
             binding.threshold80.setChecked(true);
@@ -175,7 +175,7 @@ public class AddEditBudgetFragment extends Fragment {
             binding.threshold100.setChecked(true);
         }
 
-        // Set note
+        // Đặt ghi chú
         if (budget.getNote() != null) {
             binding.noteInput.setText(budget.getNote());
         }
@@ -186,10 +186,10 @@ public class AddEditBudgetFragment extends Fragment {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     requireContext(),
                     (view, year, month, dayOfMonth) -> {
-                        // Set to first day of selected month
+                        // Đặt thành ngày đầu tiên của tháng được chọn
                         startDateCalendar.set(year, month, 1);
 
-                        // Set to last day of selected month
+                        // Đặt thành ngày cuối cùng của tháng được chọn
                         endDateCalendar.set(year, month, 1);
                         endDateCalendar.set(Calendar.DAY_OF_MONTH, endDateCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 
@@ -200,14 +200,15 @@ public class AddEditBudgetFragment extends Fragment {
                     startDateCalendar.get(Calendar.DAY_OF_MONTH)
             );
 
-            // Hide day selection since we only care about month and year
-            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 365 * 2)); // 2 years in future
+            // Ẩn phần chọn ngày vì chúng ta chỉ quan tâm đến tháng và năm
+            // Giới hạn ngày tối đa là 2 năm trong tương lai
+            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 365 * 2)); // 2 năm trong tương lai
             datePickerDialog.show();
         });
     }
 
     private void setupCategoryDropdown() {
-        // Setup with expense categories since budgets are typically for expenses
+        // Thiết lập với các danh mục chi tiêu vì ngân sách thường dành cho chi tiêu
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
@@ -217,7 +218,7 @@ public class AddEditBudgetFragment extends Fragment {
         AutoCompleteTextView categoryInput = binding.categoryInput;
         categoryInput.setAdapter(categoryAdapter);
 
-        // Set default selection if adapter has items
+        // Đặt lựa chọn mặc định nếu adapter có mục và không phải chế độ sửa
         if (categoryAdapter.getCount() > 0 && !isEditMode) {
             categoryInput.setText(categoryAdapter.getItem(0), false);
         }
@@ -229,12 +230,12 @@ public class AddEditBudgetFragment extends Fragment {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not needed
+                // Không cần thiết
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Not needed
+                // Không cần thiết
             }
 
             @Override
@@ -242,15 +243,15 @@ public class AddEditBudgetFragment extends Fragment {
                 if (!s.toString().equals(current)) {
                     binding.budgetAmountInput.removeTextChangedListener(this);
 
-                    // Remove all non-digit characters
+                    // Xóa tất cả các ký tự không phải là số
                     String cleanString = s.toString().replaceAll("[^\\d]", "");
 
                     if (!cleanString.isEmpty()) {
                         try {
-                            // Parse to a long (no decimals for VND)
+                            // Phân tích thành kiểu long (không có số thập phân cho VND)
                             long parsed = Long.parseLong(cleanString);
 
-                            // Format with Vietnamese locale
+                            // Định dạng với ngôn ngữ Việt Nam
                             DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(new Locale("vi", "VN"));
                             formatter.applyPattern("#,###");
                             formatter.setDecimalSeparatorAlwaysShown(false);
@@ -258,7 +259,7 @@ public class AddEditBudgetFragment extends Fragment {
                             formatter.setGroupingSize(3);
 
                             String formatted = formatter.format(parsed);
-                            // Replace comma with dot for Vietnamese display
+                            // Thay thế dấu phẩy bằng dấu chấm để hiển thị kiểu Việt Nam
                             formatted = formatted.replace(",", ".");
 
                             current = formatted;
@@ -289,7 +290,8 @@ public class AddEditBudgetFragment extends Fragment {
     }
 
     private boolean validateForm() {
-        return validateCategory() & validateAmount(); // dùng & thay vì && để cả hai hàm đều chạy (trả về lỗi nếu cả hai đều sai)
+        // dùng & thay vì && để cả hai hàm đều chạy (trả về lỗi nếu cả hai đều sai)
+        return validateCategory() & validateAmount();
     }
 
     private boolean validateCategory() {
@@ -311,6 +313,7 @@ public class AddEditBudgetFragment extends Fragment {
         }
 
         try {
+            // Xóa dấu chấm trước khi phân tích
             double amount = Double.parseDouble(amountText.replace(".", ""));
             if (amount <= 0) {
                 binding.budgetAmountLayout.setError("Số tiền phải lớn hơn 0");
@@ -325,16 +328,17 @@ public class AddEditBudgetFragment extends Fragment {
     }
 
     private void saveBudget() {
-        // Get current user ID
+        // Lấy ID người dùng hiện tại
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Get form values
+        // Lấy giá trị từ biểu mẫu
         String category = binding.categoryInput.getText().toString().trim();
 
-        // Parse amount
+        // Phân tích số tiền
         String amountStr = binding.budgetAmountInput.getText().toString().trim();
         double amount;
         try {
+            // Xóa dấu chấm trước khi phân tích
             amountStr = amountStr.replace(".", "");
             amount = Double.parseDouble(amountStr);
         } catch (NumberFormatException e) {
@@ -342,27 +346,27 @@ public class AddEditBudgetFragment extends Fragment {
             return;
         }
 
-        // Get dates
+        // Lấy ngày tháng
         Date startDate = startDateCalendar.getTime();
         Date endDate = endDateCalendar.getTime();
 
-        // Get notification settings
+        // Lấy cài đặt thông báo
         boolean notificationsEnabled = binding.notificationSwitch.isChecked();
 
-        // Determine notification threshold
+        // Xác định ngưỡng thông báo
         final int notificationThreshold;
         if (binding.threshold90.isChecked()) {
             notificationThreshold = 90;
         } else if (binding.threshold100.isChecked()) {
             notificationThreshold = 100;
         } else {
-            notificationThreshold = 80; // Default
+            notificationThreshold = 80; // Mặc định
         }
 
-        // Get note
+        // Lấy ghi chú
         String note = binding.noteInput.getText().toString().trim();
 
-        // Create final copies of variables for use in lambda
+        // Tạo bản sao cuối cùng của các biến để sử dụng trong lambda
         final double finalAmount = amount;
         final Date finalStartDate = startDate;
         final Date finalEndDate = endDate;
@@ -370,12 +374,12 @@ public class AddEditBudgetFragment extends Fragment {
         final String finalNote = note;
         final String finalCategory = category;
 
-        // Create or update budget
+        // Tạo hoặc cập nhật ngân sách
         if (isEditMode) {
-            // Update existing budget
+            // Cập nhật ngân sách hiện có
             viewModel.getBudgetById(budgetId).observe(getViewLifecycleOwner(), existingBudget -> {
                 if (existingBudget != null) {
-                    // Preserve existing spent amount and notification status
+                    // Giữ lại số tiền đã chi tiêu và trạng thái thông báo hiện có
                     double spent = existingBudget.getSpent();
                     boolean notificationSent = existingBudget.isNotificationSent();
 
@@ -384,15 +388,16 @@ public class AddEditBudgetFragment extends Fragment {
                             userId,
                             finalCategory,
                             finalAmount,
-                            spent,
+                            spent, // Giữ lại số tiền đã chi
                             finalStartDate,
                             finalEndDate,
                             finalNote,
                             finalNotificationsEnabled,
                             notificationThreshold,
-                            notificationSent
+                            notificationSent // Giữ lại trạng thái đã gửi thông báo
                     );
-                    updatedBudget.setFirebaseId(budgetId);
+                    updatedBudget.setFirebaseId(budgetId); // Đặt ID Firebase để cập nhật đúng bản ghi
+                    // Giữ lại cài đặt thông báo chi tiêu định kỳ (nếu có)
                     updatedBudget.setRecurringExpenseNotifications(existingBudget.getRecurringExpenseNotifications());
 
                     viewModel.updateBudget(updatedBudget);
@@ -401,19 +406,19 @@ public class AddEditBudgetFragment extends Fragment {
                 }
             });
         } else {
-            // Create new budget
+            // Tạo ngân sách mới
             Budget budget = new Budget(
-                    System.currentTimeMillis(),
+                    System.currentTimeMillis(), // ID tạm thời, sẽ được thay bằng ID Firebase khi lưu
                     userId,
                     finalCategory,
                     finalAmount,
-                    0, // Initial spent amount is 0
+                    0, // Số tiền chi tiêu ban đầu là 0
                     finalStartDate,
                     finalEndDate,
                     finalNote,
                     finalNotificationsEnabled,
                     notificationThreshold,
-                    false // notification not sent yet
+                    false // thông báo chưa được gửi
             );
 
             viewModel.addBudget(budget);
@@ -425,6 +430,7 @@ public class AddEditBudgetFragment extends Fragment {
 
     private void setupToolbar() {
         binding.toolbar.setNavigationOnClickListener(v -> {
+            // Quay lại màn hình trước đó
             Navigation.findNavController(requireView()).popBackStack();
         });
     }
@@ -432,6 +438,7 @@ public class AddEditBudgetFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Giải phóng binding để tránh rò rỉ bộ nhớ
         binding = null;
     }
 }
