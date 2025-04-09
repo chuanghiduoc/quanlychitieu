@@ -68,16 +68,16 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         restoreDropdownSelections();
     }
     private void restoreDropdownSelections() {
-        // Get the current selections
+        // Lấy các lựa chọn hiện tại
         String currentTransactionType = binding.transactionTypeInput.getText().toString();
 
-        // Reinitialize the adapters
+        // Khởi tạo lại các adapter
         setupTransactionTypeFilter();
 
-        // Update category filter based on current transaction type
+        // Cập nhật bộ lọc danh mục dựa trên loại giao dịch hiện tại
         updateCategoryFilterBasedOnTransactionType(currentTransactionType);
 
-        // Restore the selections
+        // Khôi phục các lựa chọn
         binding.transactionTypeInput.setText("Tất cả giao dịch", false);
         binding.categoryFilterInput.setText("Tất cả danh mục", false);
         binding.dateToInput.setText(dateFormatter.format(toDateCalendar.getTime()));
@@ -95,20 +95,20 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ViewModel
+        // Khởi tạo ViewModel
         viewModel = new ViewModelProvider(this).get(TransactionsViewModel.class);
 
         setupToolbar();
 
-        // Add this line to set up the date pickers
+        // Thêm dòng này để thiết lập bộ chọn ngày
         setupDatePickers();
 
-        // Initialize category adapters only once
+        // Khởi tạo adapter danh mục chỉ một lần
         if (allCategoriesAdapter == null) {
             initCategoryAdapters();
         }
 
-        // Set up UI components
+        // Thiết lập các thành phần UI
         setupTransactionTypeFilter();
         setupCategoryFilter();
         setupRecyclerView();
@@ -116,16 +116,16 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         observeLoadingState();
         observeTransactions();
 
-        // Apply default filters automatically
+        // Áp dụng bộ lọc mặc định tự động
         applyDefaultFilters();
     }
 
     private void applyDefaultFilters() {
-        // Set default dropdown values
+        // Đặt giá trị mặc định cho dropdown
         binding.transactionTypeInput.setText("Tất cả giao dịch", false);
         binding.categoryFilterInput.setText("Tất cả danh mục", false);
 
-        // Apply filters with default values
+        // Áp dụng bộ lọc với các giá trị mặc định
         applyFilters();
     }
 
@@ -137,7 +137,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
             } else {
                 hideLoading();
 
-                // Force UI update when loading completes
+                // Buộc cập nhật UI khi quá trình tải hoàn tất
                 List<Transaction> currentTransactions = adapter.getCurrentList();
                 updateUIBasedOnTransactions(currentTransactions);
             }
@@ -153,7 +153,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     private void hideLoading() {
         binding.loadingContainer.setVisibility(View.GONE);
 
-        // Get current transactions to determine what to show
+        // Lấy danh sách giao dịch hiện tại để xác định nội dung hiển thị
         List<Transaction> currentTransactions = adapter.getCurrentList();
         updateUIBasedOnTransactions(currentTransactions);
     }
@@ -190,13 +190,13 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         );
     }
     private void setupDatePickers() {
-        // Set from date to first day of current month
+        // Đặt ngày bắt đầu là ngày đầu tiên của tháng hiện tại
         fromDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
 
-        // Set to date to current day
-        toDateCalendar.setTime(new Date()); // Today
+        // Đặt ngày kết thúc là ngày hiện tại
+        toDateCalendar.setTime(new Date()); // Hôm nay
 
-        // Update the UI
+        // Cập nhật giao diện người dùng
         binding.dateFromInput.setText(dateFormatter.format(fromDateCalendar.getTime()));
         binding.dateToInput.setText(dateFormatter.format(toDateCalendar.getTime()));
 
@@ -209,7 +209,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
                         fromDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         binding.dateFromInput.setText(dateFormatter.format(fromDateCalendar.getTime()));
 
-                        // Apply filters with the new date
+                        // Áp dụng bộ lọc với ngày mới
                         applyFilters();
                     },
                     fromDateCalendar.get(Calendar.YEAR),
@@ -228,7 +228,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
                         toDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                         binding.dateToInput.setText(dateFormatter.format(toDateCalendar.getTime()));
 
-                        // Apply filters with the new date
+                        // Áp dụng bộ lọc với ngày mới
                         applyFilters();
                     },
                     toDateCalendar.get(Calendar.YEAR),
@@ -275,7 +275,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
 
         binding.transactionTypeInput.setAdapter(typeAdapter);
 
-        // Don't set default text here, as it will be restored in restoreDropdownSelections
+        // Không đặt văn bản mặc định ở đây, vì nó sẽ được khôi phục trong restoreDropdownSelections
 
         binding.transactionTypeInput.setOnItemClickListener((parent, view, position, id) -> {
             String selectedType = (String) parent.getItemAtPosition(position);
@@ -353,13 +353,13 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
 
 
     private void applyFilters() {
-        // Show loading before applying filters
+        // Hiển thị trạng thái tải trước khi áp dụng bộ lọc
         showLoading();
 
         Date fromDate = fromDateCalendar.getTime();
         Date toDate = toDateCalendar.getTime();
 
-        // Validate dates
+        // Kiểm tra tính hợp lệ của ngày
         if (fromDate.after(toDate)) {
             Toast.makeText(requireContext(), "Ngày bắt đầu phải trước ngày kết thúc", Toast.LENGTH_SHORT).show();
             hideLoading();
@@ -369,9 +369,9 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         String category = binding.categoryFilterInput.getText().toString();
         String transactionType = binding.transactionTypeInput.getText().toString();
 
-        // Apply filters
+        // Áp dụng bộ lọc
         viewModel.applyFilter(fromDate, toDate, category, transactionType, transactions -> {
-            // Update UI based on filtered results
+            // Cập nhật UI dựa trên kết quả đã lọc
             updateUIBasedOnTransactions(transactions);
         });
     }
@@ -381,7 +381,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         binding.transactionsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.transactionsRecyclerView.setAdapter(adapter);
 
-        // Add swipe functionality
+        // Thêm chức năng vuốt
         SwipeToDeleteCallback swipeHandler = new SwipeToDeleteCallback(requireContext(), this);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeHandler);
         itemTouchHelper.attachToRecyclerView(binding.transactionsRecyclerView);
@@ -389,7 +389,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
 
     private void setupAddTransactionButton() {
         binding.fabAddTransaction.setOnClickListener(v -> {
-            // Navigate to AddEditTransactionFragment
+            // Điều hướng đến AddEditTransactionFragment
             Navigation.findNavController(v).navigate(
                     R.id.action_transactions_to_add_transaction
             );
@@ -400,10 +400,10 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     private void observeTransactions() {
         viewModel.getTransactions().observe(getViewLifecycleOwner(), transactions -> {
 
-            // Always update the adapter with the new transactions, even if empty
+            // Luôn cập nhật adapter với các giao dịch mới, ngay cả khi danh sách trống
             adapter.submitList(transactions);
 
-            // Force UI update whenever we get new transaction data
+            // Buộc cập nhật UI bất cứ khi nào nhận được dữ liệu giao dịch mới
             updateUIBasedOnTransactions(transactions);
         });
     }
@@ -419,7 +419,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
     }
 
     private void setupToolbar() {
-        // Toolbar setup logic here
+        // Logic thiết lập Toolbar ở đây
     }
 
     @Override
@@ -445,7 +445,7 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
         showDeleteConfirmationDialog(transaction);
     }
 
-    // Implement SwipeActionListener methods
+    // Triển khai các phương thức của SwipeActionListener
     @Override
     public void onDelete(int position) {
         Transaction transaction = adapter.getCurrentList().get(position);
@@ -471,13 +471,13 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
                 .setTitle("Xóa giao dịch")
                 .setMessage("Bạn có chắc chắn muốn xóa giao dịch này?")
                 .setPositiveButton("Xóa", (dialog, which) -> {
-                    // Show loading while deleting
+                    // Hiển thị trạng thái tải trong khi xóa
                     showLoading();
                     viewModel.deleteTransaction(transaction.getFirebaseId());
                     Toast.makeText(requireContext(), "Đã xóa giao dịch", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Hủy", (dialog, which) -> {
-                    // Refresh the adapter to reset the swiped item
+                    // Làm mới adapter để đặt lại mục đã vuốt
                     adapter.notifyDataSetChanged();
                 })
                 .show();
