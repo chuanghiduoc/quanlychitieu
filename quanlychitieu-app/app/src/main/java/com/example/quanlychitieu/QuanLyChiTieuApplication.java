@@ -18,9 +18,6 @@ public class QuanLyChiTieuApplication extends Application {
             // Khởi tạo Firebase
             FirebaseApp.initializeApp(this);
 
-            // Đặt locale cho Firebase
-            Locale currentLocale = getResources().getConfiguration().getLocales().get(0);
-
             FirebaseAuth auth = FirebaseAuth.getInstance();
             auth.useAppLanguage();
 

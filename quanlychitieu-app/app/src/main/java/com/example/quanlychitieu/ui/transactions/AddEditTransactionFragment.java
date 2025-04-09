@@ -57,9 +57,6 @@ public class AddEditTransactionFragment extends Fragment {
 
     private String transactionId;
     private boolean isEditMode = false;
-    private Spinner goalSpinner;
-    private CheckBox contributeToGoalCheckbox;
-    private LinearLayout goalSelectionLayout;
     private List<FinancialGoal> availableGoals;
     @Nullable
     @Override
@@ -576,48 +573,6 @@ public class AddEditTransactionFragment extends Fragment {
 
             count++;
         }
-    }
-
-
-    // Phương thức mới để tải danh sách mục tiêu
-    private void loadAvailableGoals() {
-        FinancialGoalRepository goalRepository = FinancialGoalRepository.getInstance();
-        goalRepository.getGoals().observe(getViewLifecycleOwner(), goals -> {
-            if (goals != null && !goals.isEmpty()) {
-                // Lọc ra các mục tiêu chưa hoàn thành
-                availableGoals = new ArrayList<>();
-                for (FinancialGoal goal : goals) {
-                    if (!goal.isCompleted()) {
-                        availableGoals.add(goal);
-                    }
-                }
-
-                if (!availableGoals.isEmpty()) {
-                    // Tạo adapter cho spinner
-                    List<String> goalNames = new ArrayList<>();
-                    for (FinancialGoal goal : availableGoals) {
-                        goalNames.add(goal.getName());
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            requireContext(),
-                            android.R.layout.simple_spinner_item,
-                            goalNames
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    goalSpinner.setAdapter(adapter);
-                } else {
-                    // Không có mục tiêu nào khả dụng
-                    contributeToGoalCheckbox.setChecked(false);
-                    contributeToGoalCheckbox.setEnabled(false);
-                    Toast.makeText(requireContext(), "Không có mục tiêu nào để đóng góp", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // Không có mục tiêu nào
-                contributeToGoalCheckbox.setChecked(false);
-                contributeToGoalCheckbox.setEnabled(false);
-            }
-        });
     }
 
     private void setupToolbar() {
