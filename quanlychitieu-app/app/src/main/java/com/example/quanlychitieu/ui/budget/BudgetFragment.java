@@ -75,6 +75,13 @@ public class BudgetFragment extends Fragment {
 
         // Setup nút xem tất cả mục tiêu
         setupViewAllGoalsButton();
+
+        // Thiết lập nút tư vấn tài chính
+        binding.fabFinancialAdvisor.setOnClickListener(v -> {
+            // Chuyển đến màn hình tư vấn tài chính
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.financialAdvisorFragment);
+        });
     }
 
     @Override
