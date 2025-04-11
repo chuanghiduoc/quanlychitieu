@@ -62,12 +62,7 @@ ${financialData.goals
 
 **Câu hỏi của người dùng**: ${input.message}
 
-Nếu câu hỏi người dùng liên quan đến phân tích tài chính, hãy đưa ra phân tích **ngắn gọn** các ý kiến với mẫu tham khảo sau (sử dụng định dạng markdown để làm nổi bật) bạn có thể trả lời theo kiểu khác cũng được:
-
-### 1. Phân tích tình hình tài chính hiện tại
-### 2. Những điểm cần lưu ý hoặc cải thiện
-### 3. Lời khuyên và kế hoạch hành động cụ thể
-### 4. Dự báo và gợi ý cho tương lai
+Nếu câu hỏi người dùng liên quan đến phân tích tài chính, hãy đưa ra phân tích **ngắn gọn** (sử dụng định dạng markdown để làm nổi bật)
 
 Vui lòng đảm bảo phản hồi được định dạng tốt với markdown, bao gồm các **đề mục**, *in nghiêng*, **in đậm**, danh sách có thứ tự, và danh sách không thứ tự.
 `;
