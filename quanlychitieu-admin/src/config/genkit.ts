@@ -62,7 +62,7 @@ ${financialData.goals
 
 **Câu hỏi của người dùng**: ${input.message}
 
-Nếu câu hỏi người dùng liên quan đến phân tích tài chính, hãy đưa ra phân tích **ngắn gọn** (sử dụng định dạng markdown để làm nổi bật)
+Nếu câu hỏi người dùng liên quan đến phân tích tài chính, hãy trả lời câu hỏi người dùng **ngắn gọn** (sử dụng định dạng markdown để làm nổi bật)
 
 Vui lòng đảm bảo phản hồi được định dạng tốt với markdown, bao gồm các **đề mục**, *in nghiêng*, **in đậm**, danh sách có thứ tự, và danh sách không thứ tự.
 `;
