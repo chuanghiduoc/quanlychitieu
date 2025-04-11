@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.FinancialGoal;
 import com.example.quanlychitieu.data.model.Transaction;
@@ -211,8 +212,10 @@ public class AddEditTransactionFragment extends Fragment {
 
     private void setupTransactionTypeRadioGroup() {
         binding.transactionTypeGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            boolean isIncome = (checkedId == binding.incomeRadio.getId());
+            boolean isIncome = checkedId == R.id.income_radio;
             updateCategoryDropdown(isIncome);
+
+            binding.categoryInput.setText("", false);
         });
     }
 
@@ -319,25 +322,26 @@ public class AddEditTransactionFragment extends Fragment {
 
     private void updateCategoryDropdown(boolean isIncome) {
         ArrayAdapter<String> categoryAdapter;
+        List<String> categories;
+
         if (isIncome) {
-            categoryAdapter = new ArrayAdapter<>(
-                    requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    CategoryManager.getInstance().getIncomeCategories()
-            );
+            categories = CategoryManager.getInstance().getIncomeCategories();
         } else {
-            categoryAdapter = new ArrayAdapter<>(
-                    requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    CategoryManager.getInstance().getExpenseCategories()
-            );
+            categories = CategoryManager.getInstance().getExpenseCategories();
         }
+
+        categoryAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                categories
+        );
 
         AutoCompleteTextView categoryInput = binding.categoryInput;
         categoryInput.setAdapter(categoryAdapter);
 
-        // Set default selection if adapter has items
-        if (categoryAdapter.getCount() > 0 && (categoryInput.getText() == null || categoryInput.getText().toString().isEmpty())) {
+        // Chỉ đặt giá trị mặc định nếu không phải chế độ sửa và danh mục hiện tại trống
+        if (!isEditMode && categoryAdapter.getCount() > 0 &&
+                (categoryInput.getText() == null || categoryInput.getText().toString().isEmpty())) {
             categoryInput.setText(categoryAdapter.getItem(0), false);
         }
     }
