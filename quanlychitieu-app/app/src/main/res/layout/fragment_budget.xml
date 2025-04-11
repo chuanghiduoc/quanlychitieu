@@ -288,6 +288,16 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- FAB để thêm ngân sách -->
+    <!-- FAB để mở tư vấn tài chính -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_financial_advisor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="Tư vấn tài chính"
+        android:src="@drawable/ic_assistant"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="#5C6BC0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

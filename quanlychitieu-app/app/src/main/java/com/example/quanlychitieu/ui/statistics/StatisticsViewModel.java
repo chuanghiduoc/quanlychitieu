@@ -55,6 +55,11 @@ public class StatisticsViewModel extends ViewModel {
 
         // Xử lý từng giao dịch
         for (Transaction transaction : transactions) {
+            // Bỏ qua các giao dịch đóng góp mục tiêu
+            if (transaction.isGoalContribution()) {
+                continue;
+            }
+
             double amount = Math.abs(transaction.getAmount());
 
             if (transaction.isIncome()) {
@@ -173,6 +178,11 @@ public class StatisticsViewModel extends ViewModel {
 
         // Xử lý các giao dịch
         for (Transaction transaction : transactions) {
+            // Bỏ qua các giao dịch đóng góp mục tiêu
+            if (transaction.isGoalContribution()) {
+                continue;
+            }
+
             String periodKey = formatter.format(transaction.getDate());
             double amount = Math.abs(transaction.getAmount());
 

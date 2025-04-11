@@ -118,6 +118,13 @@ public class TransactionsFragment extends Fragment implements TransactionAdapter
 
         // Áp dụng bộ lọc mặc định tự động
         applyDefaultFilters();
+
+        // Thiết lập nút tư vấn tài chính
+        binding.fabFinancialAdvisor.setOnClickListener(v -> {
+            // Chuyển đến màn hình tư vấn tài chính
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.financialAdvisorFragment);
+        });
     }
 
     private void applyDefaultFilters() {

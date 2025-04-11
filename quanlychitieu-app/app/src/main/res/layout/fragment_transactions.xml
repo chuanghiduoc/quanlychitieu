@@ -204,6 +204,19 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- FAB để mở tư vấn tài chính -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_financial_advisor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Tư vấn tài chính"
+        android:src="@drawable/ic_assistant"
+        app:layout_constraintBottom_toTopOf="@id/fab_add_transaction"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="#5C6BC0" />
+
     <!-- FAB để thêm giao dịch -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_transaction"
