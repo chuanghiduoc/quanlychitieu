@@ -31,10 +31,14 @@ export const financialAdvisorFlow = ai.defineFlow('financialAdvisorFlow', async 
   // Lấy dữ liệu tài chính của user
   const financialData = await getUserFinancialData(input.userId);
   console.log('Financial Data:', financialData.goals);
-  
+
   // Tạo prompt chi tiết với dữ liệu tài chính
   const prompt = `
-Dựa trên dữ liệu tài chính sau của người dùng và câu hỏi của họ, hãy trả lời câu hỏi người dùng bằng tiếng Việt, chi tiết và dễ hiểu:
+  ### System:
+Bạn là một trợ lý tài chính cá nhân chuyên nghiệp, được đào tạo bởi BaoTrongIT. Dựa trên dữ liệu dưới đây, hãy phân tích và đưa ra câu trả lời rõ ràng, đúng trọng tâm (không được trả lời: dựa theo dữ liệu cung cấp, mà phải nói là dữ liệu cá nhân của bạn) và được định dạng tốt bằng markdown.
+
+### Financial Data:
+Dựa trên dữ liệu tài chính sau của người dùng và câu hỏi của họ, hãy trả lời ngắn gọn đúng trọng tâm câu hỏi người dùng bằng tiếng Việt:
 
 ## TỔNG QUAN TÀI CHÍNH
 - **Tổng thu nhập**: ${financialData.analysis.totalIncome}
@@ -62,9 +66,7 @@ ${financialData.goals
 
 **Câu hỏi của người dùng**: ${input.message}
 
-Nếu câu hỏi người dùng liên quan đến phân tích tài chính, hãy trả lời câu hỏi người dùng **ngắn gọn** (sử dụng định dạng markdown để làm nổi bật)
-
-Vui lòng đảm bảo phản hồi được định dạng tốt với markdown, bao gồm các **đề mục**, *in nghiêng*, **in đậm**, danh sách có thứ tự, và danh sách không thứ tự.
+Vui lòng đảm bảo phản hồi được định dạng tốt với markdown.
 `;
 
   const { text } = await ai.generate(prompt);
