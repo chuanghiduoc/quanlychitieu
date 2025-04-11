@@ -28,7 +28,7 @@ public class TransactionsViewModel extends ViewModel {
     public TransactionsViewModel() {
         repository = TransactionRepository.getInstance();
 
-        // Set default date range (current month)
+        // Đặt phạm vi ngày mặc định (tháng hiện tại)
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         fromDate.setValue(calendar.getTime());
@@ -36,7 +36,7 @@ public class TransactionsViewModel extends ViewModel {
         calendar = Calendar.getInstance();
         toDate.setValue(calendar.getTime());
 
-        // Load initial transactions with default date range
+        // Tải các giao dịch ban đầu với phạm vi ngày mặc định
         applyFilter(fromDate.getValue(), toDate.getValue(),
                 "Tất cả danh mục", "Tất cả giao dịch", null);
     }
@@ -57,20 +57,20 @@ public class TransactionsViewModel extends ViewModel {
         isLoading.setValue(true);
 
         repository.deleteTransaction(id).addOnCompleteListener(task -> {
-            // After deletion is complete, refresh the transactions with current filters
+            // Sau khi xóa xong, làm mới các giao dịch với các bộ lọc hiện tại
             refreshTransactions();
         });
     }
 
 
     public void applyFilter(Date fromDate, Date toDate, String category, String type, FilterCallback callback) {
-        // Update stored filter values
+        // Cập nhật các giá trị bộ lọc đã lưu trữ
         this.fromDate.setValue(fromDate);
         this.toDate.setValue(toDate);
         this.selectedCategory.setValue(category);
         this.selectedType.setValue(type);
 
-        // Prepare date range with proper time components
+        // Chuẩn bị phạm vi ngày với các thành phần thời gian thích hợp
         Calendar startCal = Calendar.getInstance();
         startCal.setTime(fromDate);
         startCal.set(Calendar.HOUR_OF_DAY, 0);
@@ -106,13 +106,13 @@ public class TransactionsViewModel extends ViewModel {
     public void refreshTransactions() {
         isLoading.setValue(true);
 
-        // Use current filter values
+        // Sử dụng các giá trị bộ lọc hiện tại
         Date startDate = fromDate.getValue();
         Date endDate = toDate.getValue();
         String category = selectedCategory.getValue();
         String type = selectedType.getValue();
 
-        // Apply proper time components
+        // Áp dụng các thành phần thời gian thích hợp
         Calendar startCal = Calendar.getInstance();
         startCal.setTime(startDate);
         startCal.set(Calendar.HOUR_OF_DAY, 0);
@@ -137,7 +137,7 @@ public class TransactionsViewModel extends ViewModel {
         });
     }
 
-    // Getters for filter values to use in UI
+    // Các getter cho các giá trị bộ lọc để sử dụng trong UI
     public Date getFromDate() {
         return fromDate.getValue();
     }

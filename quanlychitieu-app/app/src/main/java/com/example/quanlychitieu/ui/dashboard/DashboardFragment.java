@@ -95,6 +95,20 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.On
 
         // Observe chart data
         observeChartData();
+
+        // Thiết lập nút tư vấn tài chính
+        binding.fabFinancialAdvisor.setOnClickListener(v -> {
+            // Chuyển đến màn hình tư vấn tài chính
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.financialAdvisorFragment);
+        });
+
+        // Thiết lập nút thêm giao dịch
+        binding.fabAddTransaction.setOnClickListener(v -> {
+            // Chuyển đến màn hình thêm giao dịch mới
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_dashboard_to_add_transaction);
+        });
     }
 
     /**

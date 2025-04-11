@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.example.quanlychitieu.R;
 import com.example.quanlychitieu.data.CategoryManager;
 import com.example.quanlychitieu.data.model.FinancialGoal;
 import com.example.quanlychitieu.data.model.Transaction;
@@ -57,9 +58,6 @@ public class AddEditTransactionFragment extends Fragment {
 
     private String transactionId;
     private boolean isEditMode = false;
-    private Spinner goalSpinner;
-    private CheckBox contributeToGoalCheckbox;
-    private LinearLayout goalSelectionLayout;
     private List<FinancialGoal> availableGoals;
     @Nullable
     @Override
@@ -214,8 +212,10 @@ public class AddEditTransactionFragment extends Fragment {
 
     private void setupTransactionTypeRadioGroup() {
         binding.transactionTypeGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            boolean isIncome = (checkedId == binding.incomeRadio.getId());
+            boolean isIncome = checkedId == R.id.income_radio;
             updateCategoryDropdown(isIncome);
+
+            binding.categoryInput.setText("", false);
         });
     }
 
@@ -322,25 +322,26 @@ public class AddEditTransactionFragment extends Fragment {
 
     private void updateCategoryDropdown(boolean isIncome) {
         ArrayAdapter<String> categoryAdapter;
+        List<String> categories;
+
         if (isIncome) {
-            categoryAdapter = new ArrayAdapter<>(
-                    requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    CategoryManager.getInstance().getIncomeCategories()
-            );
+            categories = CategoryManager.getInstance().getIncomeCategories();
         } else {
-            categoryAdapter = new ArrayAdapter<>(
-                    requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    CategoryManager.getInstance().getExpenseCategories()
-            );
+            categories = CategoryManager.getInstance().getExpenseCategories();
         }
+
+        categoryAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                categories
+        );
 
         AutoCompleteTextView categoryInput = binding.categoryInput;
         categoryInput.setAdapter(categoryAdapter);
 
-        // Set default selection if adapter has items
-        if (categoryAdapter.getCount() > 0 && (categoryInput.getText() == null || categoryInput.getText().toString().isEmpty())) {
+        // Chỉ đặt giá trị mặc định nếu không phải chế độ sửa và danh mục hiện tại trống
+        if (!isEditMode && categoryAdapter.getCount() > 0 &&
+                (categoryInput.getText() == null || categoryInput.getText().toString().isEmpty())) {
             categoryInput.setText(categoryAdapter.getItem(0), false);
         }
     }
@@ -576,48 +577,6 @@ public class AddEditTransactionFragment extends Fragment {
 
             count++;
         }
-    }
-
-
-    // Phương thức mới để tải danh sách mục tiêu
-    private void loadAvailableGoals() {
-        FinancialGoalRepository goalRepository = FinancialGoalRepository.getInstance();
-        goalRepository.getGoals().observe(getViewLifecycleOwner(), goals -> {
-            if (goals != null && !goals.isEmpty()) {
-                // Lọc ra các mục tiêu chưa hoàn thành
-                availableGoals = new ArrayList<>();
-                for (FinancialGoal goal : goals) {
-                    if (!goal.isCompleted()) {
-                        availableGoals.add(goal);
-                    }
-                }
-
-                if (!availableGoals.isEmpty()) {
-                    // Tạo adapter cho spinner
-                    List<String> goalNames = new ArrayList<>();
-                    for (FinancialGoal goal : availableGoals) {
-                        goalNames.add(goal.getName());
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            requireContext(),
-                            android.R.layout.simple_spinner_item,
-                            goalNames
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    goalSpinner.setAdapter(adapter);
-                } else {
-                    // Không có mục tiêu nào khả dụng
-                    contributeToGoalCheckbox.setChecked(false);
-                    contributeToGoalCheckbox.setEnabled(false);
-                    Toast.makeText(requireContext(), "Không có mục tiêu nào để đóng góp", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // Không có mục tiêu nào
-                contributeToGoalCheckbox.setChecked(false);
-                contributeToGoalCheckbox.setEnabled(false);
-            }
-        });
     }
 
     private void setupToolbar() {
