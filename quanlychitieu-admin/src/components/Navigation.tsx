@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -20,9 +20,9 @@ export default function Navigation() {
               <Link
                 href="/"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  pathname === '/'
-                    ? 'border-indigo-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  pathname === "/"
+                    ? "border-indigo-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                 }`}
               >
                 Trang chủ
@@ -30,12 +30,32 @@ export default function Navigation() {
               <Link
                 href="/users"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  pathname === '/users'
-                    ? 'border-indigo-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  pathname === "/users"
+                    ? "border-indigo-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                 }`}
               >
                 Quản lý người dùng
+              </Link>
+              <Link
+                href="/transactions"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === "/transactions"
+                    ? "border-indigo-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                }`}
+              >
+                Giao dịch
+              </Link>
+              <Link
+                href="/budgets"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === "/budgets"
+                    ? "border-indigo-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                }`}
+              >
+                Ngân sách
               </Link>
             </div>
           </div>

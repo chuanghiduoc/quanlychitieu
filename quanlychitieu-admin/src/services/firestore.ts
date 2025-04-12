@@ -1,90 +1,61 @@
-import { firebaseAdmin } from '@/config/firebase';
-import { Budget, Transaction, FinancialGoal } from '@/types/models';
+import { Budget, Transaction, FinancialGoal } from "@/types/models";
 
-const db = firebaseAdmin.firestore();
+interface FinancialData {
+  transactions: Transaction[];
+  budgets: Budget[];
+  goals: FinancialGoal[];
+  analysis: {
+    totalIncome: number;
+    totalExpense: number;
+    netIncome: number;
+    categoryExpenses: { [key: string]: number };
+    budgetStatus: {
+      category: string;
+      amount: number;
+      spent: number;
+      remaining: number;
+      percentageUsed: number;
+    }[];
+  };
+}
 
-export async function getUserFinancialData(userId: string) {
+export async function getUserFinancialData(
+  userId: string
+): Promise<FinancialData> {
   try {
-    // Lấy transactions
-    const transactionsSnapshot = await db
-      .collection('users')
-      .doc(userId)
-      .collection('transactions')
-      .get();
-    
-    const transactions: Transaction[] = transactionsSnapshot.docs.map(doc => ({
-      firebaseId: doc.id,
-      ...doc.data(),
-      date: doc.data().date.toDate(),
-      endDate: doc.data().endDate?.toDate(),
-    } as Transaction));
-
-    // Lấy budgets
-    const budgetsSnapshot = await db
-      .collection('users')
-      .doc(userId)
-      .collection('budgets')
-      .get();
-    
-    const budgets: Budget[] = budgetsSnapshot.docs.map(doc => ({
-      firebaseId: doc.id,
-      ...doc.data(),
-      startDate: doc.data().startDate.toDate(),
-      endDate: doc.data().endDate.toDate(),
-    } as Budget));
-
-    // Lấy goals
-    const goalsSnapshot = await db
-      .collection('users')
-      .doc(userId)
-      .collection('goals')
-      .get();
-    
-    const goals: FinancialGoal[] = goalsSnapshot.docs.map(doc => ({
-      firebaseId: doc.id,
-      ...doc.data(),
-      startDate: doc.data().startDate.toDate(),
-      endDate: doc.data().endDate.toDate(),
-    } as FinancialGoal));
-
-    // Phân tích dữ liệu cơ bản
-    const totalIncome = transactions
-      .filter(t => t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const totalExpense = transactions
-      .filter(t => !t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const categoryExpenses = transactions
-      .filter(t => !t.isIncome)
-      .reduce((acc, t) => {
-        acc[t.category] = (acc[t.category] || 0) + t.amount;
-        return acc;
-      }, {} as { [key: string]: number });
-
-    const budgetStatus = budgets.map(b => ({
-      category: b.category,
-      amount: b.amount,
-      spent: b.spent,
-      remaining: b.amount - b.spent,
-      percentageUsed: (b.spent / b.amount) * 100
-    }));
-
-    return {
-      transactions,
-      budgets,
-      goals,
-      analysis: {
-        totalIncome,
-        totalExpense,
-        netIncome: totalIncome - totalExpense,
-        categoryExpenses,
-        budgetStatus
-      }
-    };
+    const response = await fetch(`/api/financial-data?userId=${userId}`);
+    if (!response.ok) {
+      throw new Error("Lỗi khi lấy dữ liệu tài chính");
+    }
+    return await response.json();
   } catch (error) {
-    console.error('Lỗi khi lấy dữ liệu tài chính:', error);
+    console.error("Lỗi khi lấy dữ liệu tài chính:", error);
+    throw error;
+  }
+}
+
+export async function getAllTransactions(): Promise<Transaction[]> {
+  try {
+    const response = await fetch("/api/transactions");
+    if (!response.ok) {
+      throw new Error("Lỗi khi lấy tất cả transactions");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi lấy tất cả transactions:", error);
+    throw error;
+  }
+}
+
+export async function getAllBudgets(): Promise<Budget[]> {
+  try {
+    const response = await fetch("/api/budgets");
+    if (!response.ok) {
+      throw new Error("Lỗi khi lấy tất cả budgets");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Lỗi khi lấy tất cả budgets:", error);
     throw error;
   }
 }
