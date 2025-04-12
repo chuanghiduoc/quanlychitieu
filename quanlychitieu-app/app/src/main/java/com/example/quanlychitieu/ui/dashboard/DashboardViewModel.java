@@ -157,12 +157,18 @@ public class DashboardViewModel extends ViewModel {
         if (transactions != null && !transactions.isEmpty()) {
             // 1. Cập nhật giao dịch gần đây (lấy 3 giao dịch mới nhất)
             recent = transactions.stream()
+                    .filter(t -> !t.isGoalContribution()) // Lọc bỏ giao dịch đóng góp mục tiêu
                     .sorted((t1, t2) -> t2.getDate().compareTo(t1.getDate()))
                     .limit(3)
                     .collect(Collectors.toList());
 
             // 2. Tính toán tổng quan tài chính
             for (Transaction transaction : transactions) {
+                // Bỏ qua các giao dịch đóng góp mục tiêu
+                if (transaction.isGoalContribution()) {
+                    continue;
+                }
+
                 double amount = Math.abs(transaction.getAmount());
                 boolean isIncome = transaction.isIncome();
 

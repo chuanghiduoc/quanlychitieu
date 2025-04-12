@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private static final String TAG = "MainActivity";
     private FirebaseAuth auth;
-    private static final int STORAGE_PERMISSION_REQUEST_CODE = 1001;
     private ActivityResultLauncher<String[]> storagePermissionLauncher;
     // Launcher để yêu cầu quyền thông báo
     private final ActivityResultLauncher<String> requestPermissionLauncher =

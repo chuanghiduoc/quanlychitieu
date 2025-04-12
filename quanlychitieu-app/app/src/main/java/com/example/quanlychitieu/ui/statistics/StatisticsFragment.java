@@ -70,32 +70,32 @@ public class StatisticsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize ViewModel
+        // Khởi tạo ViewModel
         viewModel = new ViewModelProvider(this).get(StatisticsViewModel.class);
 
-        // Format currency
+        // Định dạng tiền tệ
         currencyFormat.setMaximumFractionDigits(0);
 
-        // Setup period selector
+        // Thiết lập bộ chọn khoảng thời gian
         setupPeriodSelector();
 
-        // Setup charts
+        // Thiết lập biểu đồ
         setupPieChart();
         setupBarChart();
 
-        // Setup category list
+        // Thiết lập danh sách danh mục
         setupCategoryList();
 
-        // Setup export button
+        // Thiết lập nút xuất báo cáo
         binding.exportReportButton.setOnClickListener(v -> exportReport());
 
-        // Load initial data
+        // Tải dữ liệu ban đầu
         updatePeriodDisplay();
         loadData();
     }
 
     private void setupPeriodSelector() {
-        // Set up radio group for period selection
+        // Thiết lập radio group để chọn khoảng thời gian
         binding.timePeriodGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.period_week) {
                 currentPeriodType = "week";
@@ -108,7 +108,7 @@ public class StatisticsFragment extends Fragment {
             loadData();
         });
 
-        // Set up navigation buttons
+        // Thiết lập các nút điều hướng
         binding.previousPeriodButton.setOnClickListener(v -> {
             navigatePeriod(-1);
         });
@@ -140,14 +140,14 @@ public class StatisticsFragment extends Fragment {
 
         switch (currentPeriodType) {
             case "week":
-                // Get first day of week
+                // Lấy ngày đầu tiên của tuần
                 Calendar first = (Calendar) currentPeriod.clone();
                 first.set(Calendar.DAY_OF_WEEK, first.getFirstDayOfWeek());
-                // Get last day of week
+                // Lấy ngày cuối cùng của tuần
                 Calendar last = (Calendar) first.clone();
                 last.add(Calendar.DAY_OF_WEEK, 6);
 
-                // Format dates
+                // Định dạng ngày tháng
                 formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 periodText = String.format("Tuần %d: %s - %s",
                         currentPeriod.get(Calendar.WEEK_OF_YEAR),
@@ -169,7 +169,7 @@ public class StatisticsFragment extends Fragment {
 
         binding.currentPeriodText.setText(periodText);
 
-        // Disable next button if current period is current time
+        // Vô hiệu hóa nút tiếp theo nếu khoảng thời gian hiện tại là thời gian hiện tại
         Calendar now = Calendar.getInstance();
         boolean isCurrentPeriod = false;
 
@@ -191,17 +191,17 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setupPieChart() {
-        // Initialize pie chart
+        // Khởi tạo biểu đồ tròn
         pieChart = new PieChart(requireContext());
         binding.pieChartContainer.addView(pieChart);
 
-        // Setup chart appearance
+        // Thiết lập giao diện biểu đồ
         ChartHelper.setupPieChart(pieChart);
         pieChart.setNoDataText("Không có dữ liệu chi tiêu trong khoảng thời gian này");
         pieChart.getDescription().setEnabled(false);
         pieChart.setDrawEntryLabels(false);
 
-        // Configure legend
+        // Cấu hình chú giải
         Legend legend = pieChart.getLegend();
         legend.setEnabled(true);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -213,11 +213,11 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setupBarChart() {
-        // Initialize bar chart
+        // Khởi tạo biểu đồ cột
         barChart = new BarChart(requireContext());
         binding.barChartContainer.addView(barChart);
 
-        // Setup chart appearance
+        // Thiết lập giao diện biểu đồ
         barChart.getDescription().setEnabled(false);
         barChart.setDrawGridBackground(false);
         barChart.setDrawBarShadow(false);
@@ -227,14 +227,14 @@ public class StatisticsFragment extends Fragment {
         barChart.setScaleEnabled(false);
         barChart.setNoDataText("Không có dữ liệu chi tiêu trong khoảng thời gian này");
 
-        // Configure X axis
+        // Cấu hình trục X
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f);
         xAxis.setTextSize(12f);
 
-        // Configure Y axis
+        // Cấu hình trục Y
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
         leftAxis.setSpaceTop(35f);
@@ -248,7 +248,7 @@ public class StatisticsFragment extends Fragment {
 
         barChart.getAxisRight().setEnabled(false);
 
-        // Configure legend
+        // Cấu hình chú giải
         Legend legend = barChart.getLegend();
         legend.setEnabled(true);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -261,26 +261,26 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void setupCategoryList() {
-        // Create RecyclerView for categories
+        // Tạo RecyclerView cho các danh mục
         RecyclerView categoryRecyclerView = new RecyclerView(requireContext());
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         categoryAdapter = new CategoryStatisticsAdapter(requireContext());
         categoryRecyclerView.setAdapter(categoryAdapter);
 
-        // Add to the container
+        // Thêm vào container
         binding.categoriesList.addView(categoryRecyclerView);
     }
 
     private void loadData() {
-        // Get date range for selected period
+        // Lấy khoảng ngày cho khoảng thời gian đã chọn
         Pair<Date, Date> dateRange = getDateRangeForPeriod();
         Date startDate = dateRange.first;
         Date endDate = dateRange.second;
 
-        // Load financial data for the period
+        // Tải dữ liệu tài chính cho khoảng thời gian
         viewModel.loadFinancialData(startDate, endDate);
 
-        // Observe financial data
+        // Theo dõi dữ liệu tài chính
         viewModel.getIncome().observe(getViewLifecycleOwner(), income -> {
             binding.incomeAmount.setText(formatCurrency(income));
         });
@@ -292,7 +292,7 @@ public class StatisticsFragment extends Fragment {
         viewModel.getBalance().observe(getViewLifecycleOwner(), balance -> {
             binding.balanceAmount.setText(formatCurrency(balance));
 
-            // Set color based on balance
+            // Đặt màu dựa trên số dư
             if (balance < 0) {
                 binding.balanceAmount.setTextColor(getResources().getColor(R.color.expense_red, null));
             } else {
@@ -300,13 +300,13 @@ public class StatisticsFragment extends Fragment {
             }
         });
 
-        // Load chart data
+        // Tải dữ liệu biểu đồ
         viewModel.getCategoryExpenses().observe(getViewLifecycleOwner(), categoryExpenses -> {
             updatePieChart(categoryExpenses);
             categoryAdapter.updateData(categoryExpenses);
         });
 
-        // Load time series data for bar chart
+        // Tải dữ liệu chuỗi thời gian cho biểu đồ cột
         viewModel.getTimeSeriesData().observe(getViewLifecycleOwner(), timeSeriesData -> {
             updateBarChart(timeSeriesData);
         });
@@ -333,19 +333,19 @@ public class StatisticsFragment extends Fragment {
         List<Float> incomeValues = timeSeriesData.getIncomeValues();
         List<Float> expenseValues = timeSeriesData.getExpenseValues();
 
-        // Create income entries
+        // Tạo các mục nhập thu nhập
         List<BarEntry> incomeEntries = new ArrayList<>();
         for (int i = 0; i < incomeValues.size(); i++) {
             incomeEntries.add(new BarEntry(i, incomeValues.get(i)));
         }
 
-        // Create expense entries
+        // Tạo các mục nhập chi tiêu
         List<BarEntry> expenseEntries = new ArrayList<>();
         for (int i = 0; i < expenseValues.size(); i++) {
             expenseEntries.add(new BarEntry(i, expenseValues.get(i)));
         }
 
-        // Create datasets
+        // Tạo các tập dữ liệu
         BarDataSet incomeDataSet = new BarDataSet(incomeEntries, "Thu nhập");
         incomeDataSet.setColor(getResources().getColor(R.color.income_green, null));
         incomeDataSet.setValueTextSize(10f);
@@ -368,19 +368,19 @@ public class StatisticsFragment extends Fragment {
             }
         });
 
-        // Create bar data
+        // Tạo dữ liệu biểu đồ cột
         BarData barData = new BarData(incomeDataSet, expenseDataSet);
         barData.setBarWidth(0.4f);
 
-        // Set x-axis labels
+        // Đặt nhãn trục x
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
 
-        // Group bars
+        // Nhóm các cột
         float groupSpace = 0.3f;
         float barSpace = 0f;
         barData.groupBars(0, groupSpace, barSpace);
 
-        // Set data and update
+        // Đặt dữ liệu và cập nhật
         barChart.setData(barData);
         barChart.setFitBars(true);
         barChart.animateY(1000);
@@ -393,14 +393,14 @@ public class StatisticsFragment extends Fragment {
 
         switch (currentPeriodType) {
             case "week":
-                // Set to first day of week
+                // Đặt thành ngày đầu tiên của tuần
                 start.set(Calendar.DAY_OF_WEEK, start.getFirstDayOfWeek());
                 start.set(Calendar.HOUR_OF_DAY, 0);
                 start.set(Calendar.MINUTE, 0);
                 start.set(Calendar.SECOND, 0);
                 start.set(Calendar.MILLISECOND, 0);
 
-                // Set to last day of week
+                // Đặt thành ngày cuối cùng của tuần
                 end.set(Calendar.DAY_OF_WEEK, start.getFirstDayOfWeek() + 6);
                 end.set(Calendar.HOUR_OF_DAY, 23);
                 end.set(Calendar.MINUTE, 59);
@@ -409,14 +409,14 @@ public class StatisticsFragment extends Fragment {
                 break;
 
             case "month":
-                // Set to first day of month
+                // Đặt thành ngày đầu tiên của tháng
                 start.set(Calendar.DAY_OF_MONTH, 1);
                 start.set(Calendar.HOUR_OF_DAY, 0);
                 start.set(Calendar.MINUTE, 0);
                 start.set(Calendar.SECOND, 0);
                 start.set(Calendar.MILLISECOND, 0);
 
-                // Set to last day of month
+                // Đặt thành ngày cuối cùng của tháng
                 end.set(Calendar.DAY_OF_MONTH, end.getActualMaximum(Calendar.DAY_OF_MONTH));
                 end.set(Calendar.HOUR_OF_DAY, 23);
                 end.set(Calendar.MINUTE, 59);
@@ -425,14 +425,14 @@ public class StatisticsFragment extends Fragment {
                 break;
 
             case "year":
-                // Set to first day of year
+                // Đặt thành ngày đầu tiên của năm
                 start.set(Calendar.DAY_OF_YEAR, 1);
                 start.set(Calendar.HOUR_OF_DAY, 0);
                 start.set(Calendar.MINUTE, 0);
                 start.set(Calendar.SECOND, 0);
                 start.set(Calendar.MILLISECOND, 0);
 
-                // Set to last day of year
+                // Đặt thành ngày cuối cùng của năm
                 end.set(Calendar.DAY_OF_YEAR, end.getActualMaximum(Calendar.DAY_OF_YEAR));
                 end.set(Calendar.HOUR_OF_DAY, 23);
                 end.set(Calendar.MINUTE, 59);
@@ -455,7 +455,7 @@ public class StatisticsFragment extends Fragment {
         }
 
         try {
-            // Get period string for filename
+            // Lấy chuỗi khoảng thời gian cho tên tệp
             String periodStr;
             SimpleDateFormat formatter;
 
@@ -477,7 +477,7 @@ public class StatisticsFragment extends Fragment {
                     break;
             }
 
-            // Create report content
+            // Tạo nội dung báo cáo
             StringBuilder reportContent = new StringBuilder();
             reportContent.append("BÁO CÁO TÀI CHÍNH\n\n");
             reportContent.append(binding.currentPeriodText.getText()).append("\n\n");
@@ -494,17 +494,17 @@ public class StatisticsFragment extends Fragment {
                 }
             }
 
-            // Create file
+            // Tạo tệp
             File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             String fileName = "finance_report_" + periodStr + ".txt";
             File file = new File(path, fileName);
 
-            // Write to file
+            // Ghi vào tệp
             FileOutputStream stream = new FileOutputStream(file);
             stream.write(reportContent.toString().getBytes());
             stream.close();
 
-            // Share file
+            // Chia sẻ tệp
             Uri uri = FileProvider.getUriForFile(requireContext(),
                     requireContext().getPackageName() + ".fileprovider", file);
 
@@ -533,17 +533,13 @@ public class StatisticsFragment extends Fragment {
                 .replace(",", ".");
     }
 
-    private String formatCurrency(float amount) {
-        return formatCurrency((double) amount);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 
-    // Helper class for Pair since we might not have androidx.core.util.Pair
+    // Lớp trợ giúp cho Pair vì chúng ta có thể không có androidx.core.util.Pair
     private static class Pair<F, S> {
         public final F first;
         public final S second;
@@ -556,13 +552,13 @@ public class StatisticsFragment extends Fragment {
     private String formatShortCurrency(float value) {
         // Định dạng số tiền ngắn gọn
         if (value >= 1_000_000_000) {
-            return String.format("%.1fB", value / 1_000_000_000);
+            return String.format("%.1fB", value / 1_000_000_000); // Tỷ
         } else if (value >= 1_000_000) {
-            return String.format("%.1fM", value / 1_000_000);
+            return String.format("%.1fM", value / 1_000_000); // Triệu
         } else if (value >= 1_000) {
-            return String.format("%.1fK", value / 1_000);
+            return String.format("%.1fK", value / 1_000); // Ngàn
         } else {
-            return String.format("%.0f", value);
+            return String.format("%.0f", value); // Đồng (hoặc đơn vị cơ bản)
         }
     }
 }

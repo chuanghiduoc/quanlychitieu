@@ -16,8 +16,8 @@ public class Reminder {
     private String repeatType;
     private Date endDate;
     private String userId;
-    private Date createdAt; // Thêm trường này
-    private long numericId; // Thêm trường này
+    private Date createdAt;
+    private long numericId;
 
     @Exclude
     private String documentId;

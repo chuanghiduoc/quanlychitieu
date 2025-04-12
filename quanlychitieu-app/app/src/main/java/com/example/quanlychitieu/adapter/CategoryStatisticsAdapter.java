@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quanlychitieu.R;
+import com.example.quanlychitieu.ui.dashboard.ChartHelper;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -53,8 +54,10 @@ public class CategoryStatisticsAdapter extends RecyclerView.Adapter<CategoryStat
             totalAmount += amount;
         }
 
+        // Lấy map màu từ ChartHelper
+        Map<String, Integer> categoryColorMap = ChartHelper.createCategoryColorMap(context);
+
         // Thêm các mục vào danh sách
-        int colorIndex = 0;
         for (Map.Entry<String, Double> entry : categoryExpenses.entrySet()) {
             String category = entry.getKey();
             double amount = entry.getValue();
@@ -65,13 +68,11 @@ public class CategoryStatisticsAdapter extends RecyclerView.Adapter<CategoryStat
                 percentage = (int) Math.round((amount / totalAmount) * 100);
             }
 
-            // Lấy màu cho danh mục
-            int color = chartColors[colorIndex % chartColors.length];
+            // Lấy màu cho danh mục từ map
+            int color = categoryColorMap.getOrDefault(category, ContextCompat.getColor(context, R.color.chart_1));
 
             // Thêm vào danh sách
             items.add(new CategoryItem(category, amount, percentage, color));
-
-            colorIndex++;
         }
 
         notifyDataSetChanged();

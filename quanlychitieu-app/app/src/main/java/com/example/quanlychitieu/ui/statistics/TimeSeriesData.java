@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class to hold time series data for bar chart
+ * Lớp để chứa dữ liệu chuỗi thời gian cho biểu đồ cột
  */
 public class TimeSeriesData {
     private final List<String> labels;

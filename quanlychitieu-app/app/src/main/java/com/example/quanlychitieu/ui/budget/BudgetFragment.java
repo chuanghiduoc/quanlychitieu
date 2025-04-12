@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +19,7 @@ import com.example.quanlychitieu.adapter.BudgetAdapter;
 import com.example.quanlychitieu.data.model.Budget;
 import com.example.quanlychitieu.data.model.FinancialGoal;
 import com.example.quanlychitieu.databinding.FragmentBudgetBinding;
-import com.example.quanlychitieu.ui.goals.GoalPreviewAdapter;
+import com.example.quanlychitieu.adapter.GoalPreviewAdapter;
 import com.example.quanlychitieu.ui.goals.GoalsViewModel;
 
 import java.text.NumberFormat;
@@ -75,6 +74,13 @@ public class BudgetFragment extends Fragment {
 
         // Setup nút xem tất cả mục tiêu
         setupViewAllGoalsButton();
+
+        // Thiết lập nút tư vấn tài chính
+        binding.fabFinancialAdvisor.setOnClickListener(v -> {
+            // Chuyển đến màn hình tư vấn tài chính
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.financialAdvisorFragment);
+        });
     }
 
     @Override

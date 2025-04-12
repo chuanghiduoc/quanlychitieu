@@ -9,13 +9,6 @@ public class FinancialAdviceRequest {
         this.content = new Content(userId, message);
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public Content getContent() {
         return content;
