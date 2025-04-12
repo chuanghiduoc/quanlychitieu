@@ -195,7 +195,7 @@
     <!-- Màn hình tư vấn tài chính AI -->
     <fragment
         android:id="@+id/financialAdvisorFragment"
-        android:name="com.example.quanlychitieu.ui.goals.FinancialAdvisorFragment"
+        android:name="com.example.quanlychitieu.ui.chatbot.FinancialAdvisorFragment"
         android:label="Tư vấn tài chính"
         tools:layout="@layout/fragment_financial_advisor" />
 
