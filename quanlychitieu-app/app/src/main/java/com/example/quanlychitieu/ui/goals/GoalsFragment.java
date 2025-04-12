@@ -13,11 +13,11 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.quanlychitieu.R;
+import com.example.quanlychitieu.adapter.GoalAdapter;
 import com.example.quanlychitieu.data.model.FinancialGoal;
 import com.example.quanlychitieu.databinding.FragmentGoalsBinding;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GoalsFragment extends Fragment implements GoalAdapter.GoalClickListener {
 

@@ -1,0 +1,2329 @@
+[
+  {
+    "id": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+    "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocKFLki5rqM1TI22rQYlOEgQcmbIG4k4lRa7tibN0q5CWzKLdw=s96-c",
+    "createdAt": 1741797898232,
+    "displayName": "Lê Toán",
+    "email": "toanle2k17@gmail.com",
+    "budgets": [
+      {
+        "id": 1744343066307,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 500000,
+        "endDate": {
+          "_seconds": 1745984661,
+          "_nanoseconds": 429000000
+        },
+        "spent": 50000,
+        "notificationsEnabled": true,
+        "category": "Mua sắm",
+        "userId": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743479061,
+          "_nanoseconds": 429000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744343023701,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 2000000,
+        "endDate": {
+          "_seconds": 1745984617,
+          "_nanoseconds": 47000000
+        },
+        "spent": 1000000,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+        "notificationThreshold": 100,
+        "startDate": {
+          "_seconds": 1743479017,
+          "_nanoseconds": 47000000
+        },
+        "notificationSent": false
+      }
+    ],
+    "categories": [
+      {
+        "id": "user_categories",
+        "income": [],
+        "expense": [
+          "test"
+        ],
+        "user_categories": []
+      }
+    ],
+    "goals": [],
+    "reminders": [],
+    "transactions": [
+      {
+        "id": 1744342980717,
+        "date": {
+          "_seconds": 1744342972,
+          "_nanoseconds": 699000000
+        },
+        "note": "",
+        "amount": 5000000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Lương",
+        "userId": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Lương"
+      },
+      {
+        "id": 1744342999813,
+        "date": {
+          "_seconds": 1744342992,
+          "_nanoseconds": 849000000
+        },
+        "note": "",
+        "amount": -50000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Mua sắm",
+        "userId": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Mua sắm"
+      },
+      {
+        "id": 1744342588188,
+        "date": {
+          "_seconds": 1744342570,
+          "_nanoseconds": 149000000
+        },
+        "note": "",
+        "amount": -500000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "test",
+        "userId": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "test"
+      },
+      {
+        "id": 1744342568605,
+        "date": {
+          "_seconds": 1744342557,
+          "_nanoseconds": 197000000
+        },
+        "note": "",
+        "amount": -1000000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "61pjE7hqe7W2RmyZumdyWH4yGy73",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      }
+    ]
+  },
+  {
+    "id": "An3WPn0YL6bJhPobgZ8ENUBRrNz2",
+    "photoUrl": null,
+    "createdAt": 1741974279967,
+    "displayName": "tqt",
+    "email": "tqtq@emai.com",
+    "budgets": [],
+    "categories": [],
+    "goals": [],
+    "reminders": [],
+    "transactions": []
+  },
+  {
+    "id": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+    "photoUrl": null,
+    "createdAt": 1741858700914,
+    "displayName": "ducanh",
+    "email": "chucongducanh@gmail.com",
+    "budgets": [
+      {
+        "id": 1744295848834,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 3000000,
+        "endDate": {
+          "_seconds": 1746023841,
+          "_nanoseconds": 730000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Mua sắm",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743518241,
+          "_nanoseconds": 730000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741974288250,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 9999,
+        "endDate": {
+          "_seconds": 1743356680,
+          "_nanoseconds": 891000000
+        },
+        "spent": 7000000,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 90,
+        "startDate": {
+          "_seconds": 1740764680,
+          "_nanoseconds": 891000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741975065649,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 12,
+        "endDate": {
+          "_seconds": 1743357461,
+          "_nanoseconds": 16000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1740765461,
+          "_nanoseconds": 16000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744295818620,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 10000000,
+        "endDate": {
+          "_seconds": 1746023808,
+          "_nanoseconds": 237000000
+        },
+        "spent": 213232,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743518208,
+          "_nanoseconds": 237000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741886612359,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 3000000,
+        "endDate": {
+          "_seconds": 1743355404,
+          "_nanoseconds": 479000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Di chuyển",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 90,
+        "startDate": {
+          "_seconds": 1740763404,
+          "_nanoseconds": 479000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741961586750,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 3000,
+        "endDate": {
+          "_seconds": 1743430380,
+          "_nanoseconds": 166000000
+        },
+        "spent": 100000000,
+        "notificationsEnabled": true,
+        "category": "Mua sắm",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1740838380,
+          "_nanoseconds": 166000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741886530396,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 50000001,
+        "endDate": {
+          "_seconds": 1743355307,
+          "_nanoseconds": 480000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1740763307,
+          "_nanoseconds": 480000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744295839078,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 2000000,
+        "endDate": {
+          "_seconds": 1746023832,
+          "_nanoseconds": 255000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Di chuyển",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743518232,
+          "_nanoseconds": 255000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741974070994,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1,
+        "endDate": {
+          "_seconds": 1743356463,
+          "_nanoseconds": 582000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Di chuyển",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 100,
+        "startDate": {
+          "_seconds": 1740764463,
+          "_nanoseconds": 582000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744296165079,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1200000,
+        "endDate": {
+          "_seconds": 1746024157,
+          "_nanoseconds": 457000000
+        },
+        "spent": 1231233,
+        "notificationsEnabled": true,
+        "category": "Hóa đơn",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743518557,
+          "_nanoseconds": 457000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741973179175,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 160000,
+        "endDate": {
+          "_seconds": 1743355573,
+          "_nanoseconds": 267000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Di chuyển",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1740763573,
+          "_nanoseconds": 267000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741963406687,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 12345,
+        "endDate": {
+          "_seconds": 1743432201,
+          "_nanoseconds": 8000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1740840201,
+          "_nanoseconds": 8000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744298325283,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1000000,
+        "endDate": {
+          "_seconds": 1746026314,
+          "_nanoseconds": 619000000
+        },
+        "spent": 179982,
+        "notificationsEnabled": true,
+        "category": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743520714,
+          "_nanoseconds": 619000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744343005059,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 3000000,
+        "endDate": {
+          "_seconds": 1745984599,
+          "_nanoseconds": 177000000
+        },
+        "spent": 9000,
+        "notificationsEnabled": true,
+        "category": "Khác",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743478999,
+          "_nanoseconds": 177000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1741973726481,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1000000,
+        "endDate": {
+          "_seconds": 1743356109,
+          "_nanoseconds": 163000000
+        },
+        "spent": 0,
+        "notificationsEnabled": true,
+        "category": "Mua sắm",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "notificationThreshold": 90,
+        "startDate": {
+          "_seconds": 1740764109,
+          "_nanoseconds": 163000000
+        },
+        "notificationSent": false
+      }
+    ],
+    "categories": [
+      {
+        "id": "user_categories",
+        "income": [
+          "ca do"
+        ],
+        "expense": [
+          "Ca Do"
+        ],
+        "user_categories": []
+      }
+    ],
+    "goals": [
+      {
+        "id": 1744344093630,
+        "targetAmount": 5000000,
+        "endDate": {
+          "_seconds": 1775880076,
+          "_nanoseconds": 35000000
+        },
+        "name": "ca do",
+        "description": "",
+        "currentAmount": 1200000,
+        "completed": false,
+        "category": "",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "startDate": {
+          "_seconds": 1744344076,
+          "_nanoseconds": 35000000
+        }
+      }
+    ],
+    "reminders": [
+      {
+        "id": "dfjQ1dwQpB6sb28PsE8k",
+        "dateTime": {
+          "_seconds": 1744298591,
+          "_nanoseconds": 931000000
+        },
+        "numericId": 1744298604716,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1744298604,
+          "_nanoseconds": 717000000
+        },
+        "amount": 10000,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "aSC",
+        "category": "Internet",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isCompleted": true
+      },
+      {
+        "id": "fxds5r3uKVLGjW5q2Lbc",
+        "dateTime": {
+          "_seconds": 1744364201,
+          "_nanoseconds": 458000000
+        },
+        "numericId": 1744364234243,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1744364234,
+          "_nanoseconds": 243000000
+        },
+        "amount": 9000,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "ve",
+        "category": "Chi tiêu cá nhân",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isCompleted": true
+      }
+    ],
+    "transactions": [
+      {
+        "id": 1744367254903,
+        "date": {
+          "_seconds": 1744367217,
+          "_nanoseconds": 474000000
+        },
+        "note": "",
+        "amount": -123000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "banh banh",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "banh banh"
+      },
+      {
+        "id": 1744444723188,
+        "date": {
+          "_seconds": 1745187990,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723183,
+        "date": {
+          "_seconds": 1745015190,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723200,
+        "date": {
+          "_seconds": 1745792790,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723226,
+        "date": {
+          "_seconds": 1747002390,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723205,
+        "date": {
+          "_seconds": 1746051990,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744299241551,
+        "date": {
+          "_seconds": 1744299233,
+          "_nanoseconds": 922000000
+        },
+        "note": "",
+        "amount": 2000000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1744444723202,
+        "date": {
+          "_seconds": 1745879190,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744299315747,
+        "date": {
+          "_seconds": 1744299308,
+          "_nanoseconds": 282000000
+        },
+        "note": "",
+        "amount": 120000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "ca do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "ca do"
+      },
+      {
+        "id": 1744444723193,
+        "date": {
+          "_seconds": 1745447190,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444809453,
+        "date": {
+          "_seconds": 1744444803,
+          "_nanoseconds": 78000000
+        },
+        "note": "",
+        "amount": -232,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1744444723170,
+        "date": {
+          "_seconds": 1744496790,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1741858752330,
+        "date": {
+          "_seconds": 1741858745,
+          "_nanoseconds": 941000000
+        },
+        "note": "",
+        "amount": 5000000,
+        "isIncome": true,
+        "repeat": false,
+        "description": "Lương",
+        "category": "Lương",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1"
+      },
+      {
+        "id": 1744364247224,
+        "date": {
+          "_seconds": 1744364247,
+          "_nanoseconds": 224000000
+        },
+        "note": "ve",
+        "amount": -9000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": null,
+        "description": "Chi tiêu cá nhân",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Khác"
+      },
+      {
+        "id": 1744444723181,
+        "date": {
+          "_seconds": 1744928790,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723197,
+        "date": {
+          "_seconds": 1745619990,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723203,
+        "date": {
+          "_seconds": 1745965590,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723178,
+        "date": {
+          "_seconds": 1744842390,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744445338782,
+        "date": {
+          "_seconds": 1744445331,
+          "_nanoseconds": 252000000
+        },
+        "note": "",
+        "amount": -100000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1744444723172,
+        "date": {
+          "_seconds": 1744583190,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723174,
+        "date": {
+          "_seconds": 1744669590,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744300242100,
+        "date": {
+          "_seconds": 1744300147,
+          "_nanoseconds": 899000000
+        },
+        "note": "",
+        "amount": 10000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "ca do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "ca do"
+      },
+      {
+        "id": 1744444723224,
+        "date": {
+          "_seconds": 1746915990,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744300984282,
+        "date": {
+          "_seconds": 1744300978,
+          "_nanoseconds": 84000000
+        },
+        "note": "",
+        "amount": 21000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1744342758494,
+        "date": {
+          "_seconds": 1744342749,
+          "_nanoseconds": 507000000
+        },
+        "note": "",
+        "amount": -113000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1744444723207,
+        "date": {
+          "_seconds": 1746138390,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723191,
+        "date": {
+          "_seconds": 1745360790,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1741858722523,
+        "date": {
+          "_seconds": 1741858712,
+          "_nanoseconds": 501000000
+        },
+        "note": "",
+        "amount": -100000000,
+        "isIncome": false,
+        "repeat": false,
+        "description": "Mua sắm",
+        "category": "Mua sắm",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1"
+      },
+      {
+        "id": 1744444723219,
+        "date": {
+          "_seconds": 1746656790,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723216,
+        "date": {
+          "_seconds": 1746570390,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723176,
+        "date": {
+          "_seconds": 1744755990,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723213,
+        "date": {
+          "_seconds": 1746397590,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723189,
+        "date": {
+          "_seconds": 1745274390,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744297208780,
+        "date": {
+          "_seconds": 1746889160,
+          "_nanoseconds": 712000000
+        },
+        "note": "",
+        "amount": -11000000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1746889160,
+          "_nanoseconds": 712000000
+        },
+        "repeatType": "Hàng tháng",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744299816596,
+        "date": {
+          "_seconds": 1744299802,
+          "_nanoseconds": 634000000
+        },
+        "note": "",
+        "amount": 1200000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Lương",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Lương"
+      },
+      {
+        "id": 1744444723211,
+        "date": {
+          "_seconds": 1746311190,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723199,
+        "date": {
+          "_seconds": 1745706390,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723222,
+        "date": {
+          "_seconds": 1746829590,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723186,
+        "date": {
+          "_seconds": 1745101590,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723215,
+        "date": {
+          "_seconds": 1746483990,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723195,
+        "date": {
+          "_seconds": 1745533590,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723209,
+        "date": {
+          "_seconds": 1746224790,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      },
+      {
+        "id": 1744444723220,
+        "date": {
+          "_seconds": 1746743190,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -9999,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": {
+          "_seconds": 1747036650,
+          "_nanoseconds": 864000000
+        },
+        "repeatType": "Hàng ngày",
+        "description": "Ca Do",
+        "userId": "f1YpN2pH2hOpxsQOoWvRDgFZJos1",
+        "isGoalContribution": false,
+        "repeat": true,
+        "category": "Ca Do"
+      }
+    ]
+  },
+  {
+    "id": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+    "photoUrl": null,
+    "createdAt": 1743330778170,
+    "displayName": "Phung Thi Thu Huyen",
+    "email": "phuyen24@gmail.com",
+    "budgets": [],
+    "categories": [
+      {
+        "id": "user_categories",
+        "income": [],
+        "expense": [
+          "di choi",
+          "chi CChoi"
+        ],
+        "user_categories": []
+      }
+    ],
+    "goals": [
+      {
+        "id": 1744307152253,
+        "targetAmount": 2000000,
+        "endDate": {
+          "_seconds": 1756662288,
+          "_nanoseconds": 660000000
+        },
+        "name": "du lich",
+        "description": "",
+        "currentAmount": 500000,
+        "completed": false,
+        "category": "Du lịch",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "startDate": {
+          "_seconds": 1744307088,
+          "_nanoseconds": 660000000
+        }
+      }
+    ],
+    "reminders": [],
+    "transactions": [
+      {
+        "id": 1744306820804,
+        "date": {
+          "_seconds": 1744306805,
+          "_nanoseconds": 515000000
+        },
+        "note": "",
+        "amount": 3000000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Lương",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Lương"
+      },
+      {
+        "id": 1743388814097,
+        "date": {
+          "_seconds": 1743388596,
+          "_nanoseconds": 946000000
+        },
+        "note": "",
+        "amount": 1000000,
+        "isIncome": true,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Lương",
+        "category": "Lương",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1"
+      },
+      {
+        "id": 1744306862973,
+        "date": {
+          "_seconds": 1744306842,
+          "_nanoseconds": 165000000
+        },
+        "note": "Do dung",
+        "amount": -200000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Mua sắm",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Mua sắm"
+      },
+      {
+        "id": 1744306883932,
+        "date": {
+          "_seconds": 1744306870,
+          "_nanoseconds": 178000000
+        },
+        "note": "dien nuoc",
+        "amount": -260000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Hóa đơn",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Hóa đơn"
+      },
+      {
+        "id": 1744345308659,
+        "date": {
+          "_seconds": 1744345301,
+          "_nanoseconds": 720000000
+        },
+        "note": "",
+        "amount": -123123,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "di choi",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "di choi"
+      },
+      {
+        "id": 1744307174909,
+        "date": {
+          "_seconds": 1744307174,
+          "_nanoseconds": 909000000
+        },
+        "note": "Đóng góp vào mục tiêu: du lich",
+        "amount": -500000,
+        "goalId": "tfugrnOIkTSC0jePMfMq",
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": null,
+        "description": "Đóng góp: du lich",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": true,
+        "repeat": false,
+        "category": "Tiết kiệm"
+      },
+      {
+        "id": 1744345643295,
+        "date": {
+          "_seconds": 1744345633,
+          "_nanoseconds": 661000000
+        },
+        "note": "",
+        "amount": 500000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Thưởng",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Thưởng"
+      },
+      {
+        "id": 1744345330327,
+        "date": {
+          "_seconds": 1744345318,
+          "_nanoseconds": 419000000
+        },
+        "note": "",
+        "amount": -1231231,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "chi CChoi",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "chi CChoi"
+      },
+      {
+        "id": 1744306836720,
+        "date": {
+          "_seconds": 1744306824,
+          "_nanoseconds": 919000000
+        },
+        "note": "",
+        "amount": -50000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1743330882800,
+        "date": {
+          "_seconds": 1743328810,
+          "_nanoseconds": 495000000
+        },
+        "note": "di cho",
+        "amount": -50000,
+        "isIncome": false,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "category": "Ăn uống",
+        "userId": "k1anGQoKBvYTMYgs4D4U2xmLahq1"
+      }
+    ]
+  },
+  {
+    "id": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+    "photoUrl": null,
+    "createdAt": 1741797740211,
+    "displayName": "Đào Thành Hà",
+    "email": "daothanhha120204@gmail.com",
+    "budgets": [
+      {
+        "id": 1744349204448,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 500000,
+        "endDate": {
+          "_seconds": 1745990796,
+          "_nanoseconds": 512000000
+        },
+        "spent": 50000,
+        "notificationsEnabled": true,
+        "category": "Di chuyển",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743485196,
+          "_nanoseconds": 512000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744349167250,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1000000,
+        "endDate": {
+          "_seconds": 1745990759,
+          "_nanoseconds": 385000000
+        },
+        "spent": 500000,
+        "notificationsEnabled": true,
+        "category": "Ăn uống",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743485159,
+          "_nanoseconds": 385000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744349224295,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1500000,
+        "endDate": {
+          "_seconds": 1745990820,
+          "_nanoseconds": 193000000
+        },
+        "spent": 500000,
+        "notificationsEnabled": true,
+        "category": "Khác",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743485220,
+          "_nanoseconds": 193000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744349218572,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 1000000,
+        "endDate": {
+          "_seconds": 1745990813,
+          "_nanoseconds": 302000000
+        },
+        "spent": 300000,
+        "notificationsEnabled": true,
+        "category": "Hóa đơn",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743485213,
+          "_nanoseconds": 302000000
+        },
+        "notificationSent": false
+      },
+      {
+        "id": 1744349211544,
+        "recurringExpenseNotifications": {},
+        "note": "",
+        "amount": 500000,
+        "endDate": {
+          "_seconds": 1745990806,
+          "_nanoseconds": 426000000
+        },
+        "spent": 200000,
+        "notificationsEnabled": true,
+        "category": "Mua sắm",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "notificationThreshold": 80,
+        "startDate": {
+          "_seconds": 1743485206,
+          "_nanoseconds": 426000000
+        },
+        "notificationSent": false
+      }
+    ],
+    "categories": [
+      {
+        "id": "user_categories",
+        "income": [],
+        "expense": [],
+        "user_categories": []
+      }
+    ],
+    "goals": [
+      {
+        "id": 1744349333660,
+        "targetAmount": 5000000,
+        "endDate": {
+          "_seconds": 1775885299,
+          "_nanoseconds": 894000000
+        },
+        "name": "ăn sập hà nội",
+        "description": "ăn hết món ngon hà nội",
+        "currentAmount": 500000,
+        "completed": false,
+        "category": "Ăn uống",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "startDate": {
+          "_seconds": 1744349299,
+          "_nanoseconds": 894000000
+        }
+      }
+    ],
+    "reminders": [],
+    "transactions": [
+      {
+        "id": 1744349282690,
+        "date": {
+          "_seconds": 1744349275,
+          "_nanoseconds": 970000000
+        },
+        "note": "",
+        "amount": -300000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Hóa đơn",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Hóa đơn"
+      },
+      {
+        "id": 1744349260445,
+        "date": {
+          "_seconds": 1744349252,
+          "_nanoseconds": 689000000
+        },
+        "note": "",
+        "amount": -200000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Mua sắm",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Mua sắm"
+      },
+      {
+        "id": 1744349150019,
+        "date": {
+          "_seconds": 1744349145,
+          "_nanoseconds": 297000000
+        },
+        "note": "",
+        "amount": -500000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Ăn uống",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Ăn uống"
+      },
+      {
+        "id": 1744349291718,
+        "date": {
+          "_seconds": 1744349285,
+          "_nanoseconds": 424000000
+        },
+        "note": "",
+        "amount": -500000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Khác",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Khác"
+      },
+      {
+        "id": 1744349134553,
+        "date": {
+          "_seconds": 1744349125,
+          "_nanoseconds": 991000000
+        },
+        "note": "",
+        "amount": 5000000,
+        "goalId": null,
+        "isIncome": true,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Lương",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Lương"
+      },
+      {
+        "id": 1744349344477,
+        "date": {
+          "_seconds": 1744349344,
+          "_nanoseconds": 477000000
+        },
+        "note": "Đóng góp vào mục tiêu: ăn sập hà nội",
+        "amount": -300000,
+        "goalId": "tC750GwwCtlLzLxzyplb",
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": null,
+        "description": "Đóng góp: ăn sập hà nội",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": true,
+        "repeat": false,
+        "category": "Tiết kiệm"
+      },
+      {
+        "id": 1744349184731,
+        "date": {
+          "_seconds": 1744349177,
+          "_nanoseconds": 947000000
+        },
+        "note": "",
+        "amount": -50000,
+        "goalId": null,
+        "isIncome": false,
+        "endDate": null,
+        "repeatType": "None",
+        "description": "Di chuyển",
+        "userId": "qfgGJWtlcpMWOzhAJxco02SRTNh2",
+        "isGoalContribution": false,
+        "repeat": false,
+        "category": "Di chuyển"
+      }
+    ]
+  },
+  {
+    "id": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+    "photoUrl": null,
+    "createdAt": 1741785210131,
+    "displayName": "Lê Vạn Bảo Trọng",
+    "email": "levanbaotrong03@gmail.com",
+    "budgets": [],
+    "categories": [],
+    "goals": [],
+    "reminders": [
+      {
+        "id": "4k2OxqKsBYE7aHSgECCl",
+        "dateTime": {
+          "_seconds": 1741968429,
+          "_nanoseconds": 935000000
+        },
+        "numericId": 1741968388048,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741968388,
+          "_nanoseconds": 49000000
+        },
+        "amount": 123,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123",
+        "category": "Tiền thuê nhà",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "6H4CktrlbjvXv3IeF9te",
+        "dateTime": {
+          "_seconds": 1742355122,
+          "_nanoseconds": 563000000
+        },
+        "numericId": 1742182333413,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1742182333,
+          "_nanoseconds": 413000000
+        },
+        "amount": 23423,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "ghjhbnb",
+        "category": "Tiền điện",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": false
+      },
+      {
+        "id": "GWByqVFR8DHBDZrch2Cm",
+        "dateTime": {
+          "_seconds": 1742177738,
+          "_nanoseconds": 986000000
+        },
+        "numericId": 1742177753318,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1742177753,
+          "_nanoseconds": 318000000
+        },
+        "amount": 1231245,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "kdjakk",
+        "category": "Tiền nước",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "JgbJ9PBP8yzZlXQEIKVz",
+        "dateTime": {
+          "_seconds": 1741969223,
+          "_nanoseconds": 702000000
+        },
+        "numericId": 1741969173306,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741969173,
+          "_nanoseconds": 306000000
+        },
+        "amount": 12312312,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123",
+        "category": "Trả góp",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "KyWfroYsA4xQLdO85MQh",
+        "dateTime": {
+          "_seconds": 1742182303,
+          "_nanoseconds": 38000000
+        },
+        "numericId": 1742182310511,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1742182310,
+          "_nanoseconds": 511000000
+        },
+        "amount": 5645424,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "gfh",
+        "category": "Tiền điện",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "MsMAdWbF7f45GFe6EF7b",
+        "dateTime": {
+          "_seconds": 1741967899,
+          "_nanoseconds": 988000000
+        },
+        "numericId": 1741967795720,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741967795,
+          "_nanoseconds": 720000000
+        },
+        "amount": 123123123,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123123123",
+        "category": "Internet",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "NTbXIw6DUab1YqpYixBT",
+        "dateTime": {
+          "_seconds": 1741969195,
+          "_nanoseconds": 512000000
+        },
+        "numericId": 1741969157982,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741969157,
+          "_nanoseconds": 982000000
+        },
+        "amount": 5000000,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "tetata",
+        "category": "Tiền thuê nhà",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "PZvwcVUwag0OlNoZ9Ugf",
+        "dateTime": {
+          "_seconds": 1742274535,
+          "_nanoseconds": 18000000
+        },
+        "numericId": 1742274488074,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1742274488,
+          "_nanoseconds": 74000000
+        },
+        "amount": 12312312,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "1231231",
+        "category": "Chi tiêu cá nhân",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "R7e15Zt8jIJc6AwJfLjS",
+        "dateTime": {
+          "_seconds": 1741969721,
+          "_nanoseconds": 178000000
+        },
+        "numericId": 1741969735030,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741969735,
+          "_nanoseconds": 30000000
+        },
+        "amount": 123,
+        "isRepeating": true,
+        "endDate": {
+          "_seconds": 1742056121,
+          "_nanoseconds": 178000000
+        },
+        "repeatType": "DAILY",
+        "title": "123",
+        "category": "Tiền điện",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "b3Q9kEeJLORaRSTdelcB",
+        "dateTime": {
+          "_seconds": 1741967745,
+          "_nanoseconds": 606000000
+        },
+        "numericId": 1741967767660,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741967767,
+          "_nanoseconds": 660000000
+        },
+        "amount": 12346,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "test",
+        "category": "Tiền nước",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "eX6QH24jIlIq5P3sLleU",
+        "dateTime": {
+          "_seconds": 1741968274,
+          "_nanoseconds": 377000000
+        },
+        "numericId": 1741968216853,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741968216,
+          "_nanoseconds": 854000000
+        },
+        "amount": 123456,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "teat",
+        "category": "Tiền điện",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "p69rfn9zHqKNEk9y1i3w",
+        "dateTime": {
+          "_seconds": 1741967155,
+          "_nanoseconds": 567000000
+        },
+        "numericId": 1741967165407,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741967165,
+          "_nanoseconds": 407000000
+        },
+        "amount": 123,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123",
+        "category": "Tiền thuê nhà",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "pf81J8UnIKoogwdwLrGs",
+        "dateTime": {
+          "_seconds": 1742054759,
+          "_nanoseconds": 666000000
+        },
+        "numericId": 1741968368855,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1741968368,
+          "_nanoseconds": 855000000
+        },
+        "amount": 123,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123",
+        "category": "Tiền thuê nhà",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": false
+      },
+      {
+        "id": "qOk4eFgKl7ygQ2biZ4ei",
+        "dateTime": {
+          "_seconds": 1742311446,
+          "_nanoseconds": 694000000
+        },
+        "numericId": 1742311452737,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1742311452,
+          "_nanoseconds": 737000000
+        },
+        "amount": 123,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123",
+        "category": "Hóa đơn",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      },
+      {
+        "id": "sp1LN5xRf753wEMJYehP",
+        "dateTime": {
+          "_seconds": 1742390010,
+          "_nanoseconds": 367000000
+        },
+        "numericId": 1742389970691,
+        "note": "",
+        "createdAt": {
+          "_seconds": 1742389970,
+          "_nanoseconds": 691000000
+        },
+        "amount": 1231231,
+        "isRepeating": false,
+        "repeatType": null,
+        "title": "123123",
+        "category": "Tiền điện",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83",
+        "isCompleted": true
+      }
+    ],
+    "transactions": [
+      {
+        "id": 1742314859030,
+        "date": {
+          "_seconds": 1742314850,
+          "_nanoseconds": 276000000
+        },
+        "note": "",
+        "amount": -200000,
+        "isIncome": false,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Hóa đơn",
+        "category": "Hóa đơn",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742310943600,
+        "date": {
+          "_seconds": 1742483715,
+          "_nanoseconds": 25000000
+        },
+        "note": "",
+        "amount": 2000000,
+        "isIncome": true,
+        "endDate": {
+          "_seconds": 1742483715,
+          "_nanoseconds": 25000000
+        },
+        "repeat": true,
+        "repeatType": "Hàng ngày",
+        "description": "Lương",
+        "category": "Lương",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742310943598,
+        "date": {
+          "_seconds": 1742310915,
+          "_nanoseconds": 25000000
+        },
+        "note": "",
+        "amount": 2000000,
+        "isIncome": true,
+        "endDate": {
+          "_seconds": 1742483715,
+          "_nanoseconds": 25000000
+        },
+        "repeat": true,
+        "repeatType": "Hàng ngày",
+        "description": "Lương",
+        "category": "Lương",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742299080422,
+        "date": {
+          "_seconds": 1742299072,
+          "_nanoseconds": 844000000
+        },
+        "note": "",
+        "amount": -1000000,
+        "isIncome": false,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Mua sắm",
+        "category": "Mua sắm",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742311135331,
+        "date": {
+          "_seconds": 1742311126,
+          "_nanoseconds": 864000000
+        },
+        "note": "",
+        "amount": -10000,
+        "isIncome": false,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Hóa đơn",
+        "category": "Hóa đơn",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742310856743,
+        "date": {
+          "_seconds": 1742310849,
+          "_nanoseconds": 541000000
+        },
+        "note": "",
+        "amount": 10000000,
+        "isIncome": true,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Lương",
+        "category": "Lương",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742299250585,
+        "date": {
+          "_seconds": 1742299245,
+          "_nanoseconds": 441000000
+        },
+        "note": "",
+        "amount": -123123,
+        "isIncome": false,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Mua sắm",
+        "category": "Mua sắm",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      },
+      {
+        "id": 1742301694799,
+        "date": {
+          "_seconds": 1742299254,
+          "_nanoseconds": 239000000
+        },
+        "note": "",
+        "amount": -231230,
+        "isIncome": false,
+        "endDate": null,
+        "repeat": false,
+        "repeatType": "None",
+        "description": "Di chuyển",
+        "category": "Di chuyển",
+        "userId": "uiLqA2sYNXf2EGCn0i08a35JJR83"
+      }
+    ]
+  }
+]
